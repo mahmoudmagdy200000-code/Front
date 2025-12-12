@@ -1,0 +1,76 @@
+{
+    "app": {
+        "title": "RAS SEDR RENTAL",
+        "welcome": "مرحباً بك"
+    },
+    "nav": {
+        "home": "الرئيسية",
+        "chalets": "الشاليهات",
+        "bookings": "الحجوزات",
+        "login": "تسجيل الدخول",
+        "dashboard": "لوحة التحكم"
+    },
+    "chalet": {
+        "pricePerNight": "{{price}} جنيه / ليلة",
+        "viewDetails": "عرض التفاصيل",
+        "book": "احجز الآن",
+        "description": "الوصف"
+    },
+    "booking": {
+        "title": "احجز الآن",
+        "checkIn": "تاريخ الوصول",
+        "checkOut": "تاريخ المغادرة",
+        "phone": "رقم الهاتف",
+        "phonePlaceholder": "أدخل رقم هاتفك",
+        "checkAvailability": "تحقق من التوافر",
+        "confirm": "تأكيد الحجز",
+        "available": "الشاليه متاح للحجز!",
+        "notAvailable": "الشاليه غير متاح في هذه التواريخ",
+        "selectDates": "يرجى اختيار تواريخ الوصول والمغادرة",
+        "enterPhone": "يرجى إدخال رقم الهاتف",
+        "success": "تم الحجز بنجاح! سنتواصل معك قريباً.",
+        "failed": "فشل الحجز. يرجى المحاولة مرة أخرى.",
+        "nights": "{{count}} ليلة",
+        "totalPrice": "السعر الإجمالي",
+        "fillAllFields": "يرجى ملء جميع الحقول",
+        "yourPhone": "رقم الهاتف",
+        "invalidPhone": "رقم الهاتف يجب أن يتكون من 11 رقم"
+    },
+    "login": {
+        "ownerPortal": "بوابة المالك",
+        "subtitle": "قم بتسجيل الدخول لإدارة شاليهاتك",
+        "username": "اسم المستخدم",
+        "usernamePlaceholder": "أدخل اسم المستخدم",
+        "password": "كلمة المرور",
+        "passwordPlaceholder": "أدخل كلمة المرور",
+        "submit": "تسجيل الدخول",
+        "failed": "فشل تسجيل الدخول. تحقق من بياناتك.",
+        "fillAllFields": "يرجى ملء جميع الحقول",
+        "demoCredentials": "بيانات تجريبية للاختبار:"
+    },
+    "dashboard": {
+        "title": "لوحة التحكم",
+        "myChalets": "شاليهاتي",
+        "addChalet": "إضافة شاليه",
+        "edit": "تعديل",
+        "delete": "حذف",
+        "confirmDelete": "هل أنت متأكد من حذف هذا الشاليه؟",
+        "titleEn": "العنوان بالإنجليزية",
+        "titleAr": "العنوان بالعربية",
+        "descriptionEn": "الوصف بالإنجليزية",
+        "descriptionAr": "الوصف بالعربية",
+        "pricePerNight": "السعر لكل ليلة",
+        "create": "إنشاء",
+        "update": "تحديث",
+        "bookingReference": "رقم الحجز"
+    },
+    "common": {
+        "loading": "جاري التحميل...",
+        "error": "حدث خطأ",
+        "noData": "لا توجد بيانات",
+        "back": "رجوع",
+        "backToHome": "العودة للرئيسية",
+        "sar": "جنيه",
+        "cancel": "إلغاء"
+    }
+}

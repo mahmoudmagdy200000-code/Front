@@ -1,0 +1,77 @@
+{
+    "app": {
+        "title": "RAS SEDR RENTAL",
+        "welcome": "Welcome"
+    },
+    "nav": {
+        "home": "Home",
+        "chalets": "Chalets",
+        "bookings": "Bookings",
+        "login": "Login",
+        "dashboard": "Dashboard"
+    },
+    "chalet": {
+        "pricePerNight": "{{price}} EGP / night",
+        "viewDetails": "View Details",
+        "book": "Book Now",
+        "description": "Description"
+    },
+    "booking": {
+        "title": "Book Now",
+        "checkIn": "Check-in Date",
+        "checkOut": "Check-out Date",
+        "phone": "Phone Number",
+        "phonePlaceholder": "Enter your phone number",
+        "checkAvailability": "Check Availability",
+        "confirm": "Confirm Booking",
+        "available": "Chalet is available for booking!",
+        "notAvailable": "Chalet is not available for these dates",
+        "selectDates": "Please select check-in and check-out dates",
+        "enterPhone": "Please enter your phone number",
+        "success": "Booking successful! We will contact you soon.",
+        "failed": "Booking failed. Please try again.",
+        "nights": "{{count}} Night",
+        "nights_plural": "{{count}} Nights",
+        "totalPrice": "Total Price",
+        "fillAllFields": "Please fill all fields",
+        "yourPhone": "Phone Number",
+        "invalidPhone": "Phone number must be 11 digits"
+    },
+    "login": {
+        "ownerPortal": "Owner Portal",
+        "subtitle": "Login to manage your chalets",
+        "username": "Username",
+        "usernamePlaceholder": "Enter your username",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "submit": "Login",
+        "failed": "Login failed. Check your credentials.",
+        "fillAllFields": "Please fill all fields",
+        "demoCredentials": "Demo credentials for testing:"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "myChalets": "My Chalets",
+        "addChalet": "Add Chalet",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirmDelete": "Are you sure you want to delete this chalet?",
+        "titleEn": "Title (English)",
+        "titleAr": "Title (Arabic)",
+        "descriptionEn": "Description (English)",
+        "descriptionAr": "Description (Arabic)",
+        "pricePerNight": "Price Per Night",
+        "create": "Create",
+        "update": "Update",
+        "bookingReference": "Booking Reference"
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "noData": "No data available",
+        "back": "Back",
+        "backToHome": "Back to Home",
+        "sar": "EGP",
+        "cancel": "Cancel"
+    }
+}

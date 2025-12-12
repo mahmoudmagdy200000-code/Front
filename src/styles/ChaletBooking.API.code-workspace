@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../ChaletBooking.API"
+		},
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../node_modules"
+		}
+	]
+}

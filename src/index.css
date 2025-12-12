@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+
+/* Calendar Customization */
+.react-calendar {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  border-radius: 0.5rem;
+  border: none;
+  box-shadow: none;
+  width: 100%;
+  background-color: white;
+}
+
+.react-calendar__navigation {
+  margin-bottom: 1rem;
+}
+
+.react-calendar__navigation button {
+  min-width: 44px;
+  background-color: transparent;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  border-radius: 0.5rem;
+  transition-property: color, background-color;
+  transition-duration: 150ms;
+}
+
+.react-calendar__navigation button:hover {
+  background-color: #f3f4f6;
+}
+
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  text-decoration: none;
+}
+
+/* General Day Style - Force Black Text */
+.react-calendar__tile,
+.react-calendar__month-view__days__day,
+.react-calendar__month-view__days__day--weekend,
+.react-calendar__month-view__days__day--neighboringMonth {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000000 !important;
+  /* Force black text for EVERYTHING */
+  text-decoration: none !important;
+  border-radius: 0.5rem;
+  transition-property: background-color;
+  transition-duration: 150ms;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__month-view__days__day:enabled:hover {
+  background-color: #e5e7eb;
+}
+
+.react-calendar__tile--active {
+  background-color: #2563eb;
+  color: white;
+}
+
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+  background-color: #1d4ed8;
+}
+
+/* Current Date Style - Teal Background (Persistent - Overrides Active) */
+.react-calendar__tile--now,
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus,
+.react-calendar__tile--now.react-calendar__tile--active,
+.react-calendar__tile--now.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--now.react-calendar__tile--active:enabled:focus {
+  background-color: #5eead4 !important;
+  /* Teal 300 */
+  color: #000000 !important;
+  font-weight: 900 !important;
+  border: 2px solid #0f766e !important;
+  /* Teal 700 */
+}
+
+/* Booked Date Style */
+.booked-date {
+  background-color: #fee2e2 !important;
+  color: #7f1d1d !important;
+  background-image: repeating-linear-gradient(45deg,
+      #fee2e2,
+      #fee2e2 10px,
+      #f87171 10px,
+      #f87171 20px);
+  border: 2px dashed #b91c1c !important;
+  font-weight: 800;
+}
