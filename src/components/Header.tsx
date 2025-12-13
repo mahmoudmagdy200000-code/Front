@@ -135,8 +135,8 @@ const Header = () => {
                     <div className="flex items-center gap-2 sm:gap-4 order-2 md:order-3">
 
 
-                        {/* Desktop Actions (Hidden on Mobile) */}
-                        <div className="hidden md:flex items-center gap-4">
+                        {/* Desktop Actions (Hidden on Mobile/Tablet) */}
+                        <div className="hidden lg:flex items-center gap-4">
                             {!isAuthenticated && (
                                 <LanguageSwitcher />
                             )}
