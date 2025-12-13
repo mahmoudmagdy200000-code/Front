@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { Chalet } from '../../types/chalet';
@@ -15,6 +16,13 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
     const navigate = useNavigate();
     const isArabic = i18n.language === 'ar';
 
+    const [imgError, setImgError] = useState(false);
+
+    // Reset error state when chalet changes
+    useEffect(() => {
+        setImgError(false);
+    }, [chalet.Id]);
+
     // Helper for safe description truncation (although line-clamp handles visual truncation)
     const getDescription = () => {
         const desc = isArabic ? chalet.DescriptionAr : chalet.DescriptionEn;
@@ -25,17 +33,19 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
         <div className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden flex flex-col h-full relative">
             {/* Image Section - Enforce h-48 and object-cover */}
             <div className="relative h-48 w-full bg-gray-100">
-                {chalet.Images && chalet.Images.length > 0 ? (
+                {chalet.Images && chalet.Images.length > 0 && !imgError ? (
                     <img
                         src={getImageUrl(chalet.Images.find(i => i.IsPrimary)?.ImageUrl || chalet.Images[0].ImageUrl)}
                         alt={isArabic ? chalet.TitleAr : chalet.TitleEn}
+                        onError={() => setImgError(true)}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
-                        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50">
+                        <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
+                        <span className="text-xs text-gray-400 font-medium">No Image</span>
                     </div>
                 )}
 
