@@ -39,6 +39,10 @@ const ChaletCard = ({ chalet, checkIn, checkOut }: ChaletCardProps) => {
                         src={getImageUrl(displayImage)}
                         alt={title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        onError={(e) => {
+                            e.currentTarget.src = 'https://placehold.co/600x400/1e293b/ffffff?text=No+Image';
+                            e.currentTarget.onerror = null; // Prevent infinite loop
+                        }}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300">

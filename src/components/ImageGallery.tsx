@@ -61,6 +61,10 @@ const ImageGallery = ({ images, autoPlayInterval = 4000 }: ImageGalleryProps) =>
                     alt={`Slide ${currentIndex + 1}`}
                     className="w-full h-full object-cover transition-opacity duration-700"
                     key={currentImage.Id}
+                    onError={(e) => {
+                        e.currentTarget.src = 'https://placehold.co/800x600/1e293b/ffffff?text=Image+Not+Found';
+                        e.currentTarget.onerror = null;
+                    }}
                 />
 
                 {/* Gradient Overlay */}
@@ -131,6 +135,10 @@ const ImageGallery = ({ images, autoPlayInterval = 4000 }: ImageGalleryProps) =>
                                 src={getImageUrl(image.ImageUrl)}
                                 alt={`Thumbnail ${index + 1}`}
                                 className="w-full h-full object-cover"
+                                onError={(e) => {
+                                    e.currentTarget.src = 'https://placehold.co/200x200/1e293b/ffffff?text=No+Image';
+                                    e.currentTarget.onerror = null;
+                                }}
                             />
                         </button>
                     ))}
