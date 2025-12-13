@@ -125,7 +125,7 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
                         <img
                             src="/logo.png"
                             alt="Logo"
-                            className={`${!isDesktop ? 'h-10' : 'h-32'} w-auto hover:opacity-90 transition-opacity`}
+                            className={`${!isDesktop ? 'h-24' : 'h-32'} w-auto hover:opacity-90 transition-opacity`}
                         />
                     </Link>
                 </div>
