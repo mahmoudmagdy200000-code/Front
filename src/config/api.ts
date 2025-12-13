@@ -31,15 +31,30 @@ export const getImageUrl = (imagePath: string | undefined | null): string => {
         return '';
     }
 
-    // If it's already a full URL, return as-is
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    // Fix: Handle legacy or incorrect localhost URLs stored in DB
+    // If the path contains localhost or 127.0.0.1, we strip the domain part
+    if (imagePath.includes('localhost') || imagePath.includes('127.0.0.1')) {
+        // Extract the path part (e.g. /images/...)
+        const match = imagePath.match(/(?:localhost|127\.0\.0\.1)(?::\d+)?(\/.*)$/);
+        if (match && match[1]) {
+            imagePath = match[1];
+        }
+    }
+
+    // If it's a valid remote URL (not localhost), return as-is
+    if ((imagePath.startsWith('http://') || imagePath.startsWith('https://')) &&
+        !imagePath.includes('localhost') &&
+        !imagePath.includes('127.0.0.1')) {
         return imagePath;
     }
 
     // Ensure the path starts with /
     const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
 
-    return `${getServerBaseUrl()}${normalizedPath}`;
+    // Remove any double slashes caused by concatenation
+    const baseUrl = getServerBaseUrl().replace(/\/+$/, '');
+
+    return `${baseUrl}${normalizedPath}`;
 };
 
 /**
