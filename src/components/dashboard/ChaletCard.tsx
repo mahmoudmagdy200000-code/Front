@@ -8,12 +8,7 @@ interface ChaletCardProps {
     onDelete: (id: number) => void;
 }
 
-const BASE_URL = 'http://127.0.0.1:5266';
-const getImageUrl = (url: string | undefined) => {
-    if (!url) return '';
-    if (url.startsWith('http')) return url;
-    return `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
-};
+import { getImageUrl } from '../../config/api';
 
 const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
     const { t, i18n } = useTranslation();

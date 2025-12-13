@@ -6,12 +6,7 @@ import type { Chalet, ChaletImage } from '../types/chalet';
 import DashboardHeader from '../components/DashboardHeader';
 import ChaletCard from '../components/dashboard/ChaletCard';
 
-const BASE_URL = 'http://127.0.0.1:5266';
-const getImageUrl = (url: string | undefined) => {
-    if (!url) return '';
-    if (url.startsWith('http')) return url;
-    return `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
-};
+import { getImageUrl } from '../config/api';
 
 const DashboardPage = () => {
     const { t, i18n } = useTranslation();
