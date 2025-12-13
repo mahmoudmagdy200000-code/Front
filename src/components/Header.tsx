@@ -17,6 +17,13 @@ const Header = () => {
     const [pendingRequest, setPendingRequest] = useState<OwnerRequest | null>(null);
     const [requestLoading, setRequestLoading] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+    useEffect(() => {
+        const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Check for pending owner request if logged in as Client
     useEffect(() => {
@@ -135,68 +142,71 @@ const Header = () => {
                     <div className="flex items-center gap-2 sm:gap-4 order-2 lg:order-3">
 
 
-                        {/* Desktop Actions (Hidden on Mobile/Tablet) */}
-                        <div className="hidden lg:flex items-center gap-4">
-                            {!isAuthenticated && (
-                                <LanguageSwitcher />
-                            )}
 
-                            {isAuthenticated ? (
-                                <>
-                                    {/* Desktop User Actions */}
-                                    {role === 'Client' && (
+                        {/* Desktop Actions (Hidden on Mobile/Tablet) */}
+                        {isDesktop && (
+                            <div className="hidden lg:flex items-center gap-4">
+                                {!isAuthenticated && (
+                                    <LanguageSwitcher />
+                                )}
+
+                                {isAuthenticated ? (
+                                    <>
+                                        {/* Desktop User Actions */}
+                                        {role === 'Client' && (
+                                            <button
+                                                onClick={pendingRequest ? undefined : handleBecomeOwner}
+                                                disabled={requestLoading || !!pendingRequest}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${pendingRequest
+                                                    ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-700 cursor-default'
+                                                    : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-lg'
+                                                    }`}
+                                            >
+                                                {requestLoading ? (
+                                                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                                                ) : pendingRequest ? (
+                                                    <><span>⏳</span><span className="hidden lg:inline">{isRTL ? 'قيد المراجعة' : 'Pending'}</span></>
+                                                ) : (
+                                                    <><span>🏠</span><span className="hidden lg:inline">{isRTL ? 'كن مالك' : 'Become Owner'}</span></>
+                                                )}
+                                            </button>
+                                        )}
+                                        {role === 'Owner' && (
+                                            <button onClick={() => navigate('/owner/dashboard')} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg text-sm font-medium shadow-lg transition-all">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" /></svg>
+                                                <span className="hidden lg:inline">{isRTL ? 'لوحة التحكم' : 'Dashboard'}</span>
+                                            </button>
+                                        )}
+                                        {role === 'Admin' && (
+                                            <button onClick={() => navigate('/admin/owner-requests')} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-lg text-sm font-medium shadow-lg transition-all">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                                <span className="hidden lg:inline">{isRTL ? 'لوحة الإدارة' : 'Admin'}</span>
+                                            </button>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="flex items-center gap-2">
                                         <button
-                                            onClick={pendingRequest ? undefined : handleBecomeOwner}
-                                            disabled={requestLoading || !!pendingRequest}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${pendingRequest
-                                                ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-700 cursor-default'
-                                                : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-lg'
-                                                }`}
+                                            onClick={() => navigate('/owner/login')}
+                                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-800 hover:bg-gray-700 text-blue-400 hover:text-blue-300 rounded-lg border border-gray-700 transition-all text-xs sm:text-sm font-medium"
                                         >
-                                            {requestLoading ? (
-                                                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-                                            ) : pendingRequest ? (
-                                                <><span>⏳</span><span className="hidden lg:inline">{isRTL ? 'قيد المراجعة' : 'Pending'}</span></>
-                                            ) : (
-                                                <><span>🏠</span><span className="hidden lg:inline">{isRTL ? 'كن مالك' : 'Become Owner'}</span></>
-                                            )}
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                            </svg>
+                                            {isRTL ? 'دخول' : 'Login'}
                                         </button>
-                                    )}
-                                    {role === 'Owner' && (
-                                        <button onClick={() => navigate('/owner/dashboard')} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg text-sm font-medium shadow-lg transition-all">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" /></svg>
-                                            <span className="hidden lg:inline">{isRTL ? 'لوحة التحكم' : 'Dashboard'}</span>
+                                        <button
+                                            onClick={() => navigate('/owner/register')}
+                                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg text-sm font-medium shadow-lg transition-all"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                                            {isRTL ? 'تسجيل' : 'Register'}
                                         </button>
-                                    )}
-                                    {role === 'Admin' && (
-                                        <button onClick={() => navigate('/admin/owner-requests')} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-lg text-sm font-medium shadow-lg transition-all">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                            <span className="hidden lg:inline">{isRTL ? 'لوحة الإدارة' : 'Admin'}</span>
-                                        </button>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => navigate('/owner/login')}
-                                        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-800 hover:bg-gray-700 text-blue-400 hover:text-blue-300 rounded-lg border border-gray-700 transition-all text-xs sm:text-sm font-medium"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                        </svg>
-                                        {isRTL ? 'دخول' : 'Login'}
-                                    </button>
-                                    <button
-                                        onClick={() => navigate('/owner/register')}
-                                        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg text-sm font-medium shadow-lg transition-all"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
-                                        {isRTL ? 'تسجيل' : 'Register'}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Unified Menu Button - VISIBLE TO ALL USERS (Auth & Guest) */}
                         <div className="relative">
