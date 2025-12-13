@@ -1,7 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 
-const LanguageSwitcher = () => {
+interface LanguageSwitcherProps {
+    className?: string;
+    labelClassName?: string;
+}
+
+const LanguageSwitcher = ({ className = '', labelClassName = '' }: LanguageSwitcherProps) => {
     const { i18n } = useTranslation();
 
     useEffect(() => {
@@ -20,7 +25,7 @@ const LanguageSwitcher = () => {
     return (
         <button
             onClick={toggleLanguage}
-            className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg transition-all border border-transparent hover:border-gray-200"
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all border border-transparent ${className}`}
             title={i18n.language === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
         >
             <img
@@ -28,7 +33,7 @@ const LanguageSwitcher = () => {
                 alt={i18n.language === 'ar' ? 'English' : 'العربية'}
                 className="w-6 h-6 rounded object-cover shadow-sm"
             />
-            <span className="hidden sm:inline text-gray-700 text-sm font-medium">
+            <span className={`text-sm font-medium ${labelClassName}`}>
                 {i18n.language === 'ar' ? 'English' : 'العربية'}
             </span>
         </button>

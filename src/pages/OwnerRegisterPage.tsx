@@ -81,7 +81,7 @@ const OwnerRegisterPage = () => {
                 ConfirmPassword: formData.confirmPassword
             };
 
-            await axiosInstance.post('/api/auth/register', apiPayload);
+            await axiosInstance.post('/auth/register', apiPayload);
             setSuccess(true);
             setTimeout(() => {
                 navigate('/owner/login');
