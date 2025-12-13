@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -9,6 +9,14 @@ const BookingsHeader = () => {
     const isRTL = i18n.language === 'ar';
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
+
+    // Desktop detection
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+    useEffect(() => {
+        const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const isActive = (path: string) => location.pathname === path;
 
@@ -21,8 +29,8 @@ const BookingsHeader = () => {
     return (
         <header className="bg-white shadow-md sticky top-0 z-50">
             <div className="container mx-auto px-6 py-3 flex items-center justify-between gap-6 relative">
-                {/* Menu Button & Logo Container */}
-                <div className="flex items-center gap-4">
+                {/* Menu Button & Logo/Title Container */}
+                <div className="flex items-center gap-4 z-20">
                     {/* Menu Button */}
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -38,38 +46,53 @@ const BookingsHeader = () => {
                         </svg>
                     </button>
 
-                    {/* Logo */}
-                    <Link to="/" className="flex-shrink-0">
-                        <img
-                            src="/logo.png"
-                            alt="Logo"
-                            className="h-32 w-auto hover:opacity-90 transition-opacity"
-                        />
-                    </Link>
+                    {/* Logo - Desktop Only (Left side) */}
+                    {isDesktop && (
+                        <Link to="/" className="flex-shrink-0">
+                            <img
+                                src="/logo.png"
+                                alt="Logo"
+                                className="h-12 w-auto hover:opacity-90 transition-opacity"
+                            />
+                        </Link>
+                    )}
                 </div>
 
-                {/* Page Title (replaces search bar) */}
-                <div className="flex-1 max-w-2xl">
-                    <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent tracking-tight text-center">
+                {/* Page Title - Centered (Visible on all) */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-full text-center pointer-events-none">
+                    <h1 className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent tracking-tight truncate max-w-[200px] md:max-w-md mx-auto">
                         {isRTL ? 'حجوزاتي' : 'My Bookings'}
                     </h1>
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-4 flex-shrink-0">
-                    <LanguageSwitcher />
+                {/* Actions (Desktop) or Logo (Mobile) */}
+                <div className="flex items-center gap-4 flex-shrink-0 z-20">
+                    {isDesktop ? (
+                        <>
+                            <LanguageSwitcher />
 
-                    <button
-                        onClick={() => navigate('/owner/dashboard')}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-full transition-all font-medium shadow-sm hover:shadow-md"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                        <span className="hidden sm:inline">
-                            {isRTL ? 'لوحة التحكم' : 'Dashboard'}
-                        </span>
-                    </button>
+                            <button
+                                onClick={() => navigate('/owner/dashboard')}
+                                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-full transition-all font-medium shadow-sm hover:shadow-md"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                </svg>
+                                <span className="hidden sm:inline">
+                                    {isRTL ? 'لوحة التحكم' : 'Dashboard'}
+                                </span>
+                            </button>
+                        </>
+                    ) : (
+                        /* Mobile Logo (Right side) */
+                        <Link to="/" className="flex-shrink-0">
+                            <img
+                                src="/logo.png"
+                                alt="Logo"
+                                className="h-10 w-auto hover:opacity-90 transition-opacity"
+                            />
+                        </Link>
+                    )}
                 </div>
 
                 {/* Mobile/Menu Dropdown */}
@@ -92,6 +115,22 @@ const BookingsHeader = () => {
                                     <span className="text-lg">{link.label}</span>
                                 </Link>
                             ))}
+
+                            <div className="border-t border-gray-100 my-2 pt-2">
+                                <LanguageSwitcher className="px-4 py-2 hover:bg-gray-50 w-full justify-start text-gray-600" />
+                            </div>
+
+                            <div className="border-t border-gray-100 my-2 pt-2">
+                                <button
+                                    onClick={() => navigate('/owner/dashboard')}
+                                    className="w-full px-4 py-3 text-left text-blue-600 hover:bg-blue-50 flex items-center gap-3 rounded-xl transition-all"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                    </svg>
+                                    {isRTL ? 'لوحة التحكم' : 'Dashboard'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}

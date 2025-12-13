@@ -104,7 +104,7 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
         <header className="bg-white shadow-md sticky top-0 z-50">
             <div className="container mx-auto px-6 py-3 flex items-center justify-between gap-6 relative">
                 {/* Menu Button & Logo Container */}
-                <div className="flex items-center gap-4">
+                <div className={`flex items-center gap-4 z-20 ${!isDesktop ? 'w-full justify-between' : ''}`}>
                     {/* Menu Button */}
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -120,12 +120,12 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
                         </svg>
                     </button>
 
-                    {/* Logo */}
-                    <Link to="/" className="flex-shrink-0">
+                    {/* Logo - Mobile: Right (End), Desktop: Left (Start) */}
+                    <Link to="/" className={`flex-shrink-0 ${!isDesktop ? 'order-last' : ''}`}>
                         <img
                             src="/logo.png"
                             alt="Logo"
-                            className="h-32 w-auto hover:opacity-90 transition-opacity"
+                            className={`${!isDesktop ? 'h-10' : 'h-32'} w-auto hover:opacity-90 transition-opacity`}
                         />
                     </Link>
                 </div>
