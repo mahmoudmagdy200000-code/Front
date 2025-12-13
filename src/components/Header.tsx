@@ -93,7 +93,7 @@ const Header = () => {
                     </div>
 
                     {/* Search Bar */}
-                    <form onSubmit={handleSearch} className="flex-1 max-w-3xl w-full mx-auto order-3 md:order-2">
+                    <form onSubmit={handleSearch} className="flex-1 max-w-3xl w-full mx-auto order-3 lg:order-2 mt-2 lg:mt-0">
                         <div className="flex flex-col sm:flex-row gap-4 bg-gray-800/50 backdrop-blur-md p-3 rounded-2xl border border-gray-700/50 shadow-2xl">
                             <div className="flex-1 relative group">
                                 <label className="absolute -top-3 left-4 bg-gray-800 px-2 text-xs text-blue-400 font-semibold tracking-wide uppercase">
@@ -132,7 +132,7 @@ const Header = () => {
                     </form>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 sm:gap-4 order-2 md:order-3">
+                    <div className="flex items-center gap-2 sm:gap-4 order-2 lg:order-3">
 
 
                         {/* Desktop Actions (Hidden on Mobile/Tablet) */}
