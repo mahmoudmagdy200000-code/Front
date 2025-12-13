@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getMyChalets, createChalet, updateChalet, deleteChalet, uploadChaletImages } from '../api/chalets';
+import { getMyChalets, createChalet, updateChalet, deleteChalet, uploadChaletImages, deleteChaletImage } from '../api/chalets';
 import type { Chalet, ChaletImage } from '../types/chalet';
 import DashboardHeader from '../components/DashboardHeader';
 import ChaletCard from '../components/dashboard/ChaletCard';
@@ -200,22 +200,46 @@ const DashboardPage = () => {
         }
     };
 
+    const handleDeleteImage = async (imageId: number) => {
+        if (!editingChalet) return;
+        if (!confirm(isArabic ? 'هل أنت متأكد من حذف هذه الصورة؟' : 'Are you sure you want to delete this image?')) return;
+
+        try {
+            await deleteChaletImage(editingChalet.Id, imageId);
+            setExistingImages(prev => prev.filter(img => img.Id !== imageId));
+
+            // Update the main chalets list to reflect changes
+            setChalets(prev => prev.map(c => {
+                if (c.Id === editingChalet.Id) {
+                    return {
+                        ...c,
+                        Images: c.Images?.filter(img => img.Id !== imageId) || []
+                    };
+                }
+                return c;
+            }));
+        } catch (error) {
+            console.error('Error deleting image:', error);
+            alert(t('common.error'));
+        }
+    };
+
     const handleImageSelection = (files: FileList | null) => {
         if (!files) return;
 
-        const totalImages = selectedImages.length + files.length;
+        const totalImages = selectedImages.length + files.length + existingImages.length;
 
         if (totalImages > MAX_IMAGES) {
             setImageError(
                 isArabic
-                    ? `الحد الأقصى من الصور هو ${MAX_IMAGES} صورة لكل شالية. أنت تحاول إضافة ${totalImages} صورة.`
-                    : `Maximum ${MAX_IMAGES} images per chalet. You're trying to add ${totalImages} images.`
+                    ? `الحد الأقصى من الصور هو ${MAX_IMAGES} صورة لكل شالية. لديك ${existingImages.length} صورة وتحاول إضافة ${files.length} (المجموع ${totalImages}).`
+                    : `Maximum ${MAX_IMAGES} images per chalet. You have ${existingImages.length} images and are trying to add ${files.length} (Total ${totalImages}).`
             );
             return;
         }
 
         setImageError(null);
-        setSelectedImages(Array.from(files));
+        setSelectedImages(prev => [...prev, ...Array.from(files)]);
     };
 
     return (
@@ -406,11 +430,26 @@ const DashboardPage = () => {
                                         {(existingImages.length > 0 || selectedImages.length > 0) && (
                                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-4">
                                                 {existingImages.map(img => (
-                                                    <div key={img.Id} className="aspect-square relative rounded-lg overflow-hidden group">
+                                                    <div key={img.Id} className="aspect-square relative rounded-lg overflow-hidden group border border-slate-200">
                                                         <img src={getImageUrl(img.ImageUrl)} className="w-full h-full object-cover" />
-                                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <span className="text-white text-[10px] font-bold">SAVED</span>
-                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                handleDeleteImage(img.Id);
+                                                            }}
+                                                            className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center transition-opacity opacity-0 group-hover:opacity-100 shadow-md z-10"
+                                                            title={isArabic ? 'حذف' : 'Delete'}
+                                                        >
+                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                        {img.IsPrimary && (
+                                                            <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] text-center py-0.5">
+                                                                Main
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ))}
                                                 {selectedImages.map((file, i) => (
