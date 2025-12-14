@@ -47,11 +47,7 @@ export const deleteChalet = async (id: number): Promise<void> => {
 export const uploadChaletImage = async (id: number, file: File): Promise<{ imageUrl: string }> => {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await axiosInstance.post(`/chalets/${id}/upload-image`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+    const response = await axiosInstance.post(`/chalets/${id}/upload-image`, formData);
     return response.data;
 };
 
@@ -61,11 +57,7 @@ export const uploadChaletImages = async (id: number, files: File[]): Promise<{ m
     files.forEach(file => {
         formData.append('files', file);
     });
-    const response = await axiosInstance.post(`/chalets/${id}/upload-images`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+    const response = await axiosInstance.post(`/chalets/${id}/upload-images`, formData);
     return response.data;
 };
 
