@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://rsr123.runasp.net/api', // API backend URL from environment
+    baseURL: import.meta.env.VITE_API_URL || 'https://rsr123.runasp.net', // API backend URL from environment
     headers: {
         'Content-Type': 'application/json',
     },
