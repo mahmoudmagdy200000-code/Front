@@ -1,6 +1,42 @@
 import axiosInstance from './axios';
 import type { Chalet } from '../types/chalet';
 
+// Create new chalet (protected - requires auth)
+export const createChalet = async (chalet: Omit<Chalet, 'Id' | 'OwnerId'>, images: File[] = []): Promise<Chalet> => {
+    const formData = new FormData();
+
+    console.log('🔍 [createChalet] Starting...');
+    console.log('📋 [createChalet] Chalet data:', chalet);
+    console.log('🖼️ [createChalet] Images count:', images.length);
+
+    // Append standard fields
+    Object.entries(chalet).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+            console.log(`  ➕ Field: ${key} = ${value}`);
+            formData.append(key, String(value));
+        }
+    });
+
+    // Append files
+    images.forEach((file, index) => {
+        console.log(`  ➕ Image ${index}: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+        formData.append('Images', file);
+    });
+
+    console.log('📤 [createChalet] Sending POST request to /chalets');
+
+    try {
+        // ❌ لا تضع Content-Type هنا - دع axios يعالجها
+        const response = await axiosInstance.post<Chalet>('/chalets', formData);
+
+        console.log('✅ [createChalet] Success!', response.data);
+        return response.data;
+    } catch (error: any) {
+        console.error('❌ [createChalet] Error:', error);
+        throw error;
+    }
+};
+
 // Get all chalets with optional search parameters
 export const getChalets = async (checkInDate?: string, checkOutDate?: string, maxPrice?: number, adults?: number, children?: number): Promise<Chalet[]> => {
     const params = new URLSearchParams();
@@ -23,33 +59,6 @@ export const getMyChalets = async (): Promise<Chalet[]> => {
 // Get chalet by ID
 export const getChaletById = async (id: number): Promise<Chalet> => {
     const response = await axiosInstance.get<Chalet>(`/chalets/${id}`);
-    return response.data;
-};
-
-// Create new chalet (protected - requires auth)
-export const createChalet = async (chalet: Omit<Chalet, 'Id' | 'OwnerId'>, images: File[] = []): Promise<Chalet> => {
-    const formData = new FormData();
-
-    // Append standard fields
-    Object.entries(chalet).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-            // Check if it's the Images array from the chalet object itself (if any) and skip it, 
-            // relying on the explicit 'images' argument, OR handle if the user passed it in 'chalet'.
-            // For now, we assume 'chalet' is just the data fields.
-            formData.append(key, value.toString());
-        }
-    });
-
-    // Append files
-    images.forEach((file) => {
-        formData.append('Images', file);
-    });
-
-    const response = await axiosInstance.post<Chalet>('/chalets', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
     return response.data;
 };
 
