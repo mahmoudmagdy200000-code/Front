@@ -112,12 +112,14 @@ const DashboardPage = () => {
         e.preventDefault();
         setSubmitError(null);
 
+        console.log('🎯 [handleSubmit] Form submission started');
+
         if (!validateForm()) {
+            console.warn('❌ [handleSubmit] Form validation failed');
             return;
         }
 
         try {
-            // تجهيز كائن البيانات
             const chaletData = {
                 TitleEn: formData.titleEn,
                 TitleAr: formData.titleAr,
@@ -128,23 +130,34 @@ const DashboardPage = () => {
                 ChildrenCapacity: formData.childrenCapacity,
             };
 
-            if (editingChalet) {
-                // --- حالة التعديل (Edit Mode) ---
-                // 1. تحديث البيانات النصية
-                await updateChalet(editingChalet.Id, chaletData);
+            console.log('📝 [handleSubmit] Chalet data:', chaletData);
+            console.log('🖼️  [handleSubmit] Selected images:', selectedImages.length);
 
-                // 2. إذا اختار المستخدم صوراً جديدة أثناء التعديل، نقوم برفعها منفصلة
+            if (editingChalet) {
+                console.log('✏️  [handleSubmit] Editing chalet ID:', editingChalet.Id);
+
+                // تحديث البيانات
+                console.log('⏳ [handleSubmit] Awaiting updateChalet...');
+                await updateChalet(editingChalet.Id, chaletData);
+                console.log('✅ [handleSubmit] updateChalet completed');
+
+                // رفع الصور إذا وجدت
                 if (selectedImages.length > 0) {
+                    console.log('⏳ [handleSubmit] Awaiting uploadChaletImages...');
                     await uploadChaletImages(editingChalet.Id, selectedImages);
+                    console.log('✅ [handleSubmit] uploadChaletImages completed');
                 }
             } else {
-                // --- حالة الإنشاء (Create Mode) ---
-                // نمرر البيانات + الصور في دالة واحدة الآن
-                // تأكد أن api/chalets.ts تم تحديثه ليقبل (data, images)
-                await createChalet(chaletData, selectedImages);
+                console.log('➕ [handleSubmit] Creating new chalet');
+                console.log('⏳ [handleSubmit] Awaiting createChalet...');
+
+                const result = await createChalet(chaletData, selectedImages);
+
+                console.log('✅ [handleSubmit] createChalet completed successfully');
+                console.log('📦 [handleSubmit] Response:', result);
             }
 
-            // إعادة تعيين النموذج بعد النجاح
+            console.log('🧹 [handleSubmit] Clearing form...');
             setShowForm(false);
             setEditingChalet(null);
             setSelectedImages([]);
@@ -160,21 +173,37 @@ const DashboardPage = () => {
                 adultsCapacity: 0,
                 childrenCapacity: 0,
             });
-            fetchData();
+
+            console.log('⏳ [handleSubmit] Fetching updated chalets...');
+            await fetchData();
+
+            console.log('✨ [handleSubmit] SUCCESS! All operations completed');
+
         } catch (error: any) {
-            console.error('Error saving chalet:', error);
+            console.error('❌ [handleSubmit] FAILED - Caught error');
+            console.error('Error object:', error);
+            console.error('Error message:', error?.message);
+            console.error('Response status:', error?.response?.status);
+            console.error('Response data:', error?.response?.data);
+            console.error('Config:', error?.config);
+
+            // محاولة استخراج رسالة خطأ مفيدة
+            let errorMessage = t('common.error');
 
             if (error.response?.data?.message) {
-                setSubmitError(error.response.data.message);
-            } else if (error.message === 'Maximum 5 chalets allowed per owner') {
-                setSubmitError(
-                    isArabic
-                        ? 'الحد الأقصى من الشاليهات هو 5 شاليهات لكل مالك'
-                        : 'Maximum 5 chalets allowed per owner'
-                );
-            } else {
-                setSubmitError(t('common.error'));
+                errorMessage = error.response.data.message;
+            } else if (error.response?.data?.errors) {
+                // قد يكون هناك validation errors
+                const errors = error.response.data.errors;
+                errorMessage = Object.values(errors)
+                    .flat()
+                    .join(', ') as string;
+            } else if (error.message) {
+                errorMessage = error.message;
             }
+
+            console.log('📣 [handleSubmit] Setting error message:', errorMessage);
+            setSubmitError(errorMessage);
         }
     };
     // ---------------------------------------------------------
