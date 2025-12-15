@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+// تأكد أن createChalet يقبل المعامل الثاني (images) في ملف api/chalets.ts كما عدلناه سابقاً
 import { getMyChalets, createChalet, updateChalet, deleteChalet, uploadChaletImages, deleteChaletImage } from '../api/chalets';
 import type { Chalet, ChaletImage } from '../types/chalet';
 import DashboardHeader from '../components/DashboardHeader';
@@ -104,17 +105,19 @@ const DashboardPage = () => {
         return Object.keys(errors).length === 0 && !hasImageError;
     };
 
+    // ---------------------------------------------------------
+    // التعديل الرئيسي هنا 👇
+    // ---------------------------------------------------------
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitError(null);
 
         if (!validateForm()) {
-            // validateForm() will set imageError and formErrors directly
-            // Both will be displayed in the UI
             return;
         }
 
         try {
+            // تجهيز كائن البيانات
             const chaletData = {
                 TitleEn: formData.titleEn,
                 TitleAr: formData.titleAr,
@@ -125,19 +128,23 @@ const DashboardPage = () => {
                 ChildrenCapacity: formData.childrenCapacity,
             };
 
-            let chaletId: number;
             if (editingChalet) {
+                // --- حالة التعديل (Edit Mode) ---
+                // 1. تحديث البيانات النصية
                 await updateChalet(editingChalet.Id, chaletData);
-                chaletId = editingChalet.Id;
+
+                // 2. إذا اختار المستخدم صوراً جديدة أثناء التعديل، نقوم برفعها منفصلة
+                if (selectedImages.length > 0) {
+                    await uploadChaletImages(editingChalet.Id, selectedImages);
+                }
             } else {
-                const newChalet = await createChalet(chaletData);
-                chaletId = newChalet.Id;
+                // --- حالة الإنشاء (Create Mode) ---
+                // نمرر البيانات + الصور في دالة واحدة الآن
+                // تأكد أن api/chalets.ts تم تحديثه ليقبل (data, images)
+                await createChalet(chaletData, selectedImages);
             }
 
-            if (selectedImages.length > 0) {
-                await uploadChaletImages(chaletId, selectedImages);
-            }
-
+            // إعادة تعيين النموذج بعد النجاح
             setShowForm(false);
             setEditingChalet(null);
             setSelectedImages([]);
@@ -157,7 +164,6 @@ const DashboardPage = () => {
         } catch (error: any) {
             console.error('Error saving chalet:', error);
 
-            // Handle specific error messages from backend
             if (error.response?.data?.message) {
                 setSubmitError(error.response.data.message);
             } else if (error.message === 'Maximum 5 chalets allowed per owner') {
@@ -171,6 +177,7 @@ const DashboardPage = () => {
             }
         }
     };
+    // ---------------------------------------------------------
 
     const handleEdit = (chalet: Chalet) => {
         setEditingChalet(chalet);
