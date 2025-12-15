@@ -65,46 +65,90 @@ const DashboardPage = () => {
         const errors: typeof formErrors = {};
         let hasImageError = false;
 
+        console.log('🔍 [validateForm] Starting validation...');
+        console.log('📋 [validateForm] Form data:', formData);
+        console.log('🖼️  [validateForm] Selected images count:', selectedImages.length);
+        console.log('🖼️  [validateForm] Existing images count:', existingImages.length);
+
+        // التحقق من titleEn
         if (!formData.titleEn || formData.titleEn.trim().length < 3) {
             errors.titleEn = isArabic ? 'عنوان اللغة الإنجليزية مطلوب (3 أحرف على الأقل)' : 'English title is required (min 3 characters)';
+            console.warn('❌ [validateForm] titleEn failed:', formData.titleEn);
+        } else {
+            console.log('✅ [validateForm] titleEn passed');
         }
 
+        // التحقق من titleAr
         if (!formData.titleAr || formData.titleAr.trim().length < 3) {
             errors.titleAr = isArabic ? 'عنوان اللغة العربية مطلوب (3 أحرف على الأقل)' : 'Arabic title is required (min 3 characters)';
+            console.warn('❌ [validateForm] titleAr failed:', formData.titleAr);
+        } else {
+            console.log('✅ [validateForm] titleAr passed');
         }
 
+        // التحقق من descriptionEn
         if (!formData.descriptionEn || formData.descriptionEn.trim().length < 10) {
             errors.descriptionEn = isArabic ? 'الوصف بالإنجليزية مطلوب (10 أحرف على الأقل)' : 'English description is required (min 10 characters)';
+            console.warn('❌ [validateForm] descriptionEn failed:', formData.descriptionEn?.length || 0, 'chars');
+        } else {
+            console.log('✅ [validateForm] descriptionEn passed');
         }
 
+        // التحقق من descriptionAr
         if (!formData.descriptionAr || formData.descriptionAr.trim().length < 10) {
             errors.descriptionAr = isArabic ? 'الوصف بالعربية مطلوب (10 أحرف على الأقل)' : 'Arabic description is required (min 10 characters)';
+            console.warn('❌ [validateForm] descriptionAr failed:', formData.descriptionAr?.length || 0, 'chars');
+        } else {
+            console.log('✅ [validateForm] descriptionAr passed');
         }
 
+        // التحقق من السعر
         if (formData.pricePerNight <= 0) {
             errors.pricePerNight = isArabic ? 'السعر مطلوب (يجب أن يكون أكبر من 0)' : 'Price is required (must be greater than 0)';
+            console.warn('❌ [validateForm] pricePerNight failed:', formData.pricePerNight);
+        } else {
+            console.log('✅ [validateForm] pricePerNight passed:', formData.pricePerNight);
         }
 
+        // التحقق من سعة البالغين
         if (formData.adultsCapacity < 1) {
             errors.adultsCapacity = isArabic ? 'سعة البالغين مطلوبة (1 على الأقل)' : 'Adults capacity is required (min 1)';
+            console.warn('❌ [validateForm] adultsCapacity failed:', formData.adultsCapacity);
+        } else {
+            console.log('✅ [validateForm] adultsCapacity passed:', formData.adultsCapacity);
         }
 
+        // التحقق من سعة الأطفال
         if (formData.childrenCapacity < 0) {
             errors.childrenCapacity = isArabic ? 'سعة الأطفال مطلوبة (0 أو أكثر)' : 'Children capacity is required (0 or more)';
+            console.warn('❌ [validateForm] childrenCapacity failed:', formData.childrenCapacity);
+        } else {
+            console.log('✅ [validateForm] childrenCapacity passed:', formData.childrenCapacity);
         }
 
-        // Check if at least one image is selected for new chalets
+        // التحقق من الصور
         if (!editingChalet && selectedImages.length === 0) {
             setImageError(isArabic ? 'يجب اختيار صورة واحدة على الأقل' : 'At least one image is required');
             hasImageError = true;
+            console.warn('❌ [validateForm] No images selected and not editing');
         } else {
             setImageError(null);
+            console.log('✅ [validateForm] Images check passed');
         }
 
         setFormErrors(errors);
-        return Object.keys(errors).length === 0 && !hasImageError;
-    };
 
+        const isValid = Object.keys(errors).length === 0 && !hasImageError;
+
+        if (!isValid) {
+            console.error('❌ [validateForm] Validation FAILED');
+            console.error('   Errors:', errors);
+        } else {
+            console.log('✅ [validateForm] Validation PASSED - all checks ok');
+        }
+
+        return isValid;
+    };
     // ---------------------------------------------------------
     // التعديل الرئيسي هنا 👇
     // ---------------------------------------------------------
