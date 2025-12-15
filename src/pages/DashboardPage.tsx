@@ -64,12 +64,16 @@ const DashboardPage = () => {
     const validateForm = (): boolean => {
         const errors: typeof formErrors = {};
         let hasImageError = false;
-
-        console.log('🔍 [validateForm] Starting validation...');
-        console.log('📋 [validateForm] Form data:', formData);
-        console.log('🖼️  [validateForm] Selected images count:', selectedImages.length);
-        console.log('🖼️  [validateForm] Existing images count:', existingImages.length);
-
+        console.log('🔍 [validateForm] Starting validation');
+        console.log('   titleEn:', formData.titleEn, 'length:', formData.titleEn.trim().length);
+        console.log('   titleAr:', formData.titleAr, 'length:', formData.titleAr.trim().length);
+        console.log('   descriptionEn length:', formData.descriptionEn.trim().length);
+        console.log('   descriptionAr length:', formData.descriptionAr.trim().length);
+        console.log('   pricePerNight:', formData.pricePerNight);
+        console.log('   adultsCapacity:', formData.adultsCapacity);
+        console.log('   childrenCapacity:', formData.childrenCapacity);
+        console.log('   selectedImages:', selectedImages.length);
+        console.log('   existingImages:', existingImages.length);
         // التحقق من titleEn
         if (!formData.titleEn || formData.titleEn.trim().length < 3) {
             errors.titleEn = isArabic ? 'عنوان اللغة الإنجليزية مطلوب (3 أحرف على الأقل)' : 'English title is required (min 3 characters)';
