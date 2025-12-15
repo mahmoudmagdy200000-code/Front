@@ -473,10 +473,12 @@ const DashboardPage = () => {
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('dashboard.descriptionEn')}</label>
                                         <textarea value={formData.descriptionEn} onChange={e => setFormData({ ...formData, descriptionEn: e.target.value })} rows={3} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
+                                        {formErrors.descriptionEn && <p className="text-red-500 text-xs mt-1">{formErrors.descriptionEn}</p>}
                                     </div>
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('dashboard.descriptionAr')}</label>
                                         <textarea value={formData.descriptionAr} onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })} rows={3} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
+                                        {formErrors.descriptionAr && <p className="text-red-500 text-xs mt-1">{formErrors.descriptionAr}</p>}
                                     </div>
 
                                     {/* Stats */}
@@ -486,15 +488,18 @@ const DashboardPage = () => {
                                             <span className="absolute left-3 top-2.5 text-slate-400">$</span>
                                             <input type="number" value={formData.pricePerNight} onChange={e => setFormData({ ...formData, pricePerNight: Number(e.target.value) })} className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
                                         </div>
+                                        {formErrors.pricePerNight && <p className="text-red-500 text-xs mt-1">{formErrors.pricePerNight}</p>}
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'البالغين' : 'Adults'}</label>
                                             <input type="number" min="1" value={formData.adultsCapacity} onChange={e => setFormData({ ...formData, adultsCapacity: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
+                                            {formErrors.adultsCapacity && <p className="text-red-500 text-xs mt-1">{formErrors.adultsCapacity}</p>}
                                         </div>
                                         <div>
                                             <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'الأطفال' : 'Children'}</label>
                                             <input type="number" min="0" value={formData.childrenCapacity} onChange={e => setFormData({ ...formData, childrenCapacity: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
+                                            {formErrors.childrenCapacity && <p className="text-red-500 text-xs mt-1">{formErrors.childrenCapacity}</p>}
                                         </div>
                                     </div>
 
