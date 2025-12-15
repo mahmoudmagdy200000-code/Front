@@ -27,8 +27,29 @@ export const getChaletById = async (id: number): Promise<Chalet> => {
 };
 
 // Create new chalet (protected - requires auth)
-export const createChalet = async (chalet: Omit<Chalet, 'Id' | 'OwnerId'>): Promise<Chalet> => {
-    const response = await axiosInstance.post<Chalet>('/chalets', chalet);
+export const createChalet = async (chalet: Omit<Chalet, 'Id' | 'OwnerId'>, images: File[] = []): Promise<Chalet> => {
+    const formData = new FormData();
+
+    // Append standard fields
+    Object.entries(chalet).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+            // Check if it's the Images array from the chalet object itself (if any) and skip it, 
+            // relying on the explicit 'images' argument, OR handle if the user passed it in 'chalet'.
+            // For now, we assume 'chalet' is just the data fields.
+            formData.append(key, value.toString());
+        }
+    });
+
+    // Append files
+    images.forEach((file) => {
+        formData.append('Images', file);
+    });
+
+    const response = await axiosInstance.post<Chalet>('/chalets', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
     return response.data;
 };
 
