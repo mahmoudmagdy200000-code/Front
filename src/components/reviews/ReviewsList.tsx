@@ -13,6 +13,7 @@ const ReviewsList = ({ chaletId }: ReviewsListProps) => {
     const isArabic = i18n.language === 'ar';
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showAll, setShowAll] = useState(false);
 
     const fetchReviews = async () => {
         try {
@@ -80,7 +81,7 @@ const ReviewsList = ({ chaletId }: ReviewsListProps) => {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {reviews.map((review) => (
+                            {(showAll ? reviews : reviews.slice(0, 3)).map((review) => (
                                 <div key={review.Id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="flex items-center gap-2">
@@ -110,6 +111,25 @@ const ReviewsList = ({ chaletId }: ReviewsListProps) => {
                                     )}
                                 </div>
                             ))}
+
+                            {reviews.length > 3 && (
+                                <button
+                                    onClick={() => setShowAll(!showAll)}
+                                    className="w-full py-3 text-blue-600 font-medium hover:bg-blue-50 rounded-xl transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {showAll ? (
+                                        <>
+                                            {isArabic ? 'عرض أقل' : 'Show less'}
+                                            <svg className="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {isArabic ? `عرض كل الـ ${reviews.length} تقييمات` : `See all ${reviews.length} reviews`}
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                        </>
+                                    )}
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
