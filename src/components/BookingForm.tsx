@@ -143,8 +143,9 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
             setCheckOutDate('');
             setUserPhoneNumber('');
             setIsAvailable(null);
-        } catch (error) {
-            setMessage({ type: 'error', text: t('common.error') });
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.message || error.message || t('common.error');
+            setMessage({ type: 'error', text: errorMsg });
         } finally {
             setLoading(false);
         }
@@ -208,7 +209,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                     type="button"
                     onClick={handleCheckAvailability}
                     disabled={loading || !checkInDate || !checkOutDate}
-                    className="w-full px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-300 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? t('common.loading') : t('booking.checkAvailability')}
                 </button>

@@ -130,7 +130,7 @@ const ReviewForm = ({ chaletId, onReviewAdded }: ReviewFormProps) => {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-100"
+                        className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-100 transform hover:-translate-y-0.5"
                     >
                         {submitting ? (isArabic ? 'جاري الإرسال...' : 'Submitting...') : (isArabic ? 'إرسال التقييم' : 'Submit Review')}
                     </button>

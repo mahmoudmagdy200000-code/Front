@@ -34,10 +34,10 @@ const HomePage = () => {
         fetchChalets();
     }, [t]);
 
-    const filteredChalets = chalets.filter(chalet => {
+    const filteredChalets = Array.isArray(chalets) ? chalets.filter(chalet => {
         const title = isRTL ? chalet.TitleAr : chalet.TitleEn;
         return title.toLowerCase().includes(searchQuery.toLowerCase());
-    });
+    }) : [];
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>

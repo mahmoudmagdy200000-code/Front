@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-if (!import.meta.env.VITE_API_URL) {
-    throw new Error('❌ VITE_API_URL is not defined. Check your .env files.');
-}
+//if (!import.meta.env.VITE_API_URL) {
+//    throw new Error('❌ VITE_API_URL is not defined. Check your .env files.');
+//}
 
 
 const axiosInstance = axios.create({
     //baseURL: import.meta.env.VITE_API_URL,//|| 'https://rsr123.runasp.net',
-    baseURL: import.meta.env.VITE_API_URL || 'https://rsr123.runasp.net',
-
+    //baseURL: import.meta.env.VITE_API_URL || 'https://rsr123.runasp.net',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5266/api',
     timeout: 120000, // ⬆️ زيادة الـ timeout إلى 120 ثانية (للملفات الكبيرة)
     withCredentials: true, // ✅ للسماح بـ CORS مع credentials
 });
@@ -63,10 +63,13 @@ axiosInstance.interceptors.response.use(
         });
 
         // معالجة أخطاء محددة
+        // معالجة أخطاء محددة
         if (error.response?.status === 401) {
-            // Unauthorized - قد تحتاج لتنظيف التوكن
-            localStorage.removeItem('token');
-            window.location.href = '/login';
+            // Unauthorized - لا تقم بإعادة التوجيه إذا كان الخطأ من صفحة تسجيل الدخول نفسها
+            if (!error.config.url.includes('/login')) {
+                localStorage.removeItem('token');
+                window.location.href = '/owner/login'; // Redirect to correct login page
+            }
         }
 
         return Promise.reject(error);
