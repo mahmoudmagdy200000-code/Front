@@ -107,7 +107,7 @@ const ChaletDetailPage = () => {
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Images & Description (Takes 2/3 width on large screens) */}
+                    {/* Left Column: Images & Description */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Image Gallery */}
                         <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100">
@@ -148,18 +148,10 @@ const ChaletDetailPage = () => {
                                 {description}
                             </p>
                         </div>
-
-                        {/* Reviews Section */}
-                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                <span>⭐</span>
-                                {isRTL ? 'تقييمات الضيوف' : 'Guest Reviews'}
-                            </h2>
-                            <ReviewsList chaletId={chalet.Id} />
-                        </div>
                     </div>
 
                     {/* Right Column: Booking Form (Sticky) */}
+                    {/* On Desktop: col-span-1. On Mobile: It naturally flows after the above div (Images/Desc). */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-24 space-y-6">
                             <div className="bg-white p-6 rounded-3xl shadow-xl border border-blue-100 ring-1 ring-blue-50">
@@ -194,6 +186,32 @@ const ChaletDetailPage = () => {
                                 </p>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Reviews Section - Moved OUT of the left column wrapper to be a direct child of the grid */}
+                    {/* On Desktop: We force it to span the full width of the left column (col-span-2) by placing it in the grid flow properly or making it full width. 
+                        Actually, to keep the desktop layout same (Reviews inside left col), we need to be clever.
+                        But the user only requested mobile change.
+                        
+                        If we make this a direct child of the grid:
+                        Mobile: Images/Desc (div 1) -> Booking (div 2) -> Reviews (div 3). CORRECT ✅
+                        Desktop: Grid is 3 columns.
+                        Div 1 (Images/Desc): col-span-2.
+                        Div 2 (Booking): col-span-1.
+                        Div 3 (Reviews): We want it to be under Div 1 in the layout.
+                        
+                        If we just let it be, it will likely start a new row.
+                        Row 1: [Images/Desc (2)] [Booking (1)]
+                        Row 2: [Reviews (?)]
+                        
+                        We want Reviews to be col-span-2, so it stays on the left side under Images/Desc.
+                    */}
+                    <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <span>⭐</span>
+                            {isRTL ? 'تقييمات الضيوف' : 'Guest Reviews'}
+                        </h2>
+                        <ReviewsList chaletId={chalet.Id} />
                     </div>
                 </div>
             </main>

@@ -35,7 +35,7 @@ const HomePage = () => {
     }, [t]);
 
     const filteredChalets = Array.isArray(chalets) ? chalets.filter(chalet => {
-        const title = isRTL ? chalet.TitleAr : chalet.TitleEn;
+        const title = (isRTL ? chalet.TitleAr : chalet.TitleEn) || "";
         return title.toLowerCase().includes(searchQuery.toLowerCase());
     }) : [];
 
