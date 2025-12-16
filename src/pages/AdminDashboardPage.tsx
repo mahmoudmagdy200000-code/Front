@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Button, Card, LoadingSpinner, EmptyState } from '../components/ui';
 import { getAllOwnerRequests, approveOwnerRequest, rejectOwnerRequest, type OwnerRequest } from '../api/admin';
+import PendingReviews from '../components/reviews/PendingReviews';
 
 const AdminDashboardPage = () => {
     const { i18n } = useTranslation();
@@ -312,6 +313,9 @@ const AdminDashboardPage = () => {
                         </div>
                     )}
                 </Card>
+
+                {/* Pending Reviews Section */}
+                <PendingReviews />
             </main>
         </div>
     );

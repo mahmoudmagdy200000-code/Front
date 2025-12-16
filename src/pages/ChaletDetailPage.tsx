@@ -6,6 +6,7 @@ import type { Chalet } from '../types/chalet';
 import BookingForm from '../components/BookingForm';
 import ImageGallery from '../components/ImageGallery';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import ReviewsList from '../components/reviews/ReviewsList';
 
 const ChaletDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -134,6 +135,11 @@ const ChaletDetailPage = () => {
                             initialCheckOut={checkOut}
                         />
                     </div>
+                </div>
+
+                {/* Reviews Section */}
+                <div className="mt-12 bg-gray-50 p-8 rounded-2xl">
+                    <ReviewsList chaletId={chalet.Id} />
                 </div>
             </main>
         </div>
