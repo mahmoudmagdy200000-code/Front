@@ -91,3 +91,12 @@ export const downgradeUserToClient = async (userId: string): Promise<{ message: 
     const response = await axiosInstance.post<{ message: string }>(`/admin/downgrade-to-client/${userId}`);
     return response.data;
 };
+
+/**
+ * Update featured status of a chalet (Admin only)
+ */
+export const updateChaletFeaturedStatus = async (chaletId: number, isFeatured: boolean): Promise<void> => {
+    await axiosInstance.patch(`/chalets/${chaletId}/featured`, isFeatured, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+};

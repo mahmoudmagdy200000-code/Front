@@ -18,4 +18,15 @@ export interface Chalet {
     OwnerId: string;
     ImageUrl?: string;
     Images?: ChaletImage[];
+    IsFeatured?: boolean;
+}
+
+export interface PagedResult<T> {
+    Items: T[];
+    TotalCount: number;
+    PageNumber: number;
+    PageSize: number;
+    TotalPages: number;
+    HasPreviousPage: boolean;
+    HasNextPage: boolean;
 }

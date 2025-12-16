@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { getTodayDate } from '../utils/dateUtils';
+import { getTodayDate, parseDateFromDDMMYYYY } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import { getMyOwnerRequest, requestOwnerUpgrade, type OwnerRequest } from '../api/admin';
+import DatePicker from './DatePicker';
 
 const Header = () => {
     const { t, i18n } = useTranslation();
@@ -44,14 +45,17 @@ const Header = () => {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (checkIn && checkOut && checkIn >= checkOut) {
+        const checkInISO = checkIn ? parseDateFromDDMMYYYY(checkIn) : '';
+        const checkOutISO = checkOut ? parseDateFromDDMMYYYY(checkOut) : '';
+
+        if (checkInISO && checkOutISO && checkInISO >= checkOutISO) {
             alert(t('booking.invalidDates') || 'Check-out date must be after check-in date');
             return;
         }
 
         const params = new URLSearchParams();
-        if (checkIn) params.append('checkInDate', checkIn);
-        if (checkOut) params.append('checkOutDate', checkOut);
+        if (checkInISO) params.append('checkInDate', checkInISO);
+        if (checkOutISO) params.append('checkOutDate', checkOutISO);
 
         navigate(`/?${params.toString()}`);
     };
@@ -102,28 +106,28 @@ const Header = () => {
                     {/* Search Bar */}
                     <form onSubmit={handleSearch} className="flex-1 max-w-3xl w-full mx-auto order-3 lg:order-2 mt-2 lg:mt-0">
                         <div className="flex flex-col sm:flex-row gap-4 bg-gray-800/50 backdrop-blur-md p-3 rounded-2xl border border-gray-700/50 shadow-2xl">
-                            <div className="flex-1 relative group">
-                                <label className="absolute -top-3 left-4 bg-gray-800 px-2 text-xs text-blue-400 font-semibold tracking-wide uppercase">
+                            <div className="flex-1 relative group date-picker-dark-mode">
+                                <label className="absolute -top-3 left-4 bg-gray-800 px-2 text-xs text-blue-400 font-semibold tracking-wide uppercase z-10">
                                     {t('dashboard.checkIn')}
                                 </label>
-                                <input
-                                    type="date"
+                                <DatePicker
                                     value={checkIn}
-                                    onChange={(e) => setCheckIn(e.target.value)}
-                                    className="w-full bg-gray-900/80 text-white text-base border border-gray-600 rounded-xl px-4 py-3.5 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all shadow-inner h-14"
-                                    min={getTodayDate()}
+                                    onChange={setCheckIn}
+                                    placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
+                                    minDate={new Date()}
+                                    isRTL={isRTL}
                                 />
                             </div>
-                            <div className="flex-1 relative group">
-                                <label className="absolute -top-3 left-4 bg-gray-800 px-2 text-xs text-blue-400 font-semibold tracking-wide uppercase">
+                            <div className="flex-1 relative group date-picker-dark-mode">
+                                <label className="absolute -top-3 left-4 bg-gray-800 px-2 text-xs text-blue-400 font-semibold tracking-wide uppercase z-10">
                                     {t('dashboard.checkOut')}
                                 </label>
-                                <input
-                                    type="date"
+                                <DatePicker
                                     value={checkOut}
-                                    onChange={(e) => setCheckOut(e.target.value)}
-                                    className="w-full bg-gray-900/80 text-white text-base border border-gray-600 rounded-xl px-4 py-3.5 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all shadow-inner h-14"
-                                    min={getTodayDate()}
+                                    onChange={setCheckOut}
+                                    placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
+                                    minDate={new Date()}
+                                    isRTL={isRTL}
                                 />
                             </div>
                             <button

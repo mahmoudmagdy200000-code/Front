@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import { formatDateToDDMMYYYY } from '../utils/dateUtils';
-import '../styles/datepicker.css';
+import { DayPicker } from 'react-day-picker';
+import { format, parse, isValid } from 'date-fns';
+import { arSA, enUS } from 'date-fns/locale';
+import 'react-day-picker/style.css';
+import '../styles/datepicker.css'; // We'll keep this for custom overrides if needed
 
 interface DatePickerProps {
     value: string; // DD/MM/YYYY format
@@ -24,18 +25,16 @@ const DatePicker = ({
     position = 'bottom',
 }: DatePickerProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [calendarDate, setCalendarDate] = useState<Date>(new Date());
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Parse the display value (DD/MM/YYYY) to Date object for calendar
-    useEffect(() => {
-        if (value) {
-            const [day, month, year] = value.split('/');
-            if (day && month && year) {
-                setCalendarDate(new Date(parseInt(year), parseInt(month) - 1, parseInt(day)));
-            }
-        }
-    }, [value]);
+    const getSelectedDate = (): Date | undefined => {
+        if (!value) return undefined;
+        const parsedDate = parse(value, 'dd/MM/yyyy', new Date());
+        return isValid(parsedDate) ? parsedDate : undefined;
+    };
+
+    const selectedDate = getSelectedDate();
 
     // Close calendar when clicking outside
     useEffect(() => {
@@ -49,32 +48,19 @@ const DatePicker = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleDateChange = (date: Date) => {
-        const formattedDate = formatDateToDDMMYYYY(
-            `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-        );
-        onChange(formattedDate);
-        setIsOpen(false);
-    };
-
-    // Wrapper for react-calendar onChange to handle correct type signature
-    const handleCalendarChange = (value: Date | [Date, Date] | null) => {
-        if (value instanceof Date) {
-            handleDateChange(value);
-        } else if (Array.isArray(value) && value[0] instanceof Date) {
-            handleDateChange(value[0]);
+    const handleDaySelect = (date: Date | undefined) => {
+        if (date) {
+            const formattedDate = format(date, 'dd/MM/yyyy');
+            onChange(formattedDate);
+            setIsOpen(false);
         }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         onChange(val);
-
-        // Try to parse and update calendar if valid format
-        if (val.length === 10 && val.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-            const [day, month, year] = val.split('/');
-            setCalendarDate(new Date(parseInt(year), parseInt(month) - 1, parseInt(day)));
-        }
+        // We don't auto-update the calendar from text input here to avoid jumping, 
+        // relying on re-render with `selectedDate` derived from `value` is safer.
     };
 
     const handleInputFocus = () => {
@@ -106,17 +92,30 @@ const DatePicker = ({
                 />
             </div>
 
-            {/* Calendar Dropdown */}
+            {/* Calendar Popover */}
             {isOpen && (
                 <div className={`absolute ${isRTL ? 'right-0' : 'left-0'} ${position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
-                    } bg-white rounded-xl shadow-2xl border border-gray-200 z-50 p-4`}>
-                    <Calendar
-                        onChange={handleCalendarChange as any}
-                        value={calendarDate}
-                        minDate={minDate}
-                        maxDate={undefined}
-                        className="react-calendar-custom"
-                        locale={isRTL ? 'ar-EG' : 'en-US'}
+                    } bg-white rounded-xl shadow-2xl border border-gray-200 z-50 p-2 animate-in fade-in zoom-in-95 duration-200`}
+                    style={{ minWidth: '300px' }}
+                >
+                    <DayPicker
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={handleDaySelect}
+                        disabled={minDate ? { before: minDate } : undefined}
+                        locale={isRTL ? arSA : enUS}
+                        dir={isRTL ? 'rtl' : 'ltr'}
+                        showOutsideDays
+                        modifiersClassNames={{
+                            selected: 'bg-blue-600 text-white hover:bg-blue-700',
+                            today: 'text-blue-500 font-bold'
+                        }}
+                        styles={{
+                            head_cell: { width: '40px' },
+                            cell: { width: '40px' },
+                            day: { width: '40px', height: '40px' },
+                            nav_button: { color: '#2563eb' } // Blue navigation
+                        }}
                     />
                 </div>
             )}

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button, Card, LoadingSpinner, EmptyState } from '../components/ui';
 import { getAllOwnerRequests, approveOwnerRequest, rejectOwnerRequest, type OwnerRequest } from '../api/admin';
 import PendingReviews from '../components/reviews/PendingReviews';
+import FeaturedChaletsManagement from '../components/admin/FeaturedChaletsManagement';
 
 const AdminDashboardPage = () => {
     const { i18n } = useTranslation();
@@ -226,22 +227,22 @@ const AdminDashboardPage = () => {
                             <table className="w-full">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {isRTL ? 'المستخدم' : 'User'}
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {isRTL ? 'البريد الإلكتروني' : 'Email'}
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {isRTL ? 'رقم الهاتف' : 'Phone'}
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {isRTL ? 'الحالة' : 'Status'}
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {isRTL ? 'تاريخ الطلب' : 'Requested At'}
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {isRTL ? 'الإجراءات' : 'Actions'}
                                         </th>
                                     </tr>
@@ -264,7 +265,7 @@ const AdminDashboardPage = () => {
                                                 {request.Email}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                <div dir="ltr" className="font-mono text-gray-700">
+                                                <div className="font-mono text-gray-700" style={{ direction: 'ltr', textAlign: isRTL ? 'right' : 'left' }}>
                                                     {request.PhoneNumber || '-'}
                                                 </div>
                                             </td>
@@ -316,6 +317,9 @@ const AdminDashboardPage = () => {
 
                 {/* Pending Reviews Section */}
                 <PendingReviews />
+
+                {/* Featured Chalets Management */}
+                <FeaturedChaletsManagement />
             </main>
         </div>
     );

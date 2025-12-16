@@ -20,9 +20,9 @@ const HomePage = () => {
         const fetchChalets = async () => {
             try {
                 setLoading(true);
-                // Fetch all chalets initially, we'll slice for top-rated
-                const data = await getChalets();
-                setChalets(data);
+                // Fetch featured chalets
+                const result = await getChalets({ isFeatured: true, pageSize: 6 });
+                setChalets(result.Items);
                 setError(null);
             } catch (err: any) {
                 setError(t('common.error'));

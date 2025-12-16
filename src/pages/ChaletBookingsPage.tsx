@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+import { DayPicker } from 'react-day-picker';
+import { arSA, enUS } from 'date-fns/locale';
+import 'react-day-picker/style.css';
+import '../styles/datepicker.css';
 
 import { getBookings, updateBookingStatus } from '../api/bookings';
 import { getChalets } from '../api/chalets';
@@ -216,12 +218,24 @@ const ChaletBookingsPage = () => {
                         <h2 className="text-xl font-bold text-gray-800 mb-6">
                             {isArabic ? 'تقويم التوافر' : 'Availability Calendar'}
                         </h2>
-                        <div className="bg-white rounded-lg shadow-md p-6 flex justify-center border border-gray-200">
-                            <Calendar
-                                tileClassName={({ date, view }) =>
-                                    view === 'month' && isDateBooked(date) ? 'booked-date' : null
-                                }
-                                className="w-full max-w-md border-none text-gray-800"
+                        <div className="bg-white rounded-lg shadow-md p-6 flex justify-center border border-gray-200" dir={isArabic ? 'rtl' : 'ltr'}>
+                            <DayPicker
+                                mode="default"
+                                modifiers={{
+                                    booked: (date) => isDateBooked(date)
+                                }}
+                                modifiersClassNames={{
+                                    booked: 'bg-red-100 text-red-600 font-bold hover:bg-red-200'
+                                }}
+                                locale={isArabic ? arSA : enUS}
+                                dir={isArabic ? 'rtl' : 'ltr'}
+                                showOutsideDays
+                                styles={{
+                                    head_cell: { width: '40px' },
+                                    cell: { width: '40px' },
+                                    day: { width: '40px', height: '40px' },
+                                    nav_button: { color: '#2563eb' }
+                                }}
                             />
                         </div>
                     </section>

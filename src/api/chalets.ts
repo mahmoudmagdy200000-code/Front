@@ -1,5 +1,5 @@
 import axiosInstance from './axios';
-import type { Chalet } from '../types/chalet';
+import type { Chalet, PagedResult } from '../types/chalet';
 
 // Create new chalet (protected - requires auth)
 export const createChalet = async (chalet: Omit<Chalet, 'Id' | 'OwnerId'>, images: File[] = []): Promise<Chalet> => {
@@ -37,16 +37,32 @@ export const createChalet = async (chalet: Omit<Chalet, 'Id' | 'OwnerId'>, image
     }
 };
 
-// Get all chalets with optional search parameters
-export const getChalets = async (checkInDate?: string, checkOutDate?: string, maxPrice?: number, adults?: number, children?: number): Promise<Chalet[]> => {
-    const params = new URLSearchParams();
-    if (checkInDate) params.append('checkInDate', checkInDate);
-    if (checkOutDate) params.append('checkOutDate', checkOutDate);
-    if (maxPrice) params.append('maxPrice', maxPrice.toString());
-    if (adults) params.append('adults', adults.toString());
-    if (children) params.append('children', children.toString());
+export interface GetChaletsParams {
+    checkInDate?: string;
+    checkOutDate?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    adults?: number;
+    children?: number;
+    isFeatured?: boolean;
+    page?: number;
+    pageSize?: number;
+}
 
-    const response = await axiosInstance.get<Chalet[]>('/chalets', { params });
+// Get all chalets with optional search parameters
+export const getChalets = async (params: GetChaletsParams = {}): Promise<PagedResult<Chalet>> => {
+    const queryParams = new URLSearchParams();
+    if (params.checkInDate) queryParams.append('checkInDate', params.checkInDate);
+    if (params.checkOutDate) queryParams.append('checkOutDate', params.checkOutDate);
+    if (params.minPrice) queryParams.append('minPrice', params.minPrice.toString());
+    if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice.toString());
+    if (params.adults) queryParams.append('adults', params.adults.toString());
+    if (params.children) queryParams.append('children', params.children.toString());
+    if (params.isFeatured !== undefined) queryParams.append('isFeatured', params.isFeatured.toString());
+    if (params.page !== undefined) queryParams.append('page', params.page.toString());
+    if (params.pageSize !== undefined) queryParams.append('pageSize', params.pageSize.toString());
+
+    const response = await axiosInstance.get<PagedResult<Chalet>>('/chalets', { params: queryParams });
     return response.data;
 };
 
