@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTodayDate, parseDateFromDDMMYYYY } from '../utils/dateUtils';
+import { parseDateFromDDMMYYYY } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

@@ -40,7 +40,7 @@ const ChaletBookingsPage = () => {
             setBookings(chaletBookings);
 
             // Find the chalet details
-            const foundChalet = allChalets.find(c => c.Id === chaletId);
+            const foundChalet = allChalets.Items.find(c => c.Id === chaletId);
             setChalet(foundChalet || null);
 
         } catch (error) {
@@ -220,7 +220,6 @@ const ChaletBookingsPage = () => {
                         </h2>
                         <div className="bg-white rounded-lg shadow-md p-6 flex justify-center border border-gray-200" dir={isArabic ? 'rtl' : 'ltr'}>
                             <DayPicker
-                                mode="default"
                                 modifiers={{
                                     booked: (date) => isDateBooked(date)
                                 }}
