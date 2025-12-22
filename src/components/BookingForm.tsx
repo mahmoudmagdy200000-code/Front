@@ -164,7 +164,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                             setMessage(null);
                             setErrors({});
                         }}
-                        label={t('booking.checkInDate')}
+                        label={t('booking.checkIn')}
                         placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
                         minDate={new Date()}
                         isRTL={isRTL}
@@ -183,7 +183,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                             setMessage(null);
                             setErrors({});
                         }}
-                        label={t('booking.checkOutDate')}
+                        label={t('booking.checkOut')}
                         placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
                         minDate={new Date()}
                         isRTL={isRTL}
