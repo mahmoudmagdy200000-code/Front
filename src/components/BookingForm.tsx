@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { formatDateToDDMMYYYY, parseDateFromDDMMYYYY, isValidDateFormat } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -16,6 +16,7 @@ interface BookingFormProps {
 const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialCheckOut = '' }: BookingFormProps) => {
     const { t, i18n } = useTranslation();
     const isRTL = i18n.language === 'ar';
+    const formRef = useRef<HTMLDivElement>(null);
 
     // Convert initial dates from YYYY-MM-DD to DD/MM/YYYY for display
     const [checkInDate, setCheckInDate] = useState(initialCheckIn ? formatDateToDDMMYYYY(initialCheckIn) : '');
@@ -104,6 +105,15 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                 type: result.IsAvailable ? 'success' : 'error',
                 text: result.IsAvailable ? t('booking.available') : t('booking.notAvailable'),
             });
+
+            // Scroll to the bottom of the form to show availability content
+            setTimeout(() => {
+                const element = document.getElementById('availability-content');
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+
         } catch (error) {
             setMessage({ type: 'error', text: t('common.error') });
         } finally {
@@ -139,12 +149,20 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                 UserPhoneNumber: userPhoneNumber,
             };
             const createdBooking = await createBooking(booking as any);
-            const successMsg = t('booking.success') + (createdBooking.BookingReference ? `\nBooking Reference: ${createdBooking.BookingReference}` : '');
+            const successMsg = t('booking.success') + (createdBooking.BookingReference ? `\n\nرقم الحجز: ${createdBooking.BookingReference}` : '');
+
             setMessage({ type: 'success', text: successMsg });
+
+            // Important: Scroll to the beginning of the form so user sees the success message
+            formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Clear state after successful scroll/delay
             setCheckInDate('');
             setCheckOutDate('');
             setUserPhoneNumber('');
+            setIsAcceptedTerms(false);
             setIsAvailable(null);
+
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message || t('common.error');
             setMessage({ type: 'error', text: errorMsg });
@@ -154,7 +172,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
     };
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md">
+        <div ref={formRef} className="p-6 bg-white rounded-lg shadow-md scroll-mt-20">
             <h2 className="text-2xl font-bold mb-4">{t('booking.title')}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -235,7 +253,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                 )}
 
                 {isAvailable && (
-                    <div className="space-y-6 animate-fade-in">
+                    <div id="availability-content" className="space-y-6 animate-fade-in scroll-mt-10">
                         <div>
                             <label htmlFor="userPhone" className="block text-sm font-medium text-gray-700 mb-1">
                                 {t('booking.yourPhone')}
