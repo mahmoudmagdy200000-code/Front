@@ -19,6 +19,8 @@ export interface Chalet {
     ImageUrl?: string;
     Images?: ChaletImage[];
     IsFeatured?: boolean;
+    MonthlyEarnings?: number;
+    UpcomingBookingsCount?: number;
 }
 
 export interface PagedResult<T> {

@@ -19,6 +19,7 @@ const BookingsPage = lazy(() => import('./pages/BookingsPage'));
 const ChaletBookingsPage = lazy(() => import('./pages/ChaletBookingsPage'));
 const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
 const ClientDashboardPage = lazy(() => import('./pages/ClientDashboardPage'));
+const EarningsPage = lazy(() => import('./pages/EarningsPage'));
 
 function App() {
   return (
@@ -51,6 +52,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <ChaletBookingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/owner/earnings"
+                element={
+                  <ProtectedRoute>
+                    <EarningsPage />
                   </ProtectedRoute>
                 }
               />

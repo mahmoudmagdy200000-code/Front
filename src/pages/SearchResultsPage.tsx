@@ -163,7 +163,12 @@ const SearchResultsPage = () => {
                                 <>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         {chalets.map((chalet) => (
-                                            <ChaletCard key={chalet.Id} chalet={chalet} />
+                                            <ChaletCard
+                                                key={chalet.Id}
+                                                chalet={chalet}
+                                                checkIn={searchParams.get('checkIn') || undefined}
+                                                checkOut={searchParams.get('checkOut') || undefined}
+                                            />
                                         ))}
                                     </div>
 

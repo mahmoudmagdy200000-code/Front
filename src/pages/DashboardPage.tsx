@@ -3,17 +3,21 @@ import { useTranslation } from 'react-i18next';
 
 // تأكد أن createChalet يقبل المعامل الثاني (images) في ملف api/chalets.ts كما عدلناه سابقاً
 import { getMyChalets, createChalet, updateChalet, deleteChalet, uploadChaletImages, deleteChaletImage } from '../api/chalets';
+import { getEarningsSummary, type EarningsSummary } from '../api/earnings';
 import type { Chalet, ChaletImage } from '../types/chalet';
 import DashboardHeader from '../components/DashboardHeader';
 import ChaletCard from '../components/dashboard/ChaletCard';
+import { useNavigate } from 'react-router-dom';
 
 import { getImageUrl } from '../config/api';
 
 const DashboardPage = () => {
     const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const isArabic = i18n.language === 'ar';
 
     const [chalets, setChalets] = useState<Chalet[]>([]);
+    const [earningsSummary, setEarningsSummary] = useState<EarningsSummary | null>(null);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingChalet, setEditingChalet] = useState<Chalet | null>(null);
@@ -52,8 +56,12 @@ const DashboardPage = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const chaletsData = await getMyChalets();
+            const [chaletsData, summaryData] = await Promise.all([
+                getMyChalets(),
+                getEarningsSummary()
+            ]);
             setChalets(chaletsData);
+            setEarningsSummary(summaryData);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -330,7 +338,69 @@ const DashboardPage = () => {
         <div className="min-h-screen bg-stone-50 font-sans relative isolate" dir={isArabic ? 'rtl' : 'ltr'}>
             <DashboardHeader />
 
-            <main className="container mx-auto px-4 md:px-6 py-6">
+            <main className="container mx-auto px-4 md:px-6 py-6 font-sans">
+                {/* Earnings Summary Section */}
+                {(loading || earningsSummary) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        {loading ? (
+                            // Skeletons
+                            Array(4).fill(0).map((_, i) => (
+                                <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-3 animate-pulse">
+                                    <div className="h-3 w-24 bg-slate-100 rounded opacity-70" />
+                                    <div className="h-8 w-32 bg-slate-50 rounded" />
+                                    <div className="h-3 w-20 bg-slate-100 rounded opacity-50" />
+                                </div>
+                            ))
+                        ) : earningsSummary && (
+                            <>
+                                <div
+                                    onClick={() => navigate('/owner/earnings')}
+                                    className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1 cursor-pointer hover:shadow-md transition-all group overflow-hidden relative"
+                                >
+                                    <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50/50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110" />
+                                    <span className="text-slate-500 text-sm font-medium z-10">{isArabic ? 'إجمالي الأرباح' : 'Total Earnings'}</span>
+                                    <div className="flex items-baseline gap-1 z-10">
+                                        <span className="text-2xl font-extrabold text-slate-800">{earningsSummary.TotalEarnings.toLocaleString()}</span>
+                                        <span className="text-[10px] text-slate-400 font-bold uppercase">{isArabic ? 'ج.م' : 'EGP'}</span>
+                                    </div>
+                                    <div className="mt-3 text-[11px] text-blue-500 font-bold flex items-center gap-1 group-hover:gap-2 transition-all z-10">
+                                        {isArabic ? 'عرض التفاصيل' : 'View Details'}
+                                        <svg className={`w-3 h-3 ${isArabic ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-50/50 rounded-bl-full -mr-4 -mt-4" />
+                                    <span className="text-slate-500 text-sm font-medium z-10">{isArabic ? 'أرباح قادمة' : 'Upcoming Revenue'}</span>
+                                    <div className="flex items-baseline gap-1 z-10">
+                                        <span className="text-2xl font-extrabold text-indigo-600">{earningsSummary.UpcomingEarnings.toLocaleString()}</span>
+                                        <span className="text-[10px] text-slate-400 font-bold uppercase">{isArabic ? 'ج.م' : 'EGP'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-50/50 rounded-bl-full -mr-4 -mt-4" />
+                                    <span className="text-slate-500 text-sm font-medium z-10">{isArabic ? 'أرباح مكتملة' : 'Completed Revenue'}</span>
+                                    <div className="flex items-baseline gap-1 z-10">
+                                        <span className="text-2xl font-extrabold text-emerald-600">{earningsSummary.CompletedEarnings.toLocaleString()}</span>
+                                        <span className="text-[10px] text-slate-400 font-bold uppercase">{isArabic ? 'ج.م' : 'EGP'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-16 h-16 bg-rose-50/50 rounded-bl-full -mr-4 -mt-4" />
+                                    <span className="text-slate-500 text-sm font-medium z-10">{isArabic ? 'إجمالي العمولة' : 'Total Commission'}</span>
+                                    <div className="flex items-baseline gap-1 z-10">
+                                        <span className="text-2xl font-extrabold text-rose-500">{earningsSummary.TotalCommission.toLocaleString()}</span>
+                                        <span className="text-[10px] text-slate-400 font-bold uppercase">{isArabic ? 'ج.م' : 'EGP'}</span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>

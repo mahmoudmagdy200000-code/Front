@@ -73,5 +73,28 @@
         "backToHome": "Back to Home",
         "sar": "EGP",
         "cancel": "Cancel"
+    },
+    "earnings": {
+        "title": "Earnings & Revenue",
+        "totalEarnings": "Total Earnings",
+        "upcomingEarnings": "Upcoming Earnings",
+        "completedEarnings": "Completed Earnings",
+        "totalCommissions": "Total Commissions",
+        "viewDetails": "View Details",
+        "monthlyEarnings": "Monthly Earnings",
+        "upcomingBookings": "Upcoming Bookings",
+        "date": "Date",
+        "chalet": "Chalet",
+        "nights": "Nights",
+        "total": "Total",
+        "commission": "Comm.",
+        "net": "Net Earnings",
+        "status": "Status",
+        "allChalets": "All Chalets",
+        "allStatuses": "All Statuses",
+        "fromDate": "From Date",
+        "toDate": "To Date",
+        "noData": "No data found for these filters",
+        "backToDashboard": "Back to Dashboard"
     }
 }

@@ -72,5 +72,28 @@
         "backToHome": "العودة للرئيسية",
         "sar": "جنيه",
         "cancel": "إلغاء"
+    },
+    "earnings": {
+        "title": "الأرباح والعوائد",
+        "totalEarnings": "إجمالي الأرباح",
+        "upcomingEarnings": "أرباح متوقعة",
+        "completedEarnings": "أرباح مكتملة",
+        "totalCommissions": "إجمالي العمولات",
+        "viewDetails": "عرض التفاصيل",
+        "monthlyEarnings": "أرباح الشهر",
+        "upcomingBookings": "حجوزات قادمة",
+        "date": "التاريخ",
+        "chalet": "الشاليه",
+        "nights": "الليالي",
+        "total": "الإجمالي",
+        "commission": "العمولة",
+        "net": "صافي الربح",
+        "status": "الحالة",
+        "allChalets": "كل الشاليهات",
+        "allStatuses": "كل الحالات",
+        "fromDate": "من تاريخ",
+        "toDate": "إلى تاريخ",
+        "noData": "لا توجد بيانات لهذه الفلاتر",
+        "backToDashboard": "العودة للوحة التحكم"
     }
 }

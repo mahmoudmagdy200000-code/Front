@@ -1,14 +1,10 @@
 import axios from 'axios';
 
-
-
-
 const axiosInstance = axios.create({
-    //baseURL: import.meta.env.VITE_API_URL,//|| 'https://rsr123.runasp.net',
     baseURL: import.meta.env.VITE_API_URL || 'https://rsr123.runasp.net',
     //baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5266/api',
-    timeout: 120000, // ⬆️ زيادة الـ timeout إلى 120 ثانية (للملفات الكبيرة)
-    withCredentials: true, // ✅ للسماح بـ CORS مع credentials
+    timeout: 120000,
+    withCredentials: true,
 });
 
 // Request interceptor to include JWT token
@@ -60,7 +56,6 @@ axiosInstance.interceptors.response.use(
             url: error.config?.url,
         });
 
-        // معالجة أخطاء محددة
         // معالجة أخطاء محددة
         if (error.response?.status === 401) {
             // Unauthorized - لا تقم بإعادة التوجيه إذا كان الخطأ من صفحة تسجيل الدخول نفسها
