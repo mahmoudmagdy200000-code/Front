@@ -8,7 +8,7 @@ interface BudgetFilterProps {
 }
 
 const BudgetFilter: React.FC<BudgetFilterProps> = ({ onPriceFilterChange, currentMin, currentMax }) => {
-    const { t, i18n } = useTranslation();
+    const { i18n } = useTranslation();
     const isRTL = i18n.language === 'ar';
 
     const [min, setMin] = useState<string>(currentMin?.toString() || '');
