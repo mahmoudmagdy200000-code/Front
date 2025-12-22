@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // تأكد أن createChalet يقبل المعامل الثاني (images) في ملف api/chalets.ts كما عدلناه سابقاً
-import { getMyChalets, createChalet, updateChalet, deleteChalet, uploadChaletImages, deleteChaletImage } from '../api/chalets';
+import { getMyChalets, createChalet, updateChalet, deleteChalet, uploadChaletImages, deleteChaletImage, reorderChaletImages } from '../api/chalets';
 import { getEarningsSummary, type EarningsSummary } from '../api/earnings';
 import type { Chalet, ChaletImage } from '../types/chalet';
 import DashboardHeader from '../components/DashboardHeader';
@@ -26,7 +26,7 @@ const DashboardPage = () => {
     const [imageError, setImageError] = useState<string | null>(null);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const MAX_IMAGES = 12;
+    const MAX_IMAGES = 18;
     const MAX_CHALETS = 5;
 
     const [formData, setFormData] = useState({
@@ -203,6 +203,12 @@ const DashboardPage = () => {
                     await uploadChaletImages(editingChalet.Id, selectedImages);
                     console.log('✅ [handleSubmit] uploadChaletImages completed');
                 }
+
+                // تحديث ترتيب الصور الموجودة
+                if (existingImages.length > 0) {
+                    console.log('⏳ [handleSubmit] Reordering existing images...');
+                    await reorderChaletImages(editingChalet.Id, existingImages.map(img => img.Id));
+                }
             } else {
                 console.log('➕ [handleSubmit] Creating new chalet');
                 console.log('⏳ [handleSubmit] Awaiting createChalet...');
@@ -275,7 +281,7 @@ const DashboardPage = () => {
             adultsCapacity: chalet.AdultsCapacity,
             childrenCapacity: chalet.ChildrenCapacity,
         });
-        setExistingImages(chalet.Images || []);
+        setExistingImages((chalet.Images || []).sort((a, b) => a.DisplayOrder - b.DisplayOrder));
         setSelectedImages([]);
         setImageError(null);
         setShowForm(true);
@@ -313,6 +319,26 @@ const DashboardPage = () => {
         } catch (error) {
             console.error('Error deleting image:', error);
             alert(t('common.error'));
+        }
+    };
+
+    const moveExistingImage = (index: number, direction: 'left' | 'right') => {
+        const newImages = [...existingImages];
+        const newIndex = direction === 'left' ? index - 1 : index + 1;
+
+        if (newIndex >= 0 && newIndex < newImages.length) {
+            [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
+            setExistingImages(newImages);
+        }
+    };
+
+    const moveSelectedImage = (index: number, direction: 'left' | 'right') => {
+        const newImages = [...selectedImages];
+        const newIndex = direction === 'left' ? index - 1 : index + 1;
+
+        if (newIndex >= 0 && newIndex < newImages.length) {
+            [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
+            setSelectedImages(newImages);
         }
     };
 
@@ -588,24 +614,43 @@ const DashboardPage = () => {
 
                                         {(existingImages.length > 0 || selectedImages.length > 0) && (
                                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-4">
-                                                {existingImages.map(img => (
+                                                {existingImages.map((img, index) => (
                                                     <div key={img.Id} className="aspect-square relative rounded-lg overflow-hidden group border border-slate-200">
                                                         <img src={getImageUrl(img.ImageUrl)} className="w-full h-full object-cover" />
-                                                        <button
-                                                            type="button"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                handleDeleteImage(img.Id);
-                                                            }}
-                                                            className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center transition-opacity opacity-0 group-hover:opacity-100 shadow-md z-10"
-                                                            title={isArabic ? 'حذف' : 'Delete'}
-                                                        >
-                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                            </svg>
-                                                        </button>
-                                                        {img.IsPrimary && (
-                                                            <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] text-center py-0.5">
+                                                        {/* Controls Overlay */}
+                                                        <div className="absolute inset-x-0 bottom-0 bg-black/60 flex justify-between items-center px-1 py-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => { e.preventDefault(); moveExistingImage(index, 'left'); }}
+                                                                className="text-white hover:text-blue-300 p-1 disabled:opacity-30"
+                                                                disabled={index === 0}
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    handleDeleteImage(img.Id);
+                                                                }}
+                                                                className="text-red-400 hover:text-red-500 p-1"
+                                                                title={isArabic ? 'حذف' : 'Delete'}
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                </svg>
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => { e.preventDefault(); moveExistingImage(index, 'right'); }}
+                                                                className="text-white hover:text-blue-300 p-1 disabled:opacity-30"
+                                                                disabled={index === existingImages.length - 1}
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                                                            </button>
+                                                        </div>
+                                                        {index === 0 && (
+                                                            <div className="absolute top-1 left-1 bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm z-10 pointer-events-none">
                                                                 Main
                                                             </div>
                                                         )}
@@ -614,7 +659,31 @@ const DashboardPage = () => {
                                                 {selectedImages.map((file, i) => (
                                                     <div key={i} className="aspect-square relative rounded-lg overflow-hidden group border-2 border-green-400">
                                                         <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
-                                                        <button type="button" onClick={() => setSelectedImages(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">×</button>
+                                                        {/* Controls Overlay for Selected Images */}
+                                                        <div className="absolute inset-x-0 bottom-0 bg-black/60 flex justify-between items-center px-1 py-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => { e.preventDefault(); moveSelectedImage(i, 'left'); }}
+                                                                className="text-white hover:text-blue-300 p-1 disabled:opacity-30"
+                                                                disabled={i === 0}
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                                                            </button>
+                                                            <button type="button" onClick={() => setSelectedImages(prev => prev.filter((_, idx) => idx !== i))} className="text-red-400 hover:text-red-500 p-1">
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => { e.preventDefault(); moveSelectedImage(i, 'right'); }}
+                                                                className="text-white hover:text-blue-300 p-1 disabled:opacity-30"
+                                                                disabled={i === selectedImages.length - 1}
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                                                            </button>
+                                                        </div>
+                                                        <div className="absolute top-1 left-1 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm z-10 pointer-events-none">
+                                                            New
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>

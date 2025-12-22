@@ -112,3 +112,8 @@ export const deleteChaletImage = async (chaletId: number, imageId: number): Prom
     const response = await axiosInstance.delete<{ message: string }>(`/chalets/${chaletId}/images/${imageId}`);
     return response.data;
 };
+
+// Reorder chalet images (protected - requires auth)
+export const reorderChaletImages = async (chaletId: number, imageIds: number[]): Promise<void> => {
+    await axiosInstance.put(`/chalets/${chaletId}/images/order`, imageIds);
+};
