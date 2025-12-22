@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { formatDateToDDMMYYYY, parseDateFromDDMMYYYY, isValidDateFormat } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { checkAvailability, createBooking } from '../api/bookings';
 import type { Booking } from '../types/booking';
 import DatePicker from './DatePicker';
@@ -20,6 +21,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
     const [checkInDate, setCheckInDate] = useState(initialCheckIn ? formatDateToDDMMYYYY(initialCheckIn) : '');
     const [checkOutDate, setCheckOutDate] = useState(initialCheckOut ? formatDateToDDMMYYYY(initialCheckOut) : '');
     const [userPhoneNumber, setUserPhoneNumber] = useState('');
+    const [isAcceptedTerms, setIsAcceptedTerms] = useState(false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
@@ -262,10 +264,52 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                             </div>
                         </div>
 
+                        {/* Payment Method Section */}
+                        <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex items-center gap-4">
+                            <div className="w-12 h-12 bg-[#E60000] rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-slate-900 leading-tight">
+                                    {isRTL ? 'الدفع يتم عن طريق محفظة فودافون كاش' : 'Payment is done via Vodafone Cash wallet'}
+                                </p>
+                                <p className="text-xs text-red-600 font-medium mt-1">
+                                    Vodafone Cash
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Terms & Conditions Checkbox */}
+                        <div className="flex items-start gap-3 select-none">
+                            <div className="flex items-center h-6">
+                                <input
+                                    id="terms"
+                                    type="checkbox"
+                                    checked={isAcceptedTerms}
+                                    onChange={(e) => setIsAcceptedTerms(e.target.checked)}
+                                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer transition-all"
+                                />
+                            </div>
+                            <div className="text-sm">
+                                <label htmlFor="terms" className="text-gray-600 cursor-pointer">
+                                    {isRTL ? 'أوافق على ' : 'I agree to the '}
+                                    <Link
+                                        to="/terms-and-conditions"
+                                        target="_blank"
+                                        className="text-blue-600 font-bold hover:underline"
+                                    >
+                                        {isRTL ? 'الشروط والأحكام' : 'Terms & Conditions'}
+                                    </Link>
+                                </label>
+                            </div>
+                        </div>
+
                         <button
                             type="submit"
-                            disabled={loading || !userPhoneNumber}
-                            className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                            disabled={loading || !userPhoneNumber || !isAcceptedTerms}
+                            className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:scale-95"
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
