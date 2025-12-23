@@ -52,7 +52,7 @@ const ChaletBookingsPage = () => {
 
     const isDateBooked = (date: Date) => {
         return bookings.some(booking => {
-            if (booking.Status === 'Cancelled') return false;
+            if (booking.Status !== 'Confirmed') return false;
             const checkIn = new Date(booking.CheckInDate);
             const checkOut = new Date(booking.CheckOutDate);
             const d = new Date(date);
