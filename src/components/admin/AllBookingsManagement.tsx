@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getBookings, updateBookingStatus } from '../../api/bookings';
+import { useAuth } from '../../context/AuthContext';
+import { getBookings, updateBookingStatus, confirmWithDeposit } from '../../api/bookings';
 import { getChalets } from '../../api/chalets';
 import type { Booking } from '../../types/booking';
 import type { Chalet } from '../../types/chalet';
@@ -17,6 +18,7 @@ interface Props {
 
 const AllBookingsManagement = ({ externalFilters }: Props) => {
     const { i18n } = useTranslation();
+    const { role } = useAuth();
     const isRTL = i18n.language === 'ar';
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [chalets, setChalets] = useState<Chalet[]>([]);
@@ -26,6 +28,12 @@ const AllBookingsManagement = ({ externalFilters }: Props) => {
     const [filterFrom, setFilterFrom] = useState<string>(externalFilters?.fromDate || '');
     const [filterTo, setFilterTo] = useState<string>(externalFilters?.toDate || '');
     const [filterChalet, setFilterChalet] = useState<number | undefined>(externalFilters?.chaletId);
+
+    // Deposit Modal State
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
+    const [depositAmount, setDepositAmount] = useState<string>('');
+    const [referenceNumber, setReferenceNumber] = useState<string>('');
 
     useEffect(() => {
         fetchInitialData();
@@ -63,6 +71,34 @@ const AllBookingsManagement = ({ externalFilters }: Props) => {
             setBookings(prev => prev.map(b => b.Id === id ? { ...b, Status: newStatus } : b));
         } catch (error) {
             console.error('Failed to update status:', error);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleConfirmBooking = (id: number) => {
+        const booking = bookings.find(b => b.Id === id);
+        if (booking) {
+            setSelectedBookingId(id);
+            // Default deposit to total price or 50%? Let's leave it blank or pre-fill with half
+            const total = booking.TotalPrice || 0;
+            setDepositAmount((total * 0.5).toString());
+            setReferenceNumber('');
+            setIsConfirmModalOpen(true);
+        }
+    };
+
+    const submitConfirmation = async () => {
+        if (!selectedBookingId || !depositAmount || !referenceNumber) return;
+
+        try {
+            setActionLoading(selectedBookingId);
+            await confirmWithDeposit(selectedBookingId, parseFloat(depositAmount), referenceNumber);
+            setBookings(prev => prev.map(b => b.Id === selectedBookingId ? { ...b, Status: 'Confirmed' } : b));
+            setIsConfirmModalOpen(false);
+        } catch (error) {
+            console.error('Failed to confirm booking:', error);
+            alert(isRTL ? 'فشل تأكيد الحجز. يرجى التأكد من البيانات.' : 'Failed to confirm booking. Please check the data.');
         } finally {
             setActionLoading(null);
         }
@@ -197,13 +233,13 @@ const AllBookingsManagement = ({ externalFilters }: Props) => {
                                                     variant="success"
                                                     size="sm"
                                                     className="rounded-xl px-4"
-                                                    onClick={() => handleStatusChange(booking.Id, 'Confirmed')}
+                                                    onClick={() => handleConfirmBooking(booking.Id)}
                                                     isLoading={actionLoading === booking.Id}
                                                 >
                                                     {isRTL ? 'تأكيد' : 'Confirm'}
                                                 </Button>
                                             )}
-                                            {booking.Status !== 'Cancelled' && (
+                                            {booking.Status !== 'Cancelled' && role === 'SuperAdmin' && (
                                                 <Button
                                                     variant="danger"
                                                     size="sm"
@@ -223,6 +259,74 @@ const AllBookingsManagement = ({ externalFilters }: Props) => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+            )}
+            {/* Confirmation Modal */}
+            {isConfirmModalOpen && (
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform animate-in zoom-in-95 duration-300">
+                        <div className="bg-emerald-600 p-6 text-white text-center">
+                            <h3 className="text-xl font-black">{isRTL ? 'تأكيد الحجز ورفع الدفعة' : 'Confirm Booking & Record Deposit'}</h3>
+                            <p className="text-emerald-100 text-sm mt-1">
+                                {isRTL ? 'يرجى إدخال تفاصيل التحويل البنكي أو النقدي' : 'Please enter the bank transfer or cash details'}
+                            </p>
+                        </div>
+
+                        <div className="p-8 space-y-5">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1">
+                                    {isRTL ? 'مبلغ العربون / الدفعة' : 'Deposit Amount'}
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        value={depositAmount}
+                                        onChange={(e) => setDepositAmount(e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3.5 text-slate-800 font-bold outline-none focus:ring-4 focus:ring-emerald-50 focus:border-emerald-500 transition-all"
+                                        placeholder="0.00"
+                                    />
+                                    <span className={`absolute ${isRTL ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs uppercase`}>
+                                        {isRTL ? 'ج.م' : 'EGP'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1">
+                                    {isRTL ? 'رقم المرجع / التحويل' : 'Reference / Transaction ID'}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={referenceNumber}
+                                    onChange={(e) => setReferenceNumber(e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3.5 text-slate-800 font-bold outline-none focus:ring-4 focus:ring-emerald-50 focus:border-emerald-500 transition-all"
+                                    placeholder={isRTL ? 'مثال: TRX123456' : 'e.g. TRX123456'}
+                                />
+                                <p className="text-[10px] text-slate-400 px-1 italic">
+                                    {isRTL ? '* سيتم تسجيل هذا الإجراء باسمك للمراجعة والتدقيق.' : '* This action will be logged under your name for auditing.'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-6 flex gap-3">
+                            <Button
+                                variant="outline"
+                                className="flex-1 rounded-2xl border-slate-200"
+                                onClick={() => setIsConfirmModalOpen(false)}
+                            >
+                                {isRTL ? 'إلغاء' : 'Cancel'}
+                            </Button>
+                            <Button
+                                variant="success"
+                                className="flex-1 rounded-2xl font-black shadow-lg shadow-emerald-100"
+                                onClick={submitConfirmation}
+                                isLoading={actionLoading !== null}
+                                disabled={!depositAmount || !referenceNumber}
+                            >
+                                {isRTL ? 'تأكيد الحجز الآن' : 'Confirm Now'}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             )}
         </Card>

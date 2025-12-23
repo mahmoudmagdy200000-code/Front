@@ -30,6 +30,17 @@ export const updateBookingStatus = async (id: number, status: string): Promise<v
     await axiosInstance.put(`/bookings/${id}/status`, { status });
 };
 
+// Confirm booking with deposit
+export const confirmWithDeposit = async (id: number, depositAmount: number, referenceNumber: string): Promise<void> => {
+    await axiosInstance.post(`/bookings/${id}/confirm-with-deposit`, { depositAmount, referenceNumber });
+};
+
+// Get deposits audit log (SuperAdmin only)
+export const getDeposits = async (): Promise<any[]> => {
+    const response = await axiosInstance.get('/bookings/deposits');
+    return response.data;
+};
+
 // Get bookings by phone number
 export const getBookingByPhone = async (phoneNumber: string): Promise<Booking[]> => {
     const response = await axiosInstance.get<Booking[]>('/bookings/search', {

@@ -8,6 +8,7 @@ import PendingReviews from '../components/reviews/PendingReviews';
 import FeaturedChaletsManagement from '../components/admin/FeaturedChaletsManagement';
 import AllBookingsManagement from '../components/admin/AllBookingsManagement';
 import PlatformAnalyticsComponent from '../components/admin/PlatformAnalytics';
+import DepositsAuditLog from '../components/admin/DepositsAuditLog';
 
 // --- Icon Components ---
 const OverviewIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
@@ -21,7 +22,7 @@ const AdminDashboardPage = () => {
     const { role, logout } = useAuth();
     const isRTL = i18n.language === 'ar';
 
-    const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'reviews' | 'featured' | 'users' | 'bookings' | 'system_admins'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'reviews' | 'featured' | 'users' | 'bookings' | 'system_admins' | 'deposits'>('overview');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [requests, setRequests] = useState<OwnerRequest[]>([]);
     const [users, setUsers] = useState<any[]>([]);
@@ -200,6 +201,7 @@ const AdminDashboardPage = () => {
         { id: 'requests', label: isRTL ? 'طلبات ترقية المالكين' : 'Owner Requests', icon: <UsersIcon /> },
         { id: 'reviews', label: isRTL ? 'مراجعات قيد الانتظار' : 'Pending Reviews', icon: <ReviewsIcon /> },
         { id: 'featured', label: isRTL ? 'إدارة الشاليهات المميزة' : 'Featured Management', icon: <StarIcon /> },
+        ...(role === 'SuperAdmin' ? [{ id: 'deposits', label: isRTL ? 'سجل المدفوعات' : 'Deposits Log', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> }] : []),
     ];
 
     if (loading) {
@@ -470,30 +472,37 @@ const AdminDashboardPage = () => {
                                                                 {new Date(request.CreatedAt).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
                                                             </td>
                                                             <td className="px-8 py-5 whitespace-nowrap text-end">
-                                                                {request.Status === 'Pending' ? (
+                                                                {(request.Status === 'Pending' || (request.Status === 'ConfirmedByAdmin' && role === 'SuperAdmin')) ? (
                                                                     <div className="flex justify-end gap-2">
                                                                         <Button
                                                                             variant="success"
                                                                             size="sm"
                                                                             className="rounded-xl font-black shadow-sm"
                                                                             onClick={() => handleApprove(request.Id)}
-                                                                            isLoading={actionLoading === request.Id}
                                                                         >
-                                                                            {isRTL ? 'قبول' : 'Approve'}
+                                                                            {request.Status === 'ConfirmedByAdmin'
+                                                                                ? (isRTL ? 'موافقة نهائية' : 'Final Approve')
+                                                                                : (role === 'SuperAdmin' ? (isRTL ? 'قبول' : 'Approve') : (isRTL ? 'تحقق' : 'Verify'))
+                                                                            }
                                                                         </Button>
-                                                                        <Button
-                                                                            variant="danger"
-                                                                            size="sm"
-                                                                            className="rounded-xl font-black shadow-sm"
-                                                                            onClick={() => handleReject(request.Id)}
-                                                                            isLoading={actionLoading === request.Id}
-                                                                        >
-                                                                            {isRTL ? 'رفض' : 'Reject'}
-                                                                        </Button>
+                                                                        {request.Status === 'Pending' && (
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="rounded-xl border-rose-100 text-rose-600 hover:bg-rose-50"
+                                                                                onClick={() => handleReject(request.Id)}
+                                                                            >
+                                                                                {isRTL ? 'رفض' : 'Reject'}
+                                                                            </Button>
+                                                                        )}
                                                                     </div>
+                                                                ) : request.Status === 'ConfirmedByAdmin' && role !== 'SuperAdmin' ? (
+                                                                    <span className="text-xs font-bold text-indigo-500 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100">
+                                                                        {isRTL ? 'تم التحقق - بانتظار السوبر' : 'Verified - Awaiting SuperAdmin'}
+                                                                    </span>
                                                                 ) : (
-                                                                    <span className="text-xs font-black text-slate-300 uppercase tracking-widest">
-                                                                        {isRTL ? 'مكتمل' : 'Finalized'}
+                                                                    <span className="text-xs font-bold text-slate-400 italic">
+                                                                        {isRTL ? 'تمت المعالجة' : 'Processed'}
                                                                     </span>
                                                                 )}
                                                             </td>
@@ -632,6 +641,13 @@ const AdminDashboardPage = () => {
                         {activeTab === 'bookings' && (
                             <div className="animate-in slide-in-from-bottom-4 duration-500">
                                 <AllBookingsManagement externalFilters={bookingFilters} />
+                            </div>
+                        )}
+
+                        {/* --- Deposits Log Tab --- */}
+                        {activeTab === 'deposits' && (
+                            <div className="animate-in slide-in-from-bottom-4 duration-500">
+                                <DepositsAuditLog />
                             </div>
                         )}
 
@@ -799,6 +815,7 @@ const OverviewStatCard = ({ label, value, icon, color, onClick }: any) => {
 const StatusBadge = ({ status, isRTL }: { status: string; isRTL: boolean }) => {
     const config: any = {
         Pending: { bg: 'bg-amber-100/50 text-amber-600 border-amber-200/50', label: isRTL ? 'قيد الانتظار' : 'Pending' },
+        ConfirmedByAdmin: { bg: 'bg-indigo-100/50 text-indigo-600 border-indigo-200/50', label: isRTL ? 'بانتظار السوبر أدمن' : 'Awaiting SuperAdmin' },
         Approved: { bg: 'bg-emerald-100/50 text-emerald-600 border-emerald-200/50', label: isRTL ? 'مقبول' : 'Approved' },
         Rejected: { bg: 'bg-rose-100/50 text-rose-600 border-rose-200/50', label: isRTL ? 'مرفوض' : 'Rejected' }
     };
