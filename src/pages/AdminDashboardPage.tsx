@@ -22,6 +22,7 @@ const AdminDashboardPage = () => {
     const isRTL = i18n.language === 'ar';
 
     const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'reviews' | 'featured' | 'users' | 'bookings' | 'system_admins'>('overview');
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [requests, setRequests] = useState<OwnerRequest[]>([]);
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -208,23 +209,42 @@ const AdminDashboardPage = () => {
     return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col md:flex-row" dir={isRTL ? 'rtl' : 'ltr'}>
 
-            {/* Sidebar - Desktop */}
-            <aside className="w-full md:w-72 bg-white border-e border-slate-200 flex flex-col sticky top-0 md:h-screen z-20">
+            {/* Sidebar Overlay (Mobile only) */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 md:hidden"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside className={`fixed md:sticky top-0 ${isRTL ? 'right-0' : 'left-0'} bottom-0 w-72 bg-white border-e border-slate-200 flex flex-col z-40 transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')} md:translate-x-0 md:h-screen`}>
                 <div className="p-6">
-                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-4 rounded-2xl shadow-lg shadow-indigo-200 mb-8">
-                        <h1 className="text-white font-black text-xl tracking-tight">
-                            {isRTL ? 'لوحة الإدارة' : 'Admin Hub'}
-                        </h1>
-                        <p className="text-indigo-100/80 text-xs font-medium mt-1">
-                            {isRTL ? 'إدارة محتوى المنصة' : 'Platform Management'}
-                        </p>
+                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-4 rounded-2xl shadow-lg shadow-indigo-200 mb-8 flex items-center justify-between">
+                        <div>
+                            <h1 className="text-white font-black text-xl tracking-tight">
+                                {isRTL ? 'لوحة الإدارة' : 'Admin Hub'}
+                            </h1>
+                            <p className="text-indigo-100/80 text-xs font-medium mt-1">
+                                {isRTL ? 'إدارة محتوى المنصة' : 'Platform Management'}
+                            </p>
+                        </div>
+                        <button
+                            className="md:hidden text-white/80 hover:text-white"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
                     </div>
 
-                    <nav className="space-y-1.5">
+                    <nav className="space-y-1.5 overflow-y-auto max-h-[calc(100vh-250px)]">
                         {navItems.map((item) => (
                             <button
                                 key={item.id}
-                                onClick={() => setActiveTab(item.id as any)}
+                                onClick={() => {
+                                    setActiveTab(item.id as any);
+                                    setIsMobileMenuOpen(false);
+                                }}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all duration-200 ${activeTab === item.id
                                     ? 'bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-100'
                                     : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
@@ -260,13 +280,19 @@ const AdminDashboardPage = () => {
                 <header className="bg-white border-b border-slate-100 px-4 md:px-8 py-4 flex items-center justify-between sticky top-0 z-10">
                     <div className="flex items-center gap-4">
                         <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="md:hidden p-2 hover:bg-slate-50 rounded-lg text-slate-500 transition-all"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <button
                             onClick={() => navigate('/')}
                             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 transition-all"
                             title={isRTL ? 'الرئيسية' : 'Home'}
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                         </button>
-                        <h2 className="text-lg font-black text-slate-800">
+                        <h2 className="text-base md:text-lg font-black text-slate-800 truncate max-w-[150px] sm:max-w-none">
                             {navItems.find(t => t.id === activeTab)?.label}
                         </h2>
                     </div>
