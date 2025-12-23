@@ -113,7 +113,7 @@ const ChaletBookingsPage = () => {
                                                 {isArabic ? 'السعر' : 'Price'}
                                             </th>
                                             <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                {isArabic ? 'العمولة (5%)' : 'Commission (5%)'}
+                                                {isArabic ? 'العمولة (8%)' : 'Commission (8%)'}
                                             </th>
                                             <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                                 {isArabic ? 'الحالة' : 'Status'}
@@ -137,7 +137,7 @@ const ChaletBookingsPage = () => {
                                                 .sort((a, b) => new Date(a.CheckInDate).getTime() - new Date(b.CheckInDate).getTime())
                                                 .map((booking) => {
                                                     const price = booking.TotalPrice || 0;
-                                                    const deposit = price * 0.05;
+                                                    const deposit = price * 0.08;
                                                     return (
                                                         <tr key={booking.Id} className="hover:bg-gray-50 transition-colors">
                                                             <td className="px-6 py-4 whitespace-nowrap text-center">

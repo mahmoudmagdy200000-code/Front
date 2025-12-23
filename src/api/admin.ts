@@ -100,3 +100,59 @@ export const updateChaletFeaturedStatus = async (chaletId: number, isFeatured: b
         headers: { 'Content-Type': 'application/json' }
     });
 };
+
+// ==================== SUPERADMIN APIs ====================
+
+/**
+ * Upgrade user to Admin (SuperAdmin only)
+ */
+export const upgradeUserToAdmin = async (userId: string): Promise<{ message: string }> => {
+    const response = await axiosInstance.post<{ message: string }>(`/admin/upgrade-to-admin/${userId}`);
+    return response.data;
+};
+
+/**
+ * Downgrade Admin/Owner to Client (SuperAdmin only)
+ */
+export const downgradeFromAdmin = async (userId: string): Promise<{ message: string }> => {
+    const response = await axiosInstance.post<{ message: string }>(`/admin/downgrade-from-admin/${userId}`);
+    return response.data;
+};
+
+/**
+ * Delete a user account (SuperAdmin only)
+ */
+export const deleteUser = async (userId: string): Promise<{ message: string }> => {
+    const response = await axiosInstance.delete<{ message: string }>(`/admin/users/${userId}`);
+    return response.data;
+};
+
+/**
+ * Update user basic info (SuperAdmin only)
+ */
+export const updateUser = async (userId: string, data: { FullName?: string, Email?: string, PhoneNumber?: string }): Promise<{ message: string }> => {
+    const response = await axiosInstance.put<{ message: string }>(`/admin/users/${userId}`, data);
+    return response.data;
+};
+
+// ==================== ANALYTICS APIs ====================
+
+export interface PlatformAnalytics {
+    TotalBookings: number;
+    ConfirmedCount: number;
+    PendingCount: number;
+    CancelledCount: number;
+    TotalRevenue: number;
+    ConfirmedRevenue: number;
+    PendingRevenue: number;
+    CancelledRevenue: number;
+    TotalCommission: number;
+}
+
+/**
+ * Get platform-wide analytics (SuperAdmin only)
+ */
+export const getPlatformAnalytics = async (params?: { fromDate?: string; toDate?: string; chaletId?: number }): Promise<PlatformAnalytics> => {
+    const response = await axiosInstance.get<PlatformAnalytics>('/admin/analytics', { params });
+    return response.data;
+};
