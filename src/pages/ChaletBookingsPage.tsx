@@ -179,29 +179,40 @@ const ChaletBookingsPage = () => {
                                                                 </span>
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                                <select
-                                                                    value={booking.Status}
-                                                                    onChange={async (e) => {
-                                                                        try {
-                                                                            const newStatus = e.target.value;
-                                                                            await updateBookingStatus(booking.Id, newStatus);
-                                                                            setBookings(bookings.map(b =>
-                                                                                b.Id === booking.Id ? { ...b, Status: newStatus } : b
-                                                                            ));
-                                                                        } catch (error) {
-                                                                            console.error('Error updating status:', error);
-                                                                            alert(t('common.error'));
-                                                                        }
-                                                                    }}
-                                                                    className={`px-4 py-2 text-xs rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 font-semibold shadow-sm ${booking.Status === 'Confirmed' ? 'bg-green-100 text-green-800' :
+                                                                {localStorage.getItem('role') === 'Owner' ? (
+                                                                    <span className={`px-4 py-2 text-xs rounded-full font-semibold shadow-sm ${booking.Status === 'Confirmed' ? 'bg-green-100 text-green-800' :
                                                                         booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
                                                                             'bg-red-100 text-red-800'
-                                                                        }`}
-                                                                >
-                                                                    <option value="Pending">{isArabic ? 'معلق' : 'Pending'}</option>
-                                                                    <option value="Confirmed">{isArabic ? 'مؤكد' : 'Confirmed'}</option>
-                                                                    <option value="Cancelled">{isArabic ? 'ملغي' : 'Cancelled'}</option>
-                                                                </select>
+                                                                        }`}>
+                                                                        {booking.Status === 'Confirmed' ? (isArabic ? 'مؤكد' : 'Confirmed') :
+                                                                            booking.Status === 'Pending' ? (isArabic ? 'معلق' : 'Pending') :
+                                                                                (isArabic ? 'ملغي' : 'Cancelled')}
+                                                                    </span>
+                                                                ) : (
+                                                                    <select
+                                                                        value={booking.Status}
+                                                                        onChange={async (e) => {
+                                                                            try {
+                                                                                const newStatus = e.target.value;
+                                                                                await updateBookingStatus(booking.Id, newStatus);
+                                                                                setBookings(bookings.map(b =>
+                                                                                    b.Id === booking.Id ? { ...b, Status: newStatus } : b
+                                                                                ));
+                                                                            } catch (error) {
+                                                                                console.error('Error updating status:', error);
+                                                                                alert(t('common.error'));
+                                                                            }
+                                                                        }}
+                                                                        className={`px-4 py-2 text-xs rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 font-semibold shadow-sm ${booking.Status === 'Confirmed' ? 'bg-green-100 text-green-800' :
+                                                                            booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                                                'bg-red-100 text-red-800'
+                                                                            }`}
+                                                                    >
+                                                                        <option value="Pending">{isArabic ? 'معلق' : 'Pending'}</option>
+                                                                        <option value="Confirmed">{isArabic ? 'مؤكد' : 'Confirmed'}</option>
+                                                                        <option value="Cancelled">{isArabic ? 'ملغي' : 'Cancelled'}</option>
+                                                                    </select>
+                                                                )}
                                                             </td>
                                                         </tr>
                                                     );

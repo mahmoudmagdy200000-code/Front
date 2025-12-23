@@ -15,6 +15,10 @@ export interface Chalet {
     PricePerNight: number;
     AdultsCapacity: number;
     ChildrenCapacity: number;
+    RoomsCount: number;
+    BathroomsCount: number;
+    VillageNameEn: string;
+    VillageNameAr: string;
     OwnerId: string;
     ImageUrl?: string;
     Images?: ChaletImage[];

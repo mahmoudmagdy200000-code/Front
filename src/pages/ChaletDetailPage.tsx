@@ -89,6 +89,7 @@ const ChaletDetailPage = () => {
 
     const title = isRTL ? chalet.TitleAr : chalet.TitleEn;
     const description = isRTL ? chalet.DescriptionAr : chalet.DescriptionEn;
+    const villageName = isRTL ? chalet.VillageNameAr : chalet.VillageNameEn;
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -125,8 +126,25 @@ const ChaletDetailPage = () => {
                                 </span>
                             </div>
 
+                            <div className="flex items-center gap-2 mb-4 text-gray-500 font-medium">
+                                <span className="text-xl">📍</span>
+                                <span>{villageName}</span>
+                            </div>
+
                             {/* Capacity Info */}
-                            <div className="flex items-center gap-6 text-gray-600 py-4 border-y border-gray-100 mb-6">
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-gray-600 py-4 border-y border-gray-100 mb-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xl">🚪</span>
+                                    <span className="font-medium">
+                                        {chalet.RoomsCount} {isRTL ? 'غرف' : 'Rooms'}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xl">🚿</span>
+                                    <span className="font-medium">
+                                        {chalet.BathroomsCount} {isRTL ? 'حمامات' : 'Baths'}
+                                    </span>
+                                </div>
                                 <div className="flex items-center gap-2">
                                     <span className="text-xl">👨‍👩‍👧‍👦</span>
                                     <span className="font-medium">

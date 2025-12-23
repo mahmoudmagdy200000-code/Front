@@ -37,6 +37,10 @@ const DashboardPage = () => {
         pricePerNight: 0,
         adultsCapacity: 0,
         childrenCapacity: 0,
+        roomsCount: 0,
+        bathroomsCount: 0,
+        villageNameEn: '',
+        villageNameAr: '',
     });
 
     const [formErrors, setFormErrors] = useState<{
@@ -47,6 +51,10 @@ const DashboardPage = () => {
         pricePerNight?: string;
         adultsCapacity?: string;
         childrenCapacity?: string;
+        roomsCount?: string;
+        bathroomsCount?: string;
+        villageNameEn?: string;
+        villageNameAr?: string;
     }>({});
 
     useEffect(() => {
@@ -138,6 +146,26 @@ const DashboardPage = () => {
             console.log('✅ [validateForm] childrenCapacity passed:', formData.childrenCapacity);
         }
 
+        // Validate Village Name En
+        if (!formData.villageNameEn || formData.villageNameEn.trim().length < 3) {
+            errors.villageNameEn = isArabic ? 'اسم القرية بالإنجليزية مطلوب' : 'Village Name (EN) is required';
+        }
+
+        // Validate Village Name Ar
+        if (!formData.villageNameAr || formData.villageNameAr.trim().length < 3) {
+            errors.villageNameAr = isArabic ? 'اسم القرية بالعربية مطلوب' : 'Village Name (AR) is required';
+        }
+
+        // Validate Rooms
+        if (formData.roomsCount < 1) {
+            errors.roomsCount = isArabic ? 'عدد الغرف مطلوب' : 'Rooms count is required';
+        }
+
+        // Validate Bathrooms
+        if (formData.bathroomsCount < 1) {
+            errors.bathroomsCount = isArabic ? 'عدد الحمامات مطلوب' : 'Bathrooms count is required';
+        }
+
         // التحقق من الصور
         if (!editingChalet && selectedImages.length === 0) {
             setImageError(isArabic ? 'يجب اختيار صورة واحدة على الأقل' : 'At least one image is required');
@@ -184,6 +212,10 @@ const DashboardPage = () => {
                 PricePerNight: formData.pricePerNight,
                 AdultsCapacity: formData.adultsCapacity,
                 ChildrenCapacity: formData.childrenCapacity,
+                RoomsCount: formData.roomsCount,
+                BathroomsCount: formData.bathroomsCount,
+                VillageNameEn: formData.villageNameEn,
+                VillageNameAr: formData.villageNameAr,
             };
 
             console.log('📝 [handleSubmit] Chalet data:', chaletData);
@@ -234,6 +266,10 @@ const DashboardPage = () => {
                 pricePerNight: 0,
                 adultsCapacity: 0,
                 childrenCapacity: 0,
+                roomsCount: 0,
+                bathroomsCount: 0,
+                villageNameEn: '',
+                villageNameAr: '',
             });
 
             console.log('⏳ [handleSubmit] Fetching updated chalets...');
@@ -280,6 +316,10 @@ const DashboardPage = () => {
             pricePerNight: chalet.PricePerNight,
             adultsCapacity: chalet.AdultsCapacity,
             childrenCapacity: chalet.ChildrenCapacity,
+            roomsCount: chalet.RoomsCount || 0,
+            bathroomsCount: chalet.BathroomsCount || 0,
+            villageNameEn: chalet.VillageNameEn || '',
+            villageNameAr: chalet.VillageNameAr || '',
         });
         setExistingImages((chalet.Images || []).sort((a, b) => a.DisplayOrder - b.DisplayOrder));
         setSelectedImages([]);
@@ -462,6 +502,10 @@ const DashboardPage = () => {
                                 pricePerNight: 0,
                                 adultsCapacity: 0,
                                 childrenCapacity: 0,
+                                roomsCount: 0,
+                                bathroomsCount: 0,
+                                villageNameEn: '',
+                                villageNameAr: '',
                             });
                             setShowForm(true);
                         }}
@@ -565,6 +609,18 @@ const DashboardPage = () => {
                                         {formErrors.titleAr && <p className="text-red-500 text-xs mt-1">{formErrors.titleAr}</p>}
                                     </div>
 
+                                    {/* Villages */}
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'اسم القرية (EN)' : 'Village Name (EN)'}</label>
+                                        <input type="text" value={formData.villageNameEn} onChange={e => setFormData({ ...formData, villageNameEn: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
+                                        {formErrors.villageNameEn && <p className="text-red-500 text-xs mt-1">{formErrors.villageNameEn}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'اسم القرية (عربي)' : 'Village Name (AR)'}</label>
+                                        <input type="text" value={formData.villageNameAr} onChange={e => setFormData({ ...formData, villageNameAr: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
+                                        {formErrors.villageNameAr && <p className="text-red-500 text-xs mt-1">{formErrors.villageNameAr}</p>}
+                                    </div>
+
                                     {/* Descriptions */}
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('dashboard.descriptionEn')}</label>
@@ -585,6 +641,19 @@ const DashboardPage = () => {
                                             <input type="number" value={formData.pricePerNight} onChange={e => setFormData({ ...formData, pricePerNight: Number(e.target.value) })} className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
                                         </div>
                                         {formErrors.pricePerNight && <p className="text-red-500 text-xs mt-1">{formErrors.pricePerNight}</p>}
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'عدد الغرف' : 'Rooms'}</label>
+                                            <input type="number" min="0" value={formData.roomsCount} onChange={e => setFormData({ ...formData, roomsCount: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
+                                            {formErrors.roomsCount && <p className="text-red-500 text-xs mt-1">{formErrors.roomsCount}</p>}
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'عدد الحمامات' : 'Bathrooms'}</label>
+                                            <input type="number" min="0" value={formData.bathroomsCount} onChange={e => setFormData({ ...formData, bathroomsCount: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
+                                            {formErrors.bathroomsCount && <p className="text-red-500 text-xs mt-1">{formErrors.bathroomsCount}</p>}
+                                        </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>

@@ -110,9 +110,12 @@ const AdminDashboardPage = () => {
     const handleDowngradeUser = async (userId: string) => {
         try {
             setActionLoading(999999);
-            await import('../api/admin').then(m => m.downgradeUserToClient(userId));
-            setSuccessMessage(isRTL ? 'تم إلغاء ترقية المستخدم' : 'User downgraded successfully');
-            setUsers(prev => prev.map(u => u.UserId === userId ? { ...u, Role: 'Client' } : u));
+            const result = await import('../api/admin').then(m => m.downgradeUserToClient(userId));
+            setSuccessMessage(result.message);
+
+            // Re-fetch to see new status or updated roles
+            fetchData();
+
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
             setError(err.message || 'Failed to downgrade user');
@@ -819,6 +822,7 @@ const StatusBadge = ({ status, isRTL }: { status: string; isRTL: boolean }) => {
     const config: any = {
         Pending: { bg: 'bg-amber-100/50 text-amber-600 border-amber-200/50', label: isRTL ? 'قيد الانتظار' : 'Pending' },
         ConfirmedByAdmin: { bg: 'bg-indigo-100/50 text-indigo-600 border-indigo-200/50', label: isRTL ? 'بانتظار السوبر أدمن' : 'Awaiting SuperAdmin' },
+        DowngradePending: { bg: 'bg-rose-100/50 text-rose-600 border-rose-200/50', label: isRTL ? 'طلب سحب صلاحية' : 'Downgrade Pending' },
         Approved: { bg: 'bg-emerald-100/50 text-emerald-600 border-emerald-200/50', label: isRTL ? 'مقبول' : 'Approved' },
         Rejected: { bg: 'bg-rose-100/50 text-rose-600 border-rose-200/50', label: isRTL ? 'مرفوض' : 'Rejected' }
     };
