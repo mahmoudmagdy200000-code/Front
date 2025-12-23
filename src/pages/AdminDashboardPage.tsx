@@ -516,7 +516,7 @@ const AdminDashboardPage = () => {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
-                                                {users.filter(u => role === 'SuperAdmin' || u.Role !== 'Admin').map((user) => (
+                                                {users.filter(u => u.Role !== 'SuperAdmin' && (role === 'SuperAdmin' || u.Role !== 'Admin')).map((user) => (
                                                     <tr key={user.UserId} className="hover:bg-slate-50 transition-colors">
                                                         <td className="px-8 py-5 whitespace-nowrap">
                                                             <div className="flex items-center gap-4">
