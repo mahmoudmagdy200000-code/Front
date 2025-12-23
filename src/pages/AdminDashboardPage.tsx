@@ -67,7 +67,10 @@ const AdminDashboardPage = () => {
             setActionLoading(requestId);
             const result = await approveOwnerRequest(requestId);
             setSuccessMessage(result.message);
-            setRequests(prev => prev.map(r => r.Id === requestId ? { ...r, Status: 'Approved' } : r));
+
+            // Refresh the entire data to get the correct new status from the server
+            fetchData();
+
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
             setError(err.message || 'Failed to approve request');

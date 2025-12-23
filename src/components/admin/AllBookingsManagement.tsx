@@ -80,9 +80,9 @@ const AllBookingsManagement = ({ externalFilters }: Props) => {
         const booking = bookings.find(b => b.Id === id);
         if (booking) {
             setSelectedBookingId(id);
-            // Default deposit to total price or 50%? Let's leave it blank or pre-fill with half
-            const total = booking.TotalPrice || 0;
-            setDepositAmount((total * 0.5).toString());
+            // Default deposit to price of ONE night as requested
+            const oneNightPrice = booking.Chalet?.PricePerNight || (booking.TotalPrice || 0);
+            setDepositAmount(oneNightPrice.toString());
             setReferenceNumber('');
             setIsConfirmModalOpen(true);
         }
