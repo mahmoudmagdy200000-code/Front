@@ -33,6 +33,8 @@ const AdminDashboardPage = () => {
     const [bookingFilters, setBookingFilters] = useState<{ status?: string; fromDate?: string; toDate?: string; chaletId?: number } | undefined>(undefined);
     const [editingUser, setEditingUser] = useState<any | null>(null);
     const [editForm, setEditForm] = useState({ FullName: '', Email: '', PhoneNumber: '' });
+    const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
+    const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
 
     // Redirect non-admin users
     useEffect(() => {
@@ -49,12 +51,25 @@ const AdminDashboardPage = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [requestsData, usersData] = await Promise.all([
+            const [requestsData, usersData, bookingsData] = await Promise.all([
                 getAllOwnerRequests(),
-                import('../api/admin').then(m => m.getAllUsers())
+                import('../api/admin').then(m => m.getAllUsers()),
+                import('../api/bookings').then(m => m.getBookings())
             ]);
             setRequests(requestsData);
             setUsers(usersData);
+
+            // Calculate pending counts
+            const pendingReqs = requestsData.filter(r =>
+                role === 'SuperAdmin'
+                    ? (r.Status === 'Pending' || r.Status === 'ConfirmedByAdmin' || r.Status === 'DowngradePending')
+                    : (r.Status === 'Pending')
+            ).length;
+            setPendingRequestsCount(pendingReqs);
+
+            const pendingBookings = bookingsData.filter(b => b.Status === 'Pending').length;
+            setPendingBookingsCount(pendingBookings);
+
         } catch (err: any) {
             setError(err.message || 'Failed to load data');
         } finally {
@@ -84,7 +99,10 @@ const AdminDashboardPage = () => {
             setActionLoading(requestId);
             const result = await rejectOwnerRequest(requestId);
             setSuccessMessage(result.message);
-            setRequests(prev => prev.map(r => r.Id === requestId ? { ...r, Status: 'Rejected' } : r));
+
+            // Re-fetch to update sidebar counts
+            fetchData();
+
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
             setError(err.message || 'Failed to reject request');
@@ -262,7 +280,20 @@ const AdminDashboardPage = () => {
                                 <span className={activeTab === item.id ? 'text-indigo-600' : 'text-slate-400'}>
                                     {item.icon}
                                 </span>
-                                <span className="text-sm">{item.label}</span>
+                                <span className="text-sm flex-1 text-start">{item.label}</span>
+
+                                {/* Notification Badges */}
+                                {item.id === 'bookings' && pendingBookingsCount > 0 && (
+                                    <span className="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[20px] text-center shadow-lg shadow-rose-200 animate-pulse">
+                                        {pendingBookingsCount}
+                                    </span>
+                                )}
+                                {item.id === 'requests' && pendingRequestsCount > 0 && (
+                                    <span className="bg-amber-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[20px] text-center shadow-lg shadow-amber-200 animate-pulse">
+                                        {pendingRequestsCount}
+                                    </span>
+                                )}
+
                                 {activeTab === item.id && (
                                     <div className={`ms-auto w-1.5 h-1.5 rounded-full bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.5)]`} />
                                 )}
@@ -653,7 +684,7 @@ const AdminDashboardPage = () => {
                         {/* --- Bookings Tab --- */}
                         {activeTab === 'bookings' && (
                             <div className="animate-in slide-in-from-bottom-4 duration-500">
-                                <AllBookingsManagement externalFilters={bookingFilters} />
+                                <AllBookingsManagement externalFilters={bookingFilters} onRefresh={fetchData} />
                             </div>
                         )}
 

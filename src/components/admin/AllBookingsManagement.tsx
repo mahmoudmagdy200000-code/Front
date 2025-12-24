@@ -14,9 +14,10 @@ interface Props {
         toDate?: string;
         chaletId?: number;
     };
+    onRefresh?: () => void;
 }
 
-const AllBookingsManagement = ({ externalFilters }: Props) => {
+const AllBookingsManagement = ({ externalFilters, onRefresh }: Props) => {
     const { i18n } = useTranslation();
     const { role } = useAuth();
     const isRTL = i18n.language === 'ar';
@@ -69,6 +70,7 @@ const AllBookingsManagement = ({ externalFilters }: Props) => {
             setActionLoading(id);
             await updateBookingStatus(id, newStatus);
             setBookings(prev => prev.map(b => b.Id === id ? { ...b, Status: newStatus } : b));
+            if (onRefresh) onRefresh();
         } catch (error) {
             console.error('Failed to update status:', error);
         } finally {
@@ -95,6 +97,7 @@ const AllBookingsManagement = ({ externalFilters }: Props) => {
             setActionLoading(selectedBookingId);
             await confirmWithDeposit(selectedBookingId, parseFloat(depositAmount), referenceNumber);
             setBookings(prev => prev.map(b => b.Id === selectedBookingId ? { ...b, Status: 'Confirmed' } : b));
+            if (onRefresh) onRefresh();
             setIsConfirmModalOpen(false);
         } catch (error) {
             console.error('Failed to confirm booking:', error);

@@ -10,11 +10,31 @@ interface DashboardHeaderProps {
 
 const DashboardHeader = ({ }: DashboardHeaderProps) => {
     const { t, i18n } = useTranslation();
-    const { logout } = useAuth();
+    const { role, logout } = useAuth();
     const navigate = useNavigate();
     const isRTL = i18n.language === 'ar';
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
+    const [pendingCount, setPendingCount] = useState(0);
+
+    useEffect(() => {
+        const fetchPendingCount = async () => {
+            if (role === 'Owner') {
+                try {
+                    const bookings = await import('../api/bookings').then(m => m.getBookings());
+                    const count = bookings.filter(b => b.Status === 'Pending').length;
+                    setPendingCount(count);
+                } catch (error) {
+                    console.error('Failed to fetch pending bookings:', error);
+                }
+            }
+        };
+        fetchPendingCount();
+
+        // Refresh every 2 minutes
+        const interval = setInterval(fetchPendingCount, 120000);
+        return () => clearInterval(interval);
+    }, [role]);
 
     // Desktop detection
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
@@ -54,6 +74,9 @@ const DashboardHeader = ({ }: DashboardHeaderProps) => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                             )}
                         </svg>
+                        {pendingCount > 0 && !isMenuOpen && (
+                            <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                        )}
                     </button>
 
                     {/* Logo - Desktop Only (Left side) */}
@@ -123,7 +146,12 @@ const DashboardHeader = ({ }: DashboardHeaderProps) => {
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} />
                                         </svg>
-                                        <span className="text-lg">{link.label}</span>
+                                        <span className="text-lg flex-1">{link.label}</span>
+                                        {link.path === '/owner/dashboard' && pendingCount > 0 && (
+                                            <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                                                {pendingCount}
+                                            </span>
+                                        )}
                                     </Link>
                                 ))}
 
