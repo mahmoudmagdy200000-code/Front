@@ -41,10 +41,10 @@ export const getDeposits = async (): Promise<any[]> => {
     return response.data;
 };
 
-// Get bookings by phone number
-export const getBookingByPhone = async (phoneNumber: string): Promise<Booking[]> => {
+// Search bookings by phone or ID
+export const searchBookings = async (query: string): Promise<Booking[]> => {
     const response = await axiosInstance.get<Booking[]>('/bookings/search', {
-        params: { phoneNumber }
+        params: { query }
     });
     return response.data;
 };

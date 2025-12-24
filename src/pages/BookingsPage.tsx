@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import HomeHeader from '../components/HomeHeader';
 import Footer from '../components/Footer';
-import { getBookingByPhone } from '../api/bookings';
+import { searchBookings } from '../api/bookings';
 import type { Booking } from '../types/booking';
 
 const BookingsPage = () => {
@@ -24,7 +24,7 @@ const BookingsPage = () => {
             setLoading(true);
             setError(null);
             setSearched(true);
-            const data = await getBookingByPhone(phoneNumber);
+            const data = await searchBookings(phoneNumber);
             setBookings(data);
         } catch (err) {
             console.error('Error fetching bookings:', err);
@@ -65,13 +65,13 @@ const BookingsPage = () => {
                         <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
                             <div className="flex-grow">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    {t('booking.phone')}
+                                    {isRTL ? 'رقم الهاتف أو رقم الحجز' : 'Phone Number or Booking ID'}
                                 </label>
                                 <input
-                                    type="tel"
+                                    type="text"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
-                                    placeholder={t('booking.phonePlaceholder')}
+                                    placeholder={isRTL ? 'مثال: 01xxxxxxxxx أو BK-12345' : 'e.g. 01xxxxxxxxx or BK-12345'}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                     required
                                 />

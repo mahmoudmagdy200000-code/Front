@@ -134,7 +134,12 @@ const ChaletBookingsPage = () => {
                                             </tr>
                                         ) : (
                                             [...bookings]
-                                                .sort((a, b) => new Date(a.CheckInDate).getTime() - new Date(b.CheckInDate).getTime())
+                                                .sort((a, b) => {
+                                                    const dateA = a.CreatedAt ? new Date(a.CreatedAt).getTime() : 0;
+                                                    const dateB = b.CreatedAt ? new Date(b.CreatedAt).getTime() : 0;
+                                                    if (dateA !== dateB) return dateB - dateA;
+                                                    return b.Id - a.Id;
+                                                })
                                                 .map((booking) => {
                                                     const price = booking.TotalPrice || 0;
                                                     const deposit = price * 0.08;
@@ -181,12 +186,14 @@ const ChaletBookingsPage = () => {
                                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                                 {localStorage.getItem('role') === 'Owner' ? (
                                                                     <span className={`px-4 py-2 text-xs rounded-full font-semibold shadow-sm ${booking.Status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-                                                                        booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                                            'bg-red-100 text-red-800'
+                                                                            booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                                                booking.Status === 'AutoCancelled' ? 'bg-rose-100 text-rose-800' :
+                                                                                    'bg-red-100 text-red-800'
                                                                         }`}>
                                                                         {booking.Status === 'Confirmed' ? (isArabic ? 'مؤكد' : 'Confirmed') :
                                                                             booking.Status === 'Pending' ? (isArabic ? 'معلق' : 'Pending') :
-                                                                                (isArabic ? 'ملغي' : 'Cancelled')}
+                                                                                booking.Status === 'AutoCancelled' ? (isArabic ? 'ملغي تلقائياً' : 'Auto-Cancelled') :
+                                                                                    (isArabic ? 'ملغي' : 'Cancelled')}
                                                                     </span>
                                                                 ) : (
                                                                     <select
@@ -204,13 +211,15 @@ const ChaletBookingsPage = () => {
                                                                             }
                                                                         }}
                                                                         className={`px-4 py-2 text-xs rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 font-semibold shadow-sm ${booking.Status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-                                                                            booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                                                'bg-red-100 text-red-800'
+                                                                                booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                                                    booking.Status === 'AutoCancelled' ? 'bg-rose-100 text-rose-800' :
+                                                                                        'bg-red-100 text-red-800'
                                                                             }`}
                                                                     >
                                                                         <option value="Pending">{isArabic ? 'معلق' : 'Pending'}</option>
                                                                         <option value="Confirmed">{isArabic ? 'مؤكد' : 'Confirmed'}</option>
                                                                         <option value="Cancelled">{isArabic ? 'ملغي' : 'Cancelled'}</option>
+                                                                        <option value="AutoCancelled">{isArabic ? 'ملغي تلقائياً' : 'Auto-Cancelled'}</option>
                                                                     </select>
                                                                 )}
                                                             </td>

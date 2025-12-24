@@ -23,6 +23,7 @@ export interface UserWithRole {
     PendingRequestStatus?: string;
     CreatedAt: string;
     LastLoginAt: string | null;
+    PhoneNumber?: string;
 }
 
 // ==================== OWNER REQUEST APIs (for Clients) ====================

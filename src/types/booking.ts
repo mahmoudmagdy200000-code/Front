@@ -10,4 +10,6 @@ export interface Booking {
     BookingReference?: string;
     TotalPrice?: number;
     Chalet?: Chalet;
+    CreatedAt?: string;
+    PlatformCommissionAmount?: number;
 }
