@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { getServerBaseUrl } from '../config/api';
 
 const axiosInstance = axios.create({
-    baseURL: (import.meta.env.VITE_API_URL || 'https://rsr123.runasp.net').replace(/\/$/, ''),
+    baseURL: getServerBaseUrl(),
     timeout: 120000,
     withCredentials: true,
 });
@@ -9,8 +10,8 @@ const axiosInstance = axios.create({
 // Request interceptor to include JWT token and fix API path
 axiosInstance.interceptors.request.use(
     (config) => {
-        // Ensure path starts with /api/
-        if (config.url && !config.url.startsWith('/api/') && !config.url.startsWith('http')) {
+        // Ensure path starts with /api
+        if (config.url && !config.url.startsWith('/api') && !config.url.startsWith('http')) {
             config.url = `/api${config.url.startsWith('/') ? '' : '/'}${config.url}`;
         }
 

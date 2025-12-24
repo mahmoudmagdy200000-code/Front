@@ -8,7 +8,14 @@
  * Falls back to production URL if not set
  */
 export const getApiBaseUrl = (): string => {
-    return import.meta.env.VITE_API_URL || 'https://rsr123.runasp.net/api';
+    // If explicitly set in environment, use that
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+
+    // In development, use local proxy path
+    if (import.meta.env.DEV) return '/api';
+
+    // Fallback for production
+    return 'https://rsr123.runasp.net/api';
 };
 
 /**
