@@ -20,6 +20,7 @@ export interface UserWithRole {
     Email: string;
     FullName: string;
     Role: string;
+    PendingRequestStatus?: string;
     CreatedAt: string;
     LastLoginAt: string | null;
 }

@@ -102,7 +102,7 @@ const AdminDashboardPage = () => {
             fetchData();
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
-            setError(err.message || 'Failed to upgrade user');
+            setError(err.response?.data?.message || err.message || 'Failed to upgrade user');
         } finally {
             setActionLoading(null);
         }
@@ -119,7 +119,7 @@ const AdminDashboardPage = () => {
 
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
-            setError(err.message || 'Failed to downgrade user');
+            setError(err.response?.data?.message || err.message || 'Failed to downgrade user');
         } finally {
             setActionLoading(null);
         }
@@ -582,6 +582,11 @@ const AdminDashboardPage = () => {
                                                                         user.Role === 'Owner' ? (isRTL ? 'مالك' : 'Owner') :
                                                                             (isRTL ? 'عميل' : 'Client')}
                                                             </span>
+                                                            {user.PendingRequestStatus && (
+                                                                <div className="mt-1">
+                                                                    <StatusBadge status={user.PendingRequestStatus} isRTL={isRTL} />
+                                                                </div>
+                                                            )}
                                                         </td>
                                                         <td className="px-8 py-5 whitespace-nowrap">
                                                             <p className="text-xs font-bold text-slate-700">{user.Email}</p>
@@ -619,6 +624,7 @@ const AdminDashboardPage = () => {
                                                                         size="sm"
                                                                         onClick={() => user.Role === 'Owner' ? handleDowngradeUser(user.UserId) : handleUpgradeUser(user.UserId)}
                                                                         className="rounded-xl font-bold"
+                                                                        disabled={!!user.PendingRequestStatus}
                                                                     >
                                                                         {user.Role === 'Owner' ? (isRTL ? 'سحب صلاحية مالك' : 'Downgrade to Client') : (isRTL ? 'ترقية لمالك' : 'Upgrade to Owner')}
                                                                     </Button>
