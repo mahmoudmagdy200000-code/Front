@@ -96,9 +96,10 @@ const AdminDashboardPage = () => {
     const handleUpgradeUser = async (userId: string) => {
         try {
             setActionLoading(999999); // Dummy ID for user actions
-            await import('../api/admin').then(m => m.upgradeUserToOwner(userId));
-            setSuccessMessage(isRTL ? 'تم ترقية المستخدم بنجاح' : 'User upgraded successfully');
-            setUsers(prev => prev.map(u => u.UserId === userId ? { ...u, Role: 'Owner' } : u));
+            const result = await import('../api/admin').then(m => m.upgradeUserToOwner(userId));
+            setSuccessMessage(result.message);
+            // Re-fetch to see new status or updated roles
+            fetchData();
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
             setError(err.message || 'Failed to upgrade user');

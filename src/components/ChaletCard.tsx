@@ -27,7 +27,6 @@ const ChaletCard = ({ chalet, checkIn, checkOut }: ChaletCardProps) => {
     const displayImage = chalet.Images?.find(img => img.IsPrimary)?.ImageUrl
         || chalet.Images?.[0]?.ImageUrl
         || chalet.ImageUrl;
-    const imageCount = chalet.Images?.length || 0;
 
     return (
         <div
@@ -52,45 +51,37 @@ const ChaletCard = ({ chalet, checkIn, checkOut }: ChaletCardProps) => {
                         <span className="text-5xl sm:text-6xl">🏖️</span>
                     </div>
                 )}
-
-                {/* Status Badge - Absolute overlay top-left with blur */}
-                <div className="absolute top-4 left-4 bg-white/80 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-full text-[10px] font-bold shadow-sm border border-white/20">
-                    {isArabic ? 'متاح الآن' : 'Available Now'}
-                </div>
-
-                {/* Image Count - Bottom-right dark pill */}
-                {imageCount > 1 && (
-                    <div className="absolute bottom-4 right-4 bg-slate-900/60 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 shadow-lg">
-                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                        </svg>
-                        {imageCount}
-                    </div>
-                )}
             </div>
 
-            {/* Content Section - Increased whitespace and clean layout */}
+            {/* Content Section */}
             <div className="flex flex-col flex-grow p-5 sm:p-6">
-                <div className="flex justify-between items-start mb-1.5">
+                <div className="mb-4">
                     <h3 className="text-lg font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors leading-tight" title={title}>
                         {title}
                     </h3>
-                    <svg className={`w-5 h-5 text-slate-300 opacity-60 group-hover:opacity-100 group-hover:text-blue-500 transition-all ${isArabic ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <div className="flex items-center gap-1 text-slate-400 text-xs mt-1.5 font-medium">
+                        <span className="text-[10px]">📍</span>
+                        <span className="truncate">{isArabic ? chalet.VillageNameAr : chalet.VillageNameEn}</span>
+                    </div>
                 </div>
 
-                {/* Capacity - Subtle guest info without gray box */}
-                <div className="flex items-center gap-1.5 text-slate-400 mb-6">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <span className="text-sm font-medium">
-                        {isArabic ? `${chalet.AdultsCapacity + chalet.ChildrenCapacity} أفراد` : `${chalet.AdultsCapacity + chalet.ChildrenCapacity} Guests`}
-                    </span>
+                {/* Specs Section */}
+                <div className="flex flex-wrap items-center gap-4 text-slate-500 mb-6 text-[11px] font-bold">
+                    <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg">
+                        <span>🚪</span>
+                        <span>
+                            {chalet.RoomsCount} {isArabic ? 'غرف' : 'Rooms'}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg">
+                        <span>🚿</span>
+                        <span>
+                            {chalet.BathroomsCount} {isArabic ? 'حمامات' : 'Baths'}
+                        </span>
+                    </div>
                 </div>
 
-                {/* Price - Simplified layout */}
+                {/* Price Section */}
                 <div className="mt-auto pt-4 border-t border-slate-50 flex items-baseline gap-1">
                     <span className="text-xl font-black text-slate-900">
                         {chalet.PricePerNight.toLocaleString()}

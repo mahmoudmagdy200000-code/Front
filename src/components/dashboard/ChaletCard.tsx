@@ -63,13 +63,25 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
                     <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1" title={isArabic ? chalet.TitleAr : chalet.TitleEn}>
                         {isArabic ? chalet.TitleAr : chalet.TitleEn}
                     </h3>
-                    <p className="text-sm text-gray-500 line-clamp-2 min-h-[40px]">
+                    <div className="flex items-center gap-1 text-gray-400 text-xs font-medium">
+                        <span className="text-[10px]">📍</span>
+                        <span className="truncate">{isArabic ? chalet.VillageNameAr : chalet.VillageNameEn}</span>
+                    </div>
+                    <p className="text-sm text-gray-500 line-clamp-2 min-h-[40px] mt-2">
                         {getDescription()}
                     </p>
                 </div>
 
                 {/* Specs Row */}
-                <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-1.5" title={isArabic ? 'غرف' : 'Rooms'}>
+                        <span className="text-base">🚪</span>
+                        <span className="font-medium">{chalet.RoomsCount || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5" title={isArabic ? 'حمامات' : 'Bathrooms'}>
+                        <span className="text-base">🚿</span>
+                        <span className="font-medium">{chalet.BathroomsCount || 0}</span>
+                    </div>
                     <div className="flex items-center gap-1.5" title={isArabic ? 'البالغين' : 'Adults'}>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
