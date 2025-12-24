@@ -44,6 +44,7 @@ export interface GetChaletsParams {
     maxPrice?: number;
     adults?: number;
     children?: number;
+    villageName?: string;
     isFeatured?: boolean;
     page?: number;
     pageSize?: number;
@@ -58,6 +59,7 @@ export const getChalets = async (params: GetChaletsParams = {}): Promise<PagedRe
     if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice.toString());
     if (params.adults) queryParams.append('adults', params.adults.toString());
     if (params.children) queryParams.append('children', params.children.toString());
+    if (params.villageName) queryParams.append('villageName', params.villageName);
     if (params.isFeatured !== undefined) queryParams.append('isFeatured', params.isFeatured.toString());
     if (params.page !== undefined) queryParams.append('page', params.page.toString());
     if (params.pageSize !== undefined) queryParams.append('pageSize', params.pageSize.toString());

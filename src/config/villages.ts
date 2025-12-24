@@ -1,0 +1,15 @@
+export const VILLAGES = [
+    { en: 'Tavera', ar: 'تافيرا' },
+    { en: 'Lacienda', ar: 'لاسياندا' },
+    { en: 'Blue Lagoon', ar: 'بلولاجون' },
+    { en: 'La Sirena Oyoun Moussa', ar: 'لاسرينا عيون موسى' },
+    { en: 'Paradise', ar: 'باراديس' },
+    { en: 'Mousa Coast', ar: 'موسى كوست' },
+    { en: 'Riviera', ar: 'ريفيرا' },
+    { en: 'White Bay', ar: 'وايت باى' },
+    { en: 'Palm Beach', ar: 'بالم بيتش' },
+    { en: 'Golden Beach 1', ar: 'جولدن بيتش 1' },
+    { en: 'Golden Beach 2', ar: 'جولدن بيتش 2' },
+    { en: 'Venezia', ar: 'فينيسيا' },
+    { en: 'Fantasia', ar: 'فانتازيا' },
+];

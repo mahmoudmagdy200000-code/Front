@@ -8,7 +8,7 @@ import HomeHeader from '../components/HomeHeader';
 import Footer from '../components/Footer';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
-import BudgetFilter from '../components/BudgetFilter';
+import ChaletFilters from '../components/ChaletFilters';
 
 const SearchResultsPage = () => {
     const { t, i18n } = useTranslation();
@@ -26,7 +26,8 @@ const SearchResultsPage = () => {
 
     // Filter states
     const currentMaxPrice = searchParams.get('maxPrice') ? parseInt(searchParams.get('maxPrice')!) : undefined;
-    const currentMinPrice = searchParams.get('minPrice') ? parseInt(searchParams.get('minPrice')!) : undefined; // Add MinPrice
+    const currentMinPrice = searchParams.get('minPrice') ? parseInt(searchParams.get('minPrice')!) : undefined;
+    const currentVillage = searchParams.get('village') || undefined;
 
     // Determine page size based on screen width
     const getPageSize = () => {
@@ -56,6 +57,7 @@ const SearchResultsPage = () => {
                 const checkOutDate = searchParams.get('checkOut') || undefined;
                 const adults = searchParams.get('adults') ? parseInt(searchParams.get('adults')!) : undefined;
                 const children = searchParams.get('children') ? parseInt(searchParams.get('children')!) : undefined;
+                const villageName = searchParams.get('village') || undefined;
 
                 const result = await getChalets({
                     checkInDate,
@@ -64,6 +66,7 @@ const SearchResultsPage = () => {
                     maxPrice: currentMaxPrice,
                     adults,
                     children,
+                    villageName,
                     page: currentPage,
                     pageSize: pageSize
                 });
@@ -90,14 +93,17 @@ const SearchResultsPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handlePriceFilterChange = (min: number | undefined, max: number | undefined) => {
+    const handleFilterChange = (filters: { min: number | undefined; max: number | undefined; village: string | undefined }) => {
         const newParams = new URLSearchParams(searchParams);
 
-        if (min !== undefined) newParams.set('minPrice', min.toString());
+        if (filters.min !== undefined) newParams.set('minPrice', filters.min.toString());
         else newParams.delete('minPrice');
 
-        if (max !== undefined) newParams.set('maxPrice', max.toString());
+        if (filters.max !== undefined) newParams.set('maxPrice', filters.max.toString());
         else newParams.delete('maxPrice');
+
+        if (filters.village) newParams.set('village', filters.village);
+        else newParams.delete('village');
 
         newParams.set('page', '1'); // Reset to page 1
         setSearchParams(newParams);
@@ -124,12 +130,13 @@ const SearchResultsPage = () => {
                             />
                         </div>
 
-                        {/* Budget Filter */}
+                        {/* Integrated Filters */}
                         <div className="mt-6">
-                            <BudgetFilter
+                            <ChaletFilters
                                 currentMin={currentMinPrice}
                                 currentMax={currentMaxPrice}
-                                onPriceFilterChange={handlePriceFilterChange}
+                                currentVillage={currentVillage}
+                                onFilterChange={handleFilterChange}
                             />
                         </div>
                     </div>

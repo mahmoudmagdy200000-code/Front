@@ -10,6 +10,7 @@ import ChaletCard from '../components/dashboard/ChaletCard';
 import { useNavigate } from 'react-router-dom';
 
 import { getImageUrl } from '../config/api';
+import { VILLAGES } from '../config/villages';
 
 const DashboardPage = () => {
     const { t, i18n } = useTranslation();
@@ -609,16 +610,42 @@ const DashboardPage = () => {
                                         {formErrors.titleAr && <p className="text-red-500 text-xs mt-1">{formErrors.titleAr}</p>}
                                     </div>
 
-                                    {/* Villages */}
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'اسم القرية (EN)' : 'Village Name (EN)'}</label>
-                                        <input type="text" value={formData.villageNameEn} onChange={e => setFormData({ ...formData, villageNameEn: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
-                                        {formErrors.villageNameEn && <p className="text-red-500 text-xs mt-1">{formErrors.villageNameEn}</p>}
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'اسم القرية (عربي)' : 'Village Name (AR)'}</label>
-                                        <input type="text" value={formData.villageNameAr} onChange={e => setFormData({ ...formData, villageNameAr: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none" required />
-                                        {formErrors.villageNameAr && <p className="text-red-500 text-xs mt-1">{formErrors.villageNameAr}</p>}
+                                    {/* Villages selection (Merged into one dropdown) */}
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isArabic ? 'اختر القرية' : 'Select Village'}</label>
+                                        <select
+                                            value={VILLAGES.find(v => v.en === formData.villageNameEn)?.en || ''}
+                                            onChange={(e) => {
+                                                const selected = VILLAGES.find(v => v.en === e.target.value);
+                                                if (selected) {
+                                                    setFormData({
+                                                        ...formData,
+                                                        villageNameEn: selected.en,
+                                                        villageNameAr: selected.ar
+                                                    });
+                                                } else {
+                                                    setFormData({
+                                                        ...formData,
+                                                        villageNameEn: '',
+                                                        villageNameAr: ''
+                                                    });
+                                                }
+                                            }}
+                                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none bg-white font-medium"
+                                            required
+                                        >
+                                            <option value="">{isArabic ? 'اختر قرية...' : 'Select a village...'}</option>
+                                            {VILLAGES.map((v) => (
+                                                <option key={v.en} value={v.en}>
+                                                    {isArabic ? v.ar : v.en}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {(formErrors.villageNameEn || formErrors.villageNameAr) && (
+                                            <p className="text-red-500 text-xs mt-1">
+                                                {isArabic ? 'يرجى اختيار القرية' : 'Please select a village'}
+                                            </p>
+                                        )}
                                     </div>
 
                                     {/* Descriptions */}

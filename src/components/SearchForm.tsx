@@ -28,7 +28,7 @@ const SearchForm = ({
     const [checkOut, setCheckOut] = useState(initialCheckOut ? formatDateToDDMMYYYY(initialCheckOut) : '');
     const [adults, setAdults] = useState(initialAdults);
     const [children, setChildren] = useState(initialChildren);
-    
+
     // Error states
     const [errors, setErrors] = useState<{
         checkIn?: string;
