@@ -29,6 +29,10 @@ const AllBookingsManagement = ({ externalFilters, onRefresh }: Props) => {
     const [filterFrom, setFilterFrom] = useState<string>(externalFilters?.fromDate || '');
     const [filterTo, setFilterTo] = useState<string>(externalFilters?.toDate || '');
     const [filterChalet, setFilterChalet] = useState<number | undefined>(externalFilters?.chaletId);
+    // New filters
+    const [filterBookingId, setFilterBookingId] = useState<string>('');
+    const [filterPhone, setFilterPhone] = useState<string>('');
+    const [presetRange, setPresetRange] = useState<string>('All');
 
     // Deposit Modal State
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -112,7 +116,9 @@ const AllBookingsManagement = ({ externalFilters, onRefresh }: Props) => {
         const matchesFrom = !filterFrom || new Date(b.CheckInDate) >= new Date(filterFrom);
         const matchesTo = !filterTo || new Date(b.CheckInDate) <= new Date(filterTo);
         const matchesChalet = !filterChalet || b.ChaletId === filterChalet;
-        return matchesStatus && matchesFrom && matchesTo && matchesChalet;
+        const matchesBookingId = !filterBookingId || b.Id.toString().includes(filterBookingId);
+        const matchesPhone = !filterPhone || b.UserPhoneNumber?.includes(filterPhone);
+        return matchesStatus && matchesFrom && matchesTo && matchesChalet && matchesBookingId && matchesPhone;
     });
 
     const getStatusStyles = (status: string) => {
@@ -139,6 +145,37 @@ const AllBookingsManagement = ({ externalFilters, onRefresh }: Props) => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
+                    {/* Preset date range */}
+                    <select
+                        value={presetRange}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setPresetRange(val);
+                            const today = new Date();
+                            const format = (d: Date) => d.toISOString().split('T')[0];
+                            if (val === 'Day') {
+                                const day = format(today);
+                                setFilterFrom(day);
+                                setFilterTo(day);
+                            } else if (val === 'Week') {
+                                const start = format(today);
+                                const endDate = new Date();
+                                endDate.setDate(today.getDate() + 6);
+                                const end = format(endDate);
+                                setFilterFrom(start);
+                                setFilterTo(end);
+                            } else {
+                                setFilterFrom('');
+                                setFilterTo('');
+                            }
+                        }}
+                        className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
+                    >
+                        <option value="All">{isRTL ? 'الكل' : 'All'}</option>
+                        <option value="Day">{isRTL ? 'يوم واحد' : 'Day'}</option>
+                        <option value="Week">{isRTL ? 'أسبوع' : 'Week'}</option>
+                    </select>
+                    {/* Date inputs (override by preset) */}
                     <input
                         type="date"
                         value={filterFrom}
@@ -153,6 +190,7 @@ const AllBookingsManagement = ({ externalFilters, onRefresh }: Props) => {
                         className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
                         placeholder={isRTL ? 'إلى' : 'To'}
                     />
+                    {/* Chalet selector */}
                     <select
                         value={filterChalet || ''}
                         onChange={(e) => setFilterChalet(e.target.value ? parseInt(e.target.value) : undefined)}
@@ -163,6 +201,7 @@ const AllBookingsManagement = ({ externalFilters, onRefresh }: Props) => {
                             <option key={c.Id} value={c.Id}>{isRTL ? c.TitleAr : c.TitleEn}</option>
                         ))}
                     </select>
+                    {/* Status selector */}
                     <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
@@ -173,6 +212,22 @@ const AllBookingsManagement = ({ externalFilters, onRefresh }: Props) => {
                         <option value="Confirmed">{isRTL ? 'مؤكد' : 'Confirmed'}</option>
                         <option value="Cancelled">{isRTL ? 'ملغي' : 'Cancelled'}</option>
                     </select>
+                    {/* Booking ID filter */}
+                    <input
+                        type="text"
+                        placeholder={isRTL ? 'معرف الحجز' : 'Booking ID'}
+                        value={filterBookingId}
+                        onChange={(e) => setFilterBookingId(e.target.value)}
+                        className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
+                    />
+                    {/* Phone filter */}
+                    <input
+                        type="text"
+                        placeholder={isRTL ? 'رقم الهاتف' : 'Phone'}
+                        value={filterPhone}
+                        onChange={(e) => setFilterPhone(e.target.value)}
+                        className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
+                    />
                 </div>
             </div>
 
