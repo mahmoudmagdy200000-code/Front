@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { Chalet } from '../types/chalet';
 import { getImageUrl } from '../config/api';
+import { TreePalm, Bed, BedDouble } from 'lucide-react';
 
 export interface ChaletCardProps {
     chalet: Chalet;
@@ -60,7 +61,7 @@ const ChaletCard = ({ chalet, checkIn, checkOut }: ChaletCardProps) => {
                         {title}
                     </h3>
                     <div className="flex items-center gap-1 text-slate-400 text-xs mt-1.5 font-medium">
-                        <span className="text-[10px]">📍</span>
+                        <TreePalm className="w-4 h-4 text-slate-400 mr-1" />
                         <span className="truncate">{isArabic ? chalet.VillageNameAr : chalet.VillageNameEn}</span>
                     </div>
                 </div>
@@ -68,10 +69,11 @@ const ChaletCard = ({ chalet, checkIn, checkOut }: ChaletCardProps) => {
                 {/* Specs Section */}
                 <div className="flex flex-wrap items-center gap-4 text-slate-500 mb-6 text-[11px] font-bold">
                     <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg">
-                        <span>🚪</span>
+                        <Bed className="w-4 h-4 text-slate-400 mr-1" />
                         <span>
                             {chalet.RoomsCount} {isArabic ? 'غرف' : 'Rooms'}
                         </span>
+                        <BedDouble className="w-4 h-4 text-slate-400 ml-2" />
                     </div>
                     <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg">
                         <span>🚿</span>
