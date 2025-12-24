@@ -11,6 +11,8 @@ interface DatePickerProps {
     placeholder?: string;
     label?: string;
     minDate?: Date;
+    rangeFrom?: Date;
+    rangeTo?: Date;
     isRTL?: boolean;
     position?: 'top' | 'bottom';
 }
@@ -21,6 +23,8 @@ const DatePicker = ({
     placeholder = 'DD/MM/YYYY',
     label,
     minDate,
+    rangeFrom,
+    rangeTo,
     isRTL = false,
     position = 'bottom',
 }: DatePickerProps) => {
@@ -56,13 +60,6 @@ const DatePicker = ({
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        onChange(val);
-        // We don't auto-update the calendar from text input here to avoid jumping, 
-        // relying on re-render with `selectedDate` derived from `value` is safer.
-    };
-
     const handleInputFocus = () => {
         setIsOpen(true);
     };
@@ -85,18 +82,18 @@ const DatePicker = ({
                 <input
                     type="text"
                     value={value}
-                    onChange={handleInputChange}
+                    readOnly
                     onFocus={handleInputFocus}
                     placeholder={placeholder}
-                    className="w-full pl-10 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-700 font-medium"
+                    className="w-full pl-10 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-700 font-medium cursor-pointer bg-white"
                 />
             </div>
 
             {/* Calendar Popover */}
             {isOpen && (
                 <div className={`absolute ${isRTL ? 'right-0' : 'left-0'} ${position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
-                    } bg-white rounded-xl shadow-2xl border border-gray-200 z-50 p-2 animate-in fade-in zoom-in-95 duration-200`}
-                    style={{ minWidth: '300px' }}
+                    } bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-50 p-3 animate-in fade-in zoom-in-95 duration-200`}
+                    style={{ minWidth: '320px' }}
                 >
                     <DayPicker
                         mode="single"
@@ -106,17 +103,39 @@ const DatePicker = ({
                         locale={isRTL ? arSA : enUS}
                         dir={isRTL ? 'rtl' : 'ltr'}
                         showOutsideDays
+                        modifiers={{
+                            selectedRange: { from: rangeFrom, to: rangeTo }
+                        }}
                         modifiersClassNames={{
-                            selected: 'bg-blue-600 text-white hover:bg-blue-700',
-                            today: 'text-blue-500 font-bold'
+                            selected: 'custom-selected',
+                            selectedRange: 'bg-blue-50 text-blue-700',
+                            today: 'text-blue-600 font-black'
                         }}
                         styles={{
-                            head_cell: { width: '40px' },
-                            cell: { width: '40px' },
-                            day: { width: '40px', height: '40px' },
-                            nav_button: { color: '#2563eb' } // Blue navigation
+                            head_cell: { width: '44px', color: '#94a3b8', fontSize: '12px', fontWeight: 'bold' },
+                            cell: { width: '44px' },
+                            day: { width: '44px', height: '44px', borderRadius: '12px', transition: 'all 0.2s' },
+                            nav_button: { color: '#2563eb' }
                         }}
                     />
+                    <style>{`
+                        .custom-selected {
+                            background-color: #2563eb !important;
+                            color: white !important;
+                            border-radius: 12px !important;
+                            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4) !important;
+                            font-weight: bold !important;
+                        }
+                        .rdp-day_selectedRange:not(.rdp-day_selected) {
+                            background-color: #eff6ff !important;
+                            color: #2563eb !important;
+                            border-radius: 0 !important;
+                        }
+                        .rdp-day:hover:not(.rdp-day_selected) {
+                            background-color: #f8fafc !important;
+                            color: #2563eb !important;
+                        }
+                    `}</style>
                 </div>
             )}
         </div>

@@ -29,6 +29,22 @@ const SearchForm = ({
     const [adults, setAdults] = useState(initialAdults);
     const [children, setChildren] = useState(initialChildren);
 
+    // Helper to get Date object from string
+    const getCheckInDateObj = () => {
+        if (!checkIn || !isValidDateFormat(checkIn)) return new Date();
+        const parsed = parseDateFromDDMMYYYY(checkIn);
+        const date = new Date(parsed);
+        // Add 1 day for minimum check-out
+        date.setDate(date.getDate() + 1);
+        return date;
+    };
+
+    const minCheckOutDate = getCheckInDateObj();
+
+    // Range dates for highlighting
+    const checkInDate = checkIn && isValidDateFormat(checkIn) ? new Date(parseDateFromDDMMYYYY(checkIn)) : undefined;
+    const checkOutDate = checkOut && isValidDateFormat(checkOut) ? new Date(parseDateFromDDMMYYYY(checkOut)) : undefined;
+
     // Error states
     const [errors, setErrors] = useState<{
         checkIn?: string;
@@ -100,10 +116,18 @@ const SearchForm = ({
                         onChange={(value) => {
                             setCheckIn(value);
                             setErrors({});
+                            // If check-in is set/changed, we might want to validate check-out
+                            const newCheckInISO = parseDateFromDDMMYYYY(value);
+                            const currentCheckOutISO = checkOut ? parseDateFromDDMMYYYY(checkOut) : '';
+                            if (currentCheckOutISO && newCheckInISO >= currentCheckOutISO) {
+                                setCheckOut(''); // Clear check-out if it's now invalid
+                            }
                         }}
                         label={isRTL ? 'تاريخ الوصول' : 'Check-in'}
                         placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
                         minDate={new Date()}
+                        rangeFrom={checkInDate}
+                        rangeTo={checkOutDate}
                         isRTL={isRTL}
                     />
                     {errors.checkIn && (
@@ -121,7 +145,9 @@ const SearchForm = ({
                         }}
                         label={isRTL ? 'تاريخ المغادرة' : 'Check-out'}
                         placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
-                        minDate={new Date()}
+                        minDate={minCheckOutDate}
+                        rangeFrom={checkInDate}
+                        rangeTo={checkOutDate}
                         isRTL={isRTL}
                     />
                     {errors.checkOut && (
