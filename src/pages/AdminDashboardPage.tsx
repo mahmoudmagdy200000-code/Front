@@ -510,7 +510,9 @@ const AdminDashboardPage = () => {
                                                                 {new Date(request.CreatedAt).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
                                                             </td>
                                                             <td className="px-8 py-5 whitespace-nowrap text-end">
-                                                                {(request.Status === 'Pending' || (request.Status === 'ConfirmedByAdmin' && role === 'SuperAdmin')) ? (
+                                                                {(request.Status === 'Pending' ||
+                                                                    (request.Status === 'ConfirmedByAdmin' && role === 'SuperAdmin') ||
+                                                                    (request.Status === 'DowngradePending' && role === 'SuperAdmin')) ? (
                                                                     <div className="flex justify-end gap-2">
                                                                         <Button
                                                                             variant="success"
@@ -518,25 +520,29 @@ const AdminDashboardPage = () => {
                                                                             className="rounded-xl font-black shadow-sm"
                                                                             onClick={() => handleApprove(request.Id)}
                                                                         >
-                                                                            {request.Status === 'ConfirmedByAdmin'
-                                                                                ? (isRTL ? 'موافقة نهائية' : 'Final Approve')
-                                                                                : (role === 'SuperAdmin' ? (isRTL ? 'قبول' : 'Approve') : (isRTL ? 'تحقق' : 'Verify'))
+                                                                            {request.Status === 'DowngradePending'
+                                                                                ? (isRTL ? 'موافقة على السحب' : 'Approve Downgrade')
+                                                                                : request.Status === 'ConfirmedByAdmin'
+                                                                                    ? (isRTL ? 'موافقة نهائية' : 'Final Approve')
+                                                                                    : (role === 'SuperAdmin' ? (isRTL ? 'قبول' : 'Approve') : (isRTL ? 'تحقق' : 'Verify'))
                                                                             }
                                                                         </Button>
-                                                                        {request.Status === 'Pending' && (
-                                                                            <Button
-                                                                                variant="outline"
-                                                                                size="sm"
-                                                                                className="rounded-xl border-rose-100 text-rose-600 hover:bg-rose-50"
-                                                                                onClick={() => handleReject(request.Id)}
-                                                                            >
-                                                                                {isRTL ? 'رفض' : 'Reject'}
-                                                                            </Button>
-                                                                        )}
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            size="sm"
+                                                                            className="rounded-xl border-rose-100 text-rose-600 hover:bg-rose-50"
+                                                                            onClick={() => handleReject(request.Id)}
+                                                                        >
+                                                                            {isRTL ? 'رفض' : 'Reject'}
+                                                                        </Button>
                                                                     </div>
                                                                 ) : request.Status === 'ConfirmedByAdmin' && role !== 'SuperAdmin' ? (
                                                                     <span className="text-xs font-bold text-indigo-500 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100">
                                                                         {isRTL ? 'تم التحقق - بانتظار السوبر' : 'Verified - Awaiting SuperAdmin'}
+                                                                    </span>
+                                                                ) : request.Status === 'DowngradePending' && role !== 'SuperAdmin' ? (
+                                                                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100">
+                                                                        {isRTL ? 'طلب سحب - بانتظار السوبر' : 'Downgrade - Awaiting SuperAdmin'}
                                                                     </span>
                                                                 ) : (
                                                                     <span className="text-xs font-bold text-slate-400 italic">
