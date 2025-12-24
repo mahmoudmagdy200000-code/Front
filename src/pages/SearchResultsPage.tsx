@@ -59,10 +59,11 @@ const SearchResultsPage = () => {
                 const children = searchParams.get('children') ? parseInt(searchParams.get('children')!) : undefined;
                 const villageName = searchParams.get('village') || undefined;
 
+                console.log('🔍 [fetchChalets] villageName from URL:', villageName);
                 const result = await getChalets({
                     checkInDate,
                     checkOutDate,
-                    minPrice: currentMinPrice, // Pass minPrice
+                    minPrice: currentMinPrice,
                     maxPrice: currentMaxPrice,
                     adults,
                     children,
@@ -70,6 +71,7 @@ const SearchResultsPage = () => {
                     page: currentPage,
                     pageSize: pageSize
                 });
+                console.log('✅ [fetchChalets] Result:', result);
 
                 setChalets(result.Items);
                 setTotalPages(result.TotalPages);

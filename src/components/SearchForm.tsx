@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDateToDDMMYYYY, parseDateFromDDMMYYYY, isValidDateFormat } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -24,10 +24,36 @@ const SearchForm = ({
     const isRTL = i18n.language === 'ar';
 
     // Convert initial dates from YYYY-MM-DD to DD/MM/YYYY for display
-    const [checkIn, setCheckIn] = useState(initialCheckIn ? formatDateToDDMMYYYY(initialCheckIn) : '');
-    const [checkOut, setCheckOut] = useState(initialCheckOut ? formatDateToDDMMYYYY(initialCheckOut) : '');
-    const [adults, setAdults] = useState(initialAdults);
-    const [children, setChildren] = useState(initialChildren);
+    const [checkIn, setCheckIn] = useState(() => {
+        const propValue = initialCheckIn ? formatDateToDDMMYYYY(initialCheckIn) : '';
+        return propValue || sessionStorage.getItem('checkIn_display') || '';
+    });
+    const [checkOut, setCheckOut] = useState(() => {
+        const propValue = initialCheckOut ? formatDateToDDMMYYYY(initialCheckOut) : '';
+        return propValue || sessionStorage.getItem('checkOut_display') || '';
+    });
+    const [adults, setAdults] = useState(() => {
+        return Number(sessionStorage.getItem('adults')) || initialAdults;
+    });
+    const [children, setChildren] = useState(() => {
+        return Number(sessionStorage.getItem('children')) || initialChildren;
+    });
+
+    // Update sessionStorage when values change
+    useEffect(() => {
+        if (checkIn) sessionStorage.setItem('checkIn_display', checkIn);
+        if (checkOut) sessionStorage.setItem('checkOut_display', checkOut);
+        sessionStorage.setItem('adults', adults.toString());
+        sessionStorage.setItem('children', children.toString());
+    }, [checkIn, checkOut, adults, children]);
+
+    // Sync with props when they change (e.g. browser back/forward)
+    useEffect(() => {
+        if (initialCheckIn) setCheckIn(formatDateToDDMMYYYY(initialCheckIn));
+        if (initialCheckOut) setCheckOut(formatDateToDDMMYYYY(initialCheckOut));
+        setAdults(initialAdults);
+        setChildren(initialChildren);
+    }, [initialCheckIn, initialCheckOut, initialAdults, initialChildren]);
 
     // Helper to get Date object from string
     const getCheckInDateObj = () => {
