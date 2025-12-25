@@ -32,8 +32,8 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
 
     return (
         <div className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden flex flex-col h-full relative">
-            {/* Image Section - aspect-ratio 16/9 for mobile, fixed height for desktop */}
-            <div className="relative aspect-[16/9] md:h-48 w-full bg-gray-100 overflow-hidden">
+            {/* Image Section - Enforce h-48 and object-cover */}
+            <div className="relative h-48 w-full bg-gray-100">
                 {chalet.Images && chalet.Images.length > 0 && !imgError ? (
                     <img
                         src={getImageUrl(chalet.Images.find(i => i.IsPrimary)?.ImageUrl || chalet.Images[0].ImageUrl)}
@@ -49,7 +49,7 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
                         <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span className="text-xs text-gray-400 font-medium">{isArabic ? 'بدون صورة' : 'No Image'}</span>
+                        <span className="text-xs text-gray-400 font-medium">No Image</span>
                     </div>
                 )}
 
@@ -60,16 +60,14 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
             </div>
 
             {/* Content Section */}
-            <div className="flex flex-col flex-1 p-3 md:p-4">
+            <div className="flex flex-col flex-1 p-4">
                 {/* Header: Title & Description */}
-                <div className="mb-4 flex-grow">
-                    <div className="min-h-[1.5rem]">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-0.5 line-clamp-1" title={isArabic ? chalet.TitleAr : chalet.TitleEn}>
-                            {isArabic ? chalet.TitleAr : chalet.TitleEn}
-                        </h3>
-                    </div>
-                    <div className="flex items-center gap-1 text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-2">
-                        <span>📍</span>
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1" title={isArabic ? chalet.TitleAr : chalet.TitleEn}>
+                        {isArabic ? chalet.TitleAr : chalet.TitleEn}
+                    </h3>
+                    <div className="flex items-center gap-1 text-gray-400 text-xs font-medium">
+                        <span className="text-[10px]">📍</span>
                         <span className="truncate">{isArabic ? chalet.VillageNameAr : chalet.VillageNameEn}</span>
                     </div>
                     <p className="text-sm text-gray-500 line-clamp-2 min-h-[40px] mt-2">
@@ -78,23 +76,23 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
                 </div>
 
                 {/* Specs Row */}
-                <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600 mb-4 min-h-[1.25rem]">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
                     <div className="flex items-center gap-1.5" title={isArabic ? 'غرف' : 'Rooms'}>
-                        <span className="text-sm">🚪</span>
+                        <span className="text-base">🚪</span>
                         <span className="font-medium">{chalet.RoomsCount || 0}</span>
                     </div>
                     <div className="flex items-center gap-1.5" title={isArabic ? 'حمامات' : 'Bathrooms'}>
-                        <span className="text-sm">🚿</span>
+                        <span className="text-base">🚿</span>
                         <span className="font-medium">{chalet.BathroomsCount || 0}</span>
                     </div>
                     <div className="flex items-center gap-1.5" title={isArabic ? 'البالغين' : 'Adults'}>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         <span className="font-medium">{chalet.AdultsCapacity}</span>
                     </div>
                     <div className="flex items-center gap-1.5" title={isArabic ? 'الأطفال' : 'Children'}>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                         <span className="font-medium">{chalet.ChildrenCapacity}</span>
