@@ -35,8 +35,8 @@ const ChaletCard = ({ chalet, checkIn, checkOut, priority }: ChaletCardProps) =>
             onClick={handleViewDetails}
             className="soft-card group cursor-pointer overflow-hidden flex flex-col h-full"
         >
-            {/* Image Section - aspect-[4/3] for all cards */}
-            <div className="relative aspect-[4/3] sm:aspect-[4/3] bg-slate-100 overflow-hidden shrink-0">
+            {/* Image Section - aspect-[16/9] for mobile, aspect-[4/3] for desktop */}
+            <div className="relative aspect-[16/9] md:aspect-[4/3] bg-slate-100 overflow-hidden shrink-0">
                 {displayImage ? (
                     <img
                         src={getImageUrl(displayImage)}
@@ -66,21 +66,21 @@ const ChaletCard = ({ chalet, checkIn, checkOut, priority }: ChaletCardProps) =>
             </div>
 
             {/* Content Section */}
-            <div className="flex flex-col flex-grow p-5 sm:p-6">
-                <div className="mb-4">
-                    <div className="flex justify-between items-start gap-2 mb-1">
+            <div className="flex flex-col flex-grow p-4 md:p-6">
+                <div className="mb-4 flex-grow">
+                    <div className="flex justify-between items-start gap-2 mb-1 min-h-[1.5rem]">
                         <h3 className="text-lg font-black text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors leading-tight" title={title}>
                             {title}
                         </h3>
                     </div>
-                    <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                    <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">
                         <TreePalm className="w-3.5 h-3.5 text-blue-500/60" />
                         <span className="truncate">{isArabic ? chalet.VillageNameAr : chalet.VillageNameEn}</span>
                     </div>
                 </div>
 
                 {/* Specs Section - Premium pill style */}
-                <div className="flex flex-wrap items-center gap-2 mb-6 text-[10px] font-black uppercase tracking-tighter">
+                <div className="flex flex-wrap items-center gap-2 mb-6 text-[10px] font-black uppercase tracking-tighter min-h-[2rem]">
                     <div className="flex items-center gap-1.5 bg-slate-50 text-slate-600 px-3 py-1.5 rounded-full border border-slate-100/50">
                         <Bed className="w-3.5 h-3.5 opacity-60" />
                         <span>{chalet.RoomsCount || 3} {isArabic ? 'غرف' : 'Rooms'}</span>
