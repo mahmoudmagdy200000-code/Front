@@ -36,6 +36,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
         checkIn?: string;
         checkOut?: string;
         dates?: string;
+        phone?: string;
     }>({});
 
     const calculateNights = () => {
@@ -134,9 +135,10 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
         }
 
         // Phone validation: must be exactly 11 digits
+        // Phone validation: must be exactly 11 digits
         const phoneRegex = /^\d{11}$/;
         if (!phoneRegex.test(userPhoneNumber)) {
-            setMessage({ type: 'error', text: t('booking.invalidPhone') });
+            setErrors(prev => ({ ...prev, phone: isRTL ? 'رقم الهاتف يجب أن يتكون من 11 رقم' : 'Phone number must be exactly 11 digits' }));
             return;
         }
 
@@ -537,13 +539,24 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                                     type="tel"
                                     id="userPhone"
                                     value={userPhoneNumber}
-                                    onChange={(e) => setUserPhoneNumber(e.target.value)}
+                                    onChange={(e) => {
+                                        setUserPhoneNumber(e.target.value);
+                                        if (errors.phone) setErrors(prev => ({ ...prev, phone: undefined }));
+                                    }}
                                     placeholder={t('booking.phonePlaceholder')}
-                                    className={`soft-input w-full ${isRTL ? 'pr-12 pl-4' : 'pl-12 pr-4'} py-4 font-black text-slate-900 text-lg tracking-[0.1em]`}
+                                    className={`soft-input w-full ${isRTL ? 'pr-12 pl-4' : 'pl-12 pr-4'} py-4 font-black text-slate-900 text-lg tracking-[0.1em] ${errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-200 bg-red-50/10' : ''}`}
                                     required
                                     dir="ltr"
                                 />
                             </div>
+                            {errors.phone && (
+                                <p className="text-sm text-red-500 flex items-center gap-1.5 font-bold animate-fade-in px-1">
+                                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    {errors.phone}
+                                </p>
+                            )}
                         </div>
 
                         {/* Terms Checkbox - Refined */}
