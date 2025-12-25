@@ -145,12 +145,14 @@ const SearchResultsPage = () => {
                 </div>
 
                 <div className="container mx-auto px-6 py-8">
-                    {/* Centered Title and Count */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            <span className="text-blue-600">{totalCount} {isRTL ? 'شاليه تم العثور عليه' : 'Chalets Found'}</span>
+                    {/* Professional Result Header */}
+                    <div className="mb-8 border-b border-slate-100 pb-6">
+                        <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase mb-1">
+                            {isRTL ? `أكثر من ${totalCount} إقامة في رأس سدر` : `Over ${totalCount} stays in Ras Sedr`}
                         </h1>
-                        <div className="h-1 w-24 bg-blue-500 mx-auto mt-3 rounded-full"></div>
+                        <p className="text-2xl font-black text-slate-800">
+                            {isRTL ? 'شاليهات متميزة ومراجعة من الضيوف' : 'Highly rated chalets reviewed by guests'}
+                        </p>
                     </div>
 
                     {loading && (

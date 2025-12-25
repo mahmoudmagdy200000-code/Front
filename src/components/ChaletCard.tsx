@@ -84,14 +84,18 @@ const ChaletCard = ({ chalet, checkIn, checkOut }: ChaletCardProps) => {
                 </div>
 
                 {/* Price Section */}
-                <div className="mt-auto pt-4 border-t border-slate-50 flex items-baseline gap-1">
-                    <span className="text-xl font-black text-slate-900">
-                        {chalet.PricePerNight.toLocaleString()}
-                        <span className="text-xs font-bold text-slate-400 ms-1 uppercase tracking-tighter">{t('common.sar')}</span>
-                    </span>
-                    <span className="text-sm text-slate-400 font-medium font-sans">
-                        / {isArabic ? 'ليلة' : 'night'}
-                    </span>
+                <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xl font-black text-slate-900 leading-none">
+                            {chalet.PricePerNight.toLocaleString()}
+                        </span>
+                        <span className="text-sm font-bold text-slate-900 leading-none">
+                            {isArabic ? 'جنية' : t('common.sar')}
+                        </span>
+                        <span className="text-sm text-slate-400 font-medium font-sans leading-none">
+                            / {isArabic ? 'ليلة' : 'night'}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
