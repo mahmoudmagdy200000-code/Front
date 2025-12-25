@@ -127,14 +127,14 @@ const SearchForm = ({
 
     return (
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-blue-100 max-w-5xl mx-auto" >
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3 whitespace-nowrap">
                 <svg className="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 {isRTL ? 'ابحث عن إقامتك المثالية' : 'Find Your Perfect Stay'}
             </h2>
 
-            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 items-start">
                 {/* Check-in Date */}
                 <div className="relative group">
                     <DatePicker
@@ -251,26 +251,30 @@ const SearchForm = ({
                 </div>
 
                 {/* Search Button */}
-                <div className="col-span-1 md:col-span-2 lg:col-span-4 mt-2">
+                {/* Search Button */}
+                <div className="col-span-1 md:col-span-2 lg:col-span-1">
+                    <label className="block text-sm font-semibold text-transparent mb-2 select-none">
+                        Button
+                    </label>
                     {errors.dates && (
-                        <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded mb-4">
-                            <p className="text-red-700 font-medium flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="absolute -top-12 left-0 right-0 bg-red-50 border-l-4 border-red-500 p-2 rounded shadow-lg z-10">
+                            <p className="text-red-700 text-xs font-medium flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                                 </svg>
                                 {errors.dates}
                             </p>
                         </div>
                     )}
-                    <div className="flex justify-center">
+                    <div className="flex justify-center h-[52px]">
                         <button
                             type="submit"
-                            className="px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-full font-bold text-lg shadow-lg shadow-blue-300 hover:shadow-xl hover:shadow-blue-400 transition-all transform hover:-translate-y-0.5 flex items-center gap-3"
+                            className="w-full h-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-300 hover:shadow-xl hover:shadow-blue-400 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
-                            {isRTL ? 'ابحث الآن' : 'Search Now'}
+                            {isRTL ? 'بحث' : 'Search'}
                         </button>
                     </div>
                 </div>
