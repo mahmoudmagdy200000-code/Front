@@ -367,7 +367,13 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                                 }}
                                 label={t('booking.checkOut')}
                                 placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
-                                minDate={new Date()}
+                                minDate={(() => {
+                                    if (!checkInDate) return new Date();
+                                    const [d, m, y] = checkInDate.split('/');
+                                    const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+                                    date.setDate(date.getDate() + 1);
+                                    return date;
+                                })()}
                                 isRTL={isRTL}
                                 position="top"
                             />
@@ -384,6 +390,41 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                                     </svg>
                                     {errors.dates}
                                 </p>
+                            </div>
+                        )}
+
+                        {/* Duration Summary with Shadow */}
+                        {checkInDate && checkOutDate && nights > 0 && !errors.dates && (
+                            <div className="bg-white p-5 rounded-2xl shadow-[0_20px_50px_rgba(37,99,235,0.12)] border border-blue-50/50 animate-in zoom-in-95 duration-500 overflow-hidden relative group">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/30 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-blue-100/40 transition-colors" />
+                                <div className="relative z-10 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-1">
+                                                {isRTL ? 'إجمالي مدة الإقامة' : 'Total Stay Duration'}
+                                            </p>
+                                            <p className="text-xl font-black text-slate-900 leading-none">
+                                                {nights} {isRTL ? 'ليالي' : 'nights'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">
+                                            {isRTL ? 'السعر التقديري' : 'Est. Total'}
+                                        </p>
+                                        <div className="flex items-baseline gap-1">
+                                            <p className="text-2xl font-black text-blue-600 leading-none">
+                                                {totalPrice.toLocaleString()}
+                                            </p>
+                                            <span className="text-[10px] font-bold text-blue-600 uppercase">{t('common.sar')}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
