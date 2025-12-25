@@ -712,7 +712,13 @@ const DashboardPage = () => {
                                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-4">
                                                 {existingImages.map((img, index) => (
                                                     <div key={img.Id} className="aspect-square relative rounded-lg overflow-hidden group border border-slate-200">
-                                                        <img src={getImageUrl(img.ImageUrl)} className="w-full h-full object-cover" />
+                                                        <img
+                                                            src={getImageUrl(img.ImageUrl)}
+                                                            width={200}
+                                                            height={200}
+                                                            loading="lazy"
+                                                            className="w-full h-full object-cover"
+                                                        />
                                                         {/* Controls Overlay */}
                                                         <div className="absolute inset-x-0 bottom-0 bg-black/60 flex justify-between items-center px-1 py-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                                             <button
@@ -754,7 +760,13 @@ const DashboardPage = () => {
                                                 ))}
                                                 {selectedImages.map((file, i) => (
                                                     <div key={i} className="aspect-square relative rounded-lg overflow-hidden group border-2 border-green-400">
-                                                        <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
+                                                        <img
+                                                            src={URL.createObjectURL(file)}
+                                                            width={200}
+                                                            height={200}
+                                                            loading="lazy"
+                                                            className="w-full h-full object-cover"
+                                                        />
                                                         {/* Controls Overlay for Selected Images */}
                                                         <div className="absolute inset-x-0 bottom-0 bg-black/60 flex justify-between items-center px-1 py-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                                             <button

@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getChaletById } from '../api/chalets';
 import type { Chalet } from '../types/chalet';
 import BookingForm from '../components/BookingForm';
 import AirbnbGallery from '../components/AirbnbGallery';
-import ReviewsList from '../components/reviews/ReviewsList';
+const ReviewsList = lazy(() => import('../components/reviews/ReviewsList'));
 import HomeHeader from '../components/HomeHeader';
 import Footer from '../components/Footer';
 
@@ -211,7 +211,9 @@ const ChaletDetailPage = () => {
                                     <span className="text-2xl text-slate-200">·</span>
                                     <span className="text-2xl font-bold text-slate-900">12 {isRTL ? 'تقييم' : 'reviews'}</span>
                                 </div>
-                                <ReviewsList chaletId={chalet.Id} />
+                                <Suspense fallback={<div className="h-20 animate-pulse bg-slate-50 rounded-xl"></div>}>
+                                    <ReviewsList chaletId={chalet.Id} />
+                                </Suspense>
                             </section>
                         </div>
 

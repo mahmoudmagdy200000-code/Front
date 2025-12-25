@@ -59,6 +59,9 @@ const ImageGallery = ({ images, autoPlayInterval = 4000 }: ImageGalleryProps) =>
                 <img
                     src={getImageUrl(currentImage.ImageUrl)}
                     alt={`Slide ${currentIndex + 1}`}
+                    width={800}
+                    height={600}
+                    fetchPriority="high"
                     className="w-full h-full object-cover transition-opacity duration-700"
                     key={currentImage.Id}
                     onError={(e) => {
@@ -134,6 +137,9 @@ const ImageGallery = ({ images, autoPlayInterval = 4000 }: ImageGalleryProps) =>
                             <img
                                 src={getImageUrl(image.ImageUrl)}
                                 alt={`Thumbnail ${index + 1}`}
+                                width={200}
+                                height={200}
+                                loading="lazy"
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                     e.currentTarget.src = 'https://placehold.co/200x200/1e293b/ffffff?text=No+Image';

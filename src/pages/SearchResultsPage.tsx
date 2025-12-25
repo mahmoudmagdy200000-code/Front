@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getChalets } from '../api/chalets';
@@ -8,7 +8,7 @@ import HomeHeader from '../components/HomeHeader';
 import Footer from '../components/Footer';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
-import ChaletFilters from '../components/ChaletFilters';
+const ChaletFilters = lazy(() => import('../components/ChaletFilters'));
 
 const SearchResultsPage = () => {
     const { t, i18n } = useTranslation();
@@ -134,12 +134,14 @@ const SearchResultsPage = () => {
 
                         {/* Integrated Filters */}
                         <div className="mt-6">
-                            <ChaletFilters
-                                currentMin={currentMinPrice}
-                                currentMax={currentMaxPrice}
-                                currentVillage={currentVillage}
-                                onFilterChange={handleFilterChange}
-                            />
+                            <Suspense fallback={<div className="h-12 animate-pulse bg-slate-50 rounded-xl"></div>}>
+                                <ChaletFilters
+                                    currentMin={currentMinPrice}
+                                    currentMax={currentMaxPrice}
+                                    currentVillage={currentVillage}
+                                    onFilterChange={handleFilterChange}
+                                />
+                            </Suspense>
                         </div>
                     </div>
                 </div>
@@ -173,10 +175,11 @@ const SearchResultsPage = () => {
                             {chalets.length > 0 ? (
                                 <>
                                     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-                                        {chalets.map((chalet) => (
+                                        {chalets.map((chalet, index) => (
                                             <ChaletCard
                                                 key={chalet.Id}
                                                 chalet={chalet}
+                                                priority={index < 2}
                                                 checkIn={searchParams.get('checkIn') || undefined}
                                                 checkOut={searchParams.get('checkOut') || undefined}
                                             />

@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { formatDateToDDMMYYYY, parseDateFromDDMMYYYY, isValidDateFormat } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { checkAvailability, createBooking } from '../api/bookings';
 import type { Booking } from '../types/booking';
 import DatePicker from './DatePicker';
@@ -482,111 +481,102 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
 
                 {/* Phone Step */}
                 {step === 'phone' && (
-                    <div className="space-y-6 animate-fade-in">
-                        {/* Summary Card */}
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100">
-                            <div className="flex items-center justify-between text-sm text-blue-800 mb-3">
-                                <span>{isRTL ? 'تاريخ الوصول' : 'Check-in'}</span>
-                                <span className="font-bold">{checkInDate}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm text-blue-800 mb-3">
-                                <span>{isRTL ? 'تاريخ المغادرة' : 'Check-out'}</span>
-                                <span className="font-bold">{checkOutDate}</span>
-                            </div>
-                            <div className="border-t border-blue-200 pt-3 mt-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-blue-800 font-medium">{nights} {isRTL ? 'ليالي' : 'nights'}</span>
-                                    <span className="text-xl font-black text-blue-600">{totalPrice.toLocaleString()} {t('common.sar')}</span>
+                    <div className="space-y-6 animate-fade-in p-2 sm:p-4">
+                        <h3 className="text-xl font-black text-slate-900 text-center mb-6">
+                            {isRTL ? 'تأكيد معلومات التواصل' : 'Confirm Contact Info'}
+                        </h3>
+
+                        {/* Summary Card - More premium */}
+                        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/40 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-blue-100/50 transition-colors" />
+
+                            <div className="relative z-10 space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <div className="space-y-0.5">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{isRTL ? 'تاريخ الوصول' : 'Check-in'}</p>
+                                        <p className="font-bold text-slate-800">{checkInDate}</p>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                                        <svg className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </div>
+                                    <div className="space-y-0.5 text-right">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{isRTL ? 'تاريخ المغادرة' : 'Check-out'}</p>
+                                        <p className="font-bold text-slate-800">{checkOutDate}</p>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-1 bg-slate-100 rounded text-[10px] font-black text-slate-500 uppercase tracking-tighter">
+                                            {nights} {isRTL ? 'ليالي' : 'nights'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-baseline gap-1.5">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{isRTL ? 'الإجمالي' : 'Total'}</span>
+                                        <span className="text-2xl font-black text-blue-600">{totalPrice.toLocaleString()}</span>
+                                        <span className="text-[10px] font-bold text-blue-600 uppercase">{t('common.sar')}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Phone Input */}
-                        <div ref={phoneInputRef}>
-                            <label htmlFor="userPhone" className="block text-sm font-bold text-slate-700 mb-2">
+                        <div ref={phoneInputRef} className="space-y-2">
+                            <label htmlFor="userPhone" className="block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
                                 {t('booking.yourPhone')}
                             </label>
-                            <input
-                                type="tel"
-                                id="userPhone"
-                                value={userPhoneNumber}
-                                onChange={(e) => setUserPhoneNumber(e.target.value)}
-                                placeholder={t('booking.phonePlaceholder')}
-                                className="w-full px-4 py-4 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-lg font-medium"
-                                required
-                                dir="ltr"
-                            />
-                        </div>
-
-                        {message && message.type === 'error' && (
-                            <div className="p-4 rounded-lg border bg-red-50 text-red-700 border-red-200 flex items-center gap-2">
-                                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <div>{message.text}</div>
-                            </div>
-                        )}
-
-                        {/* Deposit Info */}
-                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
-                            <div className="flex items-center gap-3 text-slate-900">
-                                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <div className="relative group/phone">
+                                <div className={`absolute inset-y-0 ${isRTL ? 'right-4' : 'left-4'} flex items-center pointer-events-none text-slate-300 group-hover/phone:text-blue-500 transition-colors`}>
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                     </svg>
                                 </div>
-                                <h3 className="font-bold text-lg">{isRTL ? 'سياسة تأكيد الحجز' : 'Booking Confirmation Policy'}</h3>
-                            </div>
-
-                            <div className="space-y-3 text-slate-600 text-sm leading-relaxed">
-                                <p className="flex items-start gap-2">
-                                    <span className="text-blue-500 mt-1">●</span>
-                                    {isRTL
-                                        ? `يتم تأكيد الحجز بعد دفع عربون بقيمة يوم واحد (${pricePerNight.toLocaleString()} ${t('common.sar')}) من إجمالي مبلغ الإقامة.`
-                                        : `Booking is confirmed after paying a deposit of one day (${pricePerNight.toLocaleString()} ${t('common.sar')}) from the total amount.`
-                                    }
-                                </p>
-                                <p className="flex items-start gap-2">
-                                    <span className="text-blue-500 mt-1">●</span>
-                                    {isRTL
-                                        ? 'يتم الدفع عبر وسيلة الدفع الموضحة أدناه (فودافون كاش).'
-                                        : 'Payment is made via the method shown below (Vodafone Cash).'
-                                    }
-                                </p>
+                                <input
+                                    type="tel"
+                                    id="userPhone"
+                                    value={userPhoneNumber}
+                                    onChange={(e) => setUserPhoneNumber(e.target.value)}
+                                    placeholder={t('booking.phonePlaceholder')}
+                                    className={`soft-input w-full ${isRTL ? 'pr-12 pl-4' : 'pl-12 pr-4'} py-4 font-black text-slate-900 text-lg tracking-[0.1em]`}
+                                    required
+                                    dir="ltr"
+                                />
                             </div>
                         </div>
 
-                        {/* Terms Checkbox */}
-                        <div className="flex items-start gap-3 select-none bg-slate-50 p-4 rounded-xl border border-slate-100 transition-all hover:bg-slate-100/50 group">
-                            <div className="flex items-center h-6 mt-0.5">
-                                <input
-                                    id="terms"
-                                    type="checkbox"
-                                    checked={isAcceptedTerms}
-                                    onChange={(e) => setIsAcceptedTerms(e.target.checked)}
-                                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer transition-all"
-                                />
+                        {/* Terms Checkbox - Refined */}
+                        <div className="flex items-start gap-3 select-none bg-slate-50/50 p-5 rounded-[1.5rem] border border-slate-100 transition-all hover:bg-slate-100/50 group cursor-pointer" onClick={() => setIsAcceptedTerms(!isAcceptedTerms)}>
+                            <div className="flex items-center h-5 mt-0.5">
+                                <div className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${isAcceptedTerms ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-200 group-hover:border-blue-400'}`}>
+                                    {isAcceptedTerms && (
+                                        <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
+                                </div>
                             </div>
-                            <div className="text-sm">
-                                <label htmlFor="terms" className="text-gray-700 cursor-pointer leading-relaxed">
+                            <div className="text-xs">
+                                <label className="text-slate-600 cursor-pointer leading-relaxed block">
                                     {isRTL ? (
                                         <>
-                                            أوافق على <Link to="/terms-and-conditions" target="_blank" className="text-blue-600 font-bold hover:underline">الشروط والأحكام</Link> وأقر بأن تأكيد الحجز يتم بعد دفع عربون يوم واحد بقيمة <span className="font-black text-slate-900 underline decoration-blue-500/30 decoration-2">{pricePerNight.toLocaleString()} {t('common.sar')}</span> عبر فودافون كاش
+                                            أوافق على <span className="text-blue-600 font-black hover:underline">الشروط والأحكام</span> وأقر بأن تأكيد الحجز يتطلب دفع العربون بقيمة ليلة واحدة.
                                         </>
                                     ) : (
                                         <>
-                                            I agree to the <Link to="/terms-and-conditions" target="_blank" className="text-blue-600 font-bold hover:underline">Terms & Conditions</Link> and acknowledge that booking confirmation requires a one-day deposit of <span className="font-bold text-slate-900">{pricePerNight.toLocaleString()} {t('common.sar')}</span> via Vodafone Cash
+                                            I agree to the <span className="text-blue-600 font-black hover:underline">Terms & Conditions</span> and understand that a one-night deposit is required.
                                         </>
                                     )}
                                 </label>
                             </div>
                         </div>
 
-                        {/* Submit Button */}
+                        {/* Submit Button - Enhanced CTA */}
                         <button
                             type="submit"
                             disabled={loading || !userPhoneNumber || !isAcceptedTerms}
-                            className="w-full px-6 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-xl shadow-blue-500/20 transform hover:-translate-y-0.5 active:scale-95 text-lg"
+                            className="w-full px-8 py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-black rounded-[1.5rem] hover:shadow-2xl hover:shadow-blue-500/30 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:scale-95 text-lg uppercase tracking-widest flex items-center justify-center gap-3"
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
@@ -597,7 +587,12 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                                     {t('common.loading')}
                                 </span>
                             ) : (
-                                t('booking.confirm')
+                                <>
+                                    <span>{t('booking.confirm')}</span>
+                                    <svg className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </>
                             )}
                         </button>
 
@@ -607,9 +602,9 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                                 setStep('dates');
                                 setIsAvailable(null);
                             }}
-                            className="w-full py-2 text-slate-500 hover:text-slate-700 text-sm font-medium transition-colors"
+                            className="w-full py-2 text-slate-400 hover:text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
                         >
-                            {isRTL ? '← تعديل التواريخ' : '← Edit Dates'}
+                            {isRTL ? 'تعديل التواريخ' : 'Edit Dates'}
                         </button>
                     </div>
                 )}

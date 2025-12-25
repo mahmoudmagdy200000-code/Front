@@ -20,6 +20,8 @@ const ChaletBookingsPage = () => {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [chalet, setChalet] = useState<Chalet | null>(null);
     const [loading, setLoading] = useState(true);
+    const userRole = localStorage.getItem('role');
+    const isOwner = userRole === 'Owner';
 
     useEffect(() => {
         if (id) {
@@ -100,9 +102,11 @@ const ChaletBookingsPage = () => {
                                             <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                                 {isArabic ? 'رقم الحجز' : 'Reference'}
                                             </th>
-                                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                {isArabic ? 'الهاتف' : 'Phone'}
-                                            </th>
+                                            {!isOwner && (
+                                                <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    {isArabic ? 'الهاتف' : 'Phone'}
+                                                </th>
+                                            )}
                                             <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                                 {isArabic ? 'الوصول' : 'Check-in'}
                                             </th>
@@ -123,7 +127,7 @@ const ChaletBookingsPage = () => {
                                     <tbody className="divide-y divide-gray-100">
                                         {bookings.length === 0 ? (
                                             <tr>
-                                                <td colSpan={7} className="px-6 py-12 text-center">
+                                                <td colSpan={isOwner ? 6 : 7} className="px-6 py-12 text-center">
                                                     <div className="flex flex-col items-center gap-3">
                                                         <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -150,11 +154,13 @@ const ChaletBookingsPage = () => {
                                                                     #{booking.BookingReference || booking.Id}
                                                                 </span>
                                                             </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                                <span className="text-sm text-gray-700 font-medium" dir="ltr">
-                                                                    {booking.UserPhoneNumber || '-'}
-                                                                </span>
-                                                            </td>
+                                                            {!isOwner && (
+                                                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                                    <span className="text-sm text-gray-700 font-medium" dir="ltr">
+                                                                        {booking.UserPhoneNumber || '-'}
+                                                                    </span>
+                                                                </td>
+                                                            )}
                                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                                 <span className="text-sm text-gray-700">
                                                                     {new Date(booking.CheckInDate).toLocaleDateString(isArabic ? 'ar-EG' : 'en-US', {
@@ -186,9 +192,9 @@ const ChaletBookingsPage = () => {
                                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                                 {localStorage.getItem('role') === 'Owner' ? (
                                                                     <span className={`px-4 py-2 text-xs rounded-full font-semibold shadow-sm ${booking.Status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-                                                                            booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                                                booking.Status === 'AutoCancelled' ? 'bg-rose-100 text-rose-800' :
-                                                                                    'bg-red-100 text-red-800'
+                                                                        booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                                            booking.Status === 'AutoCancelled' ? 'bg-rose-100 text-rose-800' :
+                                                                                'bg-red-100 text-red-800'
                                                                         }`}>
                                                                         {booking.Status === 'Confirmed' ? (isArabic ? 'مؤكد' : 'Confirmed') :
                                                                             booking.Status === 'Pending' ? (isArabic ? 'معلق' : 'Pending') :
@@ -211,9 +217,9 @@ const ChaletBookingsPage = () => {
                                                                             }
                                                                         }}
                                                                         className={`px-4 py-2 text-xs rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 font-semibold shadow-sm ${booking.Status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-                                                                                booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                                                    booking.Status === 'AutoCancelled' ? 'bg-rose-100 text-rose-800' :
-                                                                                        'bg-red-100 text-red-800'
+                                                                            booking.Status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                                                booking.Status === 'AutoCancelled' ? 'bg-rose-100 text-rose-800' :
+                                                                                    'bg-red-100 text-red-800'
                                                                             }`}
                                                                     >
                                                                         <option value="Pending">{isArabic ? 'معلق' : 'Pending'}</option>

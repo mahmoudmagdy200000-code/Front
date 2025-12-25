@@ -67,15 +67,15 @@ const DatePicker = ({
     return (
         <div ref={containerRef} className="relative w-full" dir={isRTL ? 'rtl' : 'ltr'}>
             {label && (
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5 px-1">
                     {label}
                 </label>
             )}
 
-            <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                    <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <div className="relative group/datepicker">
+                <div className={`absolute inset-y-0 ${isRTL ? 'right-0 pr-4' : 'left-0 pl-4'} flex items-center pointer-events-none z-10 text-blue-500/50 group-hover/datepicker:text-blue-500 transition-colors`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
 
@@ -85,7 +85,7 @@ const DatePicker = ({
                     readOnly
                     onFocus={handleInputFocus}
                     placeholder={placeholder}
-                    className="w-full pl-10 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-700 font-medium cursor-pointer bg-white"
+                    className={`soft-input w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3.5 font-bold text-slate-900 text-sm cursor-pointer placeholder:text-slate-300 placeholder:font-medium`}
                 />
             </div>
 

@@ -81,8 +81,8 @@ const HomePage = () => {
 
                         {!loading && !error && filteredChalets.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-                                {filteredChalets.slice(0, 6).map((chalet) => (
-                                    <ChaletCard key={chalet.Id} chalet={chalet} />
+                                {filteredChalets.slice(0, 6).map((chalet, index) => (
+                                    <ChaletCard key={chalet.Id} chalet={chalet} priority={index < 2} />
                                 ))}
                             </div>
                         )}

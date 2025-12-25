@@ -52,6 +52,8 @@ const AirbnbGallery = ({ images }: AirbnbGalleryProps) => {
                             <img
                                 src={getImageUrl(img.ImageUrl)}
                                 alt={`Gallery ${idx}`}
+                                width={1200}
+                                height={800}
                                 className="w-full h-auto object-contain hover:scale-[1.01] transition-transform duration-500"
                                 loading="lazy"
                             />
@@ -68,6 +70,9 @@ const AirbnbGallery = ({ images }: AirbnbGalleryProps) => {
             <img
                 src={getImageUrl(images[currentIndex].ImageUrl)}
                 alt="Chalet"
+                width={1920}
+                height={1080}
+                fetchPriority="high"
                 className="w-full h-full object-cover transition-all duration-500 cursor-pointer"
                 onClick={() => setShowAll(true)}
                 onError={(e) => {

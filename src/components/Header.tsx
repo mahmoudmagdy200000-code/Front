@@ -96,7 +96,7 @@ const Header = () => {
                     >
                         <div className="relative">
                             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
-                            <img src="/logo.jpg" alt="RSR Logo" className="relative h-12 w-12 rounded-full object-cover border-2 border-gray-700" />
+                            <img src="/logo.jpg" alt="RSR Logo" width={48} height={48} fetchPriority="high" className="relative h-12 w-12 rounded-full object-cover border-2 border-gray-700" />
                         </div>
                         <h1 className="text-xl font-bold text-white tracking-tight">
                             <span className="text-blue-500">RAS</span> SEDR <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">RENTAL</span>

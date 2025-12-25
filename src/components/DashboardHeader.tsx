@@ -85,6 +85,9 @@ const DashboardHeader = ({ }: DashboardHeaderProps) => {
                             <img
                                 src="/logo.png"
                                 alt="Logo"
+                                width={128}
+                                height={48}
+                                fetchPriority="high"
                                 className="h-12 w-auto hover:opacity-90 transition-opacity"
                             />
                         </Link>
@@ -122,6 +125,9 @@ const DashboardHeader = ({ }: DashboardHeaderProps) => {
                             <img
                                 src="/logo.png"
                                 alt="Logo"
+                                width={112}
+                                height={40}
+                                fetchPriority="high"
                                 className="h-10 w-auto hover:opacity-90 transition-opacity"
                             />
                         </Link>

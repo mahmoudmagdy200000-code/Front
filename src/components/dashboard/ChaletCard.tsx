@@ -38,6 +38,9 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
                     <img
                         src={getImageUrl(chalet.Images.find(i => i.IsPrimary)?.ImageUrl || chalet.Images[0].ImageUrl)}
                         alt={isArabic ? chalet.TitleAr : chalet.TitleEn}
+                        width={400}
+                        height={300}
+                        loading="lazy"
                         onError={() => setImgError(true)}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
