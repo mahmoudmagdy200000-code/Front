@@ -26,6 +26,7 @@ const DashboardPage = () => {
     const [existingImages, setExistingImages] = useState<ChaletImage[]>([]);
     const [imageError, setImageError] = useState<string | null>(null);
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const MAX_IMAGES = 18;
     const MAX_CHALETS = 5;
@@ -195,7 +196,7 @@ const DashboardPage = () => {
     // ---------------------------------------------------------
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSubmitError(null);
+        if (isSubmitting) return;
 
         console.log('🎯 [handleSubmit] Form submission started');
 
@@ -203,6 +204,9 @@ const DashboardPage = () => {
             console.warn('❌ [handleSubmit] Form validation failed');
             return;
         }
+
+        setIsSubmitting(true);
+        setSubmitError(null);
 
         try {
             const chaletData = {
@@ -303,6 +307,8 @@ const DashboardPage = () => {
 
             console.log('📣 [handleSubmit] Setting error message:', errorMessage);
             setSubmitError(errorMessage);
+        } finally {
+            setIsSubmitting(false);
         }
     };
     // ---------------------------------------------------------
@@ -802,11 +808,27 @@ const DashboardPage = () => {
 
                             {/* Modal Footer */}
                             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-                                <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-white hover:border-slate-300 transition-colors">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowForm(false)}
+                                    className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-white hover:border-slate-300 transition-colors disabled:opacity-50"
+                                    disabled={isSubmitting}
+                                >
                                     {t('common.cancel')}
                                 </button>
-                                <button type="submit" className="px-5 py-2.5 rounded-xl bg-blue-500 text-white font-bold hover:bg-blue-600 shadow-md shadow-blue-200 transition-all">
-                                    {editingChalet ? t('dashboard.update') : t('dashboard.create')}
+                                <button
+                                    type="submit"
+                                    className="px-5 py-2.5 rounded-xl bg-blue-500 text-white font-bold hover:bg-blue-600 shadow-md shadow-blue-200 transition-all disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[120px]"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                            {isArabic ? 'جاري الحفظ...' : 'Saving...'}
+                                        </>
+                                    ) : (
+                                        editingChalet ? t('dashboard.update') : t('dashboard.create')
+                                    )}
                                 </button>
                             </div>
                         </form>
