@@ -1,0 +1,75 @@
+import { useState } from 'react';
+import type { ChaletImage } from '../types/chalet';
+import { getImageUrl } from '../config/api';
+
+interface AirbnbGalleryProps {
+    images: ChaletImage[];
+}
+
+const AirbnbGallery = ({ images }: AirbnbGalleryProps) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    if (!images || images.length === 0) {
+        return (
+            <div className="w-full aspect-[16/9] md:aspect-[21/9] bg-slate-200 flex items-center justify-center rounded-2xl overflow-hidden">
+                <span className="text-4xl text-slate-400">🏖️</span>
+            </div>
+        );
+    }
+
+    const nextImage = () => setCurrentIndex((prev) => (prev + 1) % images.length);
+    const prevImage = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+
+    return (
+        <div className="relative group w-full aspect-[16/9] md:aspect-[21/9] bg-slate-900 overflow-hidden md:rounded-3xl">
+            {/* Main Image */}
+            <img
+                src={getImageUrl(images[currentIndex].ImageUrl)}
+                alt="Chalet"
+                className="w-full h-full object-cover transition-all duration-500"
+                onError={(e) => {
+                    e.currentTarget.src = 'https://placehold.co/1200x600/1e293b/ffffff?text=Image+Not+Found';
+                    e.currentTarget.onerror = null;
+                }}
+            />
+
+            {/* Navigation Overlay */}
+            {images.length > 1 && (
+                <>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all opacity-0 group-hover:opacity-100 z-10"
+                    >
+                        <svg className="w-5 h-5 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all opacity-0 group-hover:opacity-100 z-10"
+                    >
+                        <svg className="w-5 h-5 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </>
+            )}
+
+            {/* Floating Photo Index (Bottom Right) */}
+            <div className="absolute bottom-6 right-6 px-3 py-1.5 bg-slate-900/70 backdrop-blur-md text-white text-xs font-bold rounded-lg pointer-events-none border border-white/10">
+                {currentIndex + 1} / {images.length}
+            </div>
+
+            {/* Show all photos button (Bottom Left style - adjusted to CAMERA icon) */}
+            <button className="absolute bottom-6 left-6 px-4 py-2 bg-white/90 hover:bg-white text-slate-900 text-sm font-bold rounded-xl flex items-center gap-2 shadow-xl backdrop-blur-sm transition-transform active:scale-95">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Show all photos
+            </button>
+        </div>
+    );
+};
+
+export default AirbnbGallery;

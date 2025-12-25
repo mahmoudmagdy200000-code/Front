@@ -1,16 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getChaletById } from '../api/chalets';
 import type { Chalet } from '../types/chalet';
 import BookingForm from '../components/BookingForm';
-import ImageGallery from '../components/ImageGallery';
-
+import AirbnbGallery from '../components/AirbnbGallery';
 import ReviewsList from '../components/reviews/ReviewsList';
 import HomeHeader from '../components/HomeHeader';
 import Footer from '../components/Footer';
-
-
 
 const ChaletDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,18 +17,19 @@ const ChaletDetailPage = () => {
     const [chalet, setChalet] = useState<Chalet | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [searchQuery, setSearchQuery] = useState(''); // State for Header
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isDescExpanded, setIsDescExpanded] = useState(false);
+    const [isBookingVisible, setIsBookingVisible] = useState(false);
+    const bookingRef = useRef<HTMLDivElement>(null);
 
     const isRTL = i18n.language === 'ar';
 
-    // Get dates from URL
     const checkIn = searchParams.get('checkIn') || '';
     const checkOut = searchParams.get('checkOut') || '';
 
     useEffect(() => {
         const fetchChalet = async () => {
             if (!id) return;
-
             try {
                 setLoading(true);
                 const data = await getChaletById(parseInt(id));
@@ -39,28 +37,31 @@ const ChaletDetailPage = () => {
                 setError(null);
             } catch (err) {
                 setError(t('common.error'));
-                console.error('Error fetching chalet:', err);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchChalet();
     }, [id, t]);
 
-    // Handle search from header (redirect to home with query)
     const handleSearch = (query: string) => {
         setSearchQuery(query);
-        // Optional: debounce and navigate to home if user types
-        // if (query) navigate(`/?search=${query}`);
+    };
+
+    const toggleBooking = () => {
+        setIsBookingVisible(!isBookingVisible);
+        if (!isBookingVisible) {
+            setTimeout(() => {
+                bookingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                    <p className="mt-4 text-gray-600 font-medium">{t('common.loading')}</p>
                 </div>
             </div>
         );
@@ -68,19 +69,12 @@ const ChaletDetailPage = () => {
 
     if (error || !chalet) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="min-h-screen bg-white flex flex-col">
                 <HomeHeader searchQuery={searchQuery} setSearchQuery={handleSearch} />
                 <div className="flex-grow flex items-center justify-center">
-                    <div className="text-center">
-                        <div className="text-6xl mb-4">🏠</div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">{error || t('common.error')}</h2>
-                        <button
-                            onClick={() => navigate('/')}
-                            className="mt-4 px-6 py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-md"
-                        >
-                            {t('common.backToHome')}
-                        </button>
-                    </div>
+                    <button onClick={() => navigate('/')} className="px-6 py-2 bg-blue-600 text-white rounded-full">
+                        {t('common.backToHome')}
+                    </button>
                 </div>
                 <Footer />
             </div>
@@ -92,100 +86,142 @@ const ChaletDetailPage = () => {
     const villageName = isRTL ? chalet.VillageNameAr : chalet.VillageNameEn;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-white flex flex-col font-inter" dir={isRTL ? 'rtl' : 'ltr'}>
             <HomeHeader searchQuery={searchQuery} setSearchQuery={handleSearch} />
 
-            <main className="flex-grow container mx-auto px-4 py-8">
-                {/* Breadcrumb / Back Button */}
-                <button
-                    onClick={() => navigate('/')}
-                    className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors mb-6 group"
-                >
-                    <svg className={`w-5 h-5 transform group-hover:-translate-x-1 transition-transform ${isRTL ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    <span className="font-medium">{t('common.backToHome')}</span>
-                </button>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Images & Description */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Image Gallery */}
-                        <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100">
-                            <ImageGallery images={chalet.Images || []} />
-                        </div>
-
-                        {/* Title & Stats */}
-                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                            <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-                                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
-                                    {title}
-                                </h1>
-                                <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                                    #{chalet.Id}
-                                </span>
-                            </div>
-
-                            <div className="flex items-center gap-2 mb-4 text-gray-500 font-medium">
-                                <span className="text-xl">📍</span>
-                                <span>{villageName}</span>
-                            </div>
-
-                            {/* Capacity Info */}
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-gray-600 py-4 border-y border-gray-100 mb-6">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xl">🚪</span>
-                                    <span className="font-medium">
-                                        {chalet.RoomsCount} {isRTL ? 'غرف' : 'Rooms'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xl">🚿</span>
-                                    <span className="font-medium">
-                                        {chalet.BathroomsCount} {isRTL ? 'حمامات' : 'Baths'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xl">👨‍👩‍👧‍👦</span>
-                                    <span className="font-medium">
-                                        {chalet.AdultsCapacity} {isRTL ? 'كبار' : 'Adults'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xl">👶</span>
-                                    <span className="font-medium">
-                                        {chalet.ChildrenCapacity} {isRTL ? 'أطفال' : 'Children'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <h2 className="text-xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors">
-                                {t('chalet.description')}
-                            </h2>
-                            <p className="text-gray-600 leading-relaxed whitespace-pre-line text-lg">
-                                {description}
-                            </p>
+            <main className="flex-grow">
+                {/* Hero Section - Airbnb Style */}
+                <div className="container mx-auto md:px-4 md:py-6">
+                    <div className="hidden md:flex items-center justify-between mb-4">
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
+                        <div className="flex items-center gap-4">
+                            <button className="flex items-center gap-2 text-sm font-semibold underline hover:bg-slate-50 px-2 py-1 rounded-md">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6L15.316 8.684m0 0a3 3 0 110 2.684m0-2.684l6.632-3.316m-6.632 6l6.632 3.316m0 0a3 3 0 110-2.684"></path></svg>
+                                {isRTL ? 'مشاركة' : 'Share'}
+                            </button>
+                            <button className="flex items-center gap-2 text-sm font-semibold underline hover:bg-slate-50 px-2 py-1 rounded-md">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                {isRTL ? 'حفظ' : 'Save'}
+                            </button>
                         </div>
                     </div>
 
-                    {/* Right Column: Booking Form (Sticky) */}
-                    {/* On Desktop: col-span-1. On Mobile: It naturally flows after the above div (Images/Desc). */}
-                    <div className="lg:col-span-1">
-                        <div className="sticky top-24 space-y-6">
-                            <div className="bg-white p-6 rounded-3xl shadow-xl border border-blue-100 ring-1 ring-blue-50">
-                                <div className="mb-6 flex items-baseline justify-between">
-                                    <div>
-                                        <span className="text-3xl font-bold text-blue-600 block">
-                                            {chalet.PricePerNight} {t('common.sar')}
-                                        </span>
-                                        <span className="text-gray-500 text-sm font-medium">/{isRTL ? 'ليلة' : 'Night'}</span>
+                    <AirbnbGallery images={chalet.Images || []} />
+                </div>
+
+                <div className="container mx-auto px-4 py-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                        {/* Left Column: Info */}
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* Header Info (Title/Rating/Location) */}
+                            <section>
+                                <h1 className="text-3xl font-black text-slate-900 mb-2 md:hidden">{title}</h1>
+
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-600 font-medium">
+                                    <div className="flex items-center gap-1">
+                                        <span className="text-slate-900 font-bold">★ 4.9</span>
+                                        <span className="text-slate-400">·</span>
+                                        <button className="underline font-bold decoration-2 underline-offset-4 hover:text-blue-600 transition-colors">
+                                            {isRTL ? '12 تقييم' : '12 reviews'}
+                                        </button>
                                     </div>
-                                    <div className="flex items-center gap-1 text-yellow-500 font-bold bg-yellow-50 px-3 py-1 rounded-full text-sm">
-                                        <span>★</span>
-                                        <span>4.9</span>
+                                    <span className="text-slate-400 hidden sm:inline">·</span>
+                                    <div className="flex items-center gap-1">
+                                        <span className="text-blue-600 font-bold font-mono">📍</span>
+                                        <span className="font-bold underline cursor-pointer">{villageName}</span>
                                     </div>
                                 </div>
+                            </section>
 
+                            <hr className="border-slate-100" />
+
+                            {/* Host info / Highlights (Minimalist) */}
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-xl font-bold text-slate-900">
+                                        {isRTL ? `شاليه كامل بواسطة مالك موثق` : `Entire chalet hosted by a verified owner`}
+                                    </h2>
+                                    <div className="flex items-center gap-1 text-slate-500 text-sm mt-1">
+                                        <span>{chalet.AdultsCapacity + chalet.ChildrenCapacity} guests</span>
+                                        <span>·</span>
+                                        <span>{chalet.RoomsCount} bedrooms</span>
+                                        <span>·</span>
+                                        <span>{chalet.RoomsCount} beds</span>
+                                        <span>·</span>
+                                        <span>{chalet.BathroomsCount} baths</span>
+                                    </div>
+                                </div>
+                                <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-black shadow-lg">
+                                    {villageName.charAt(0)}
+                                </div>
+                            </div>
+
+                            <hr className="border-slate-100" />
+
+                            {/* Features Row - Airbnb Style Icons */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4">
+                                <div className="p-4 bg-slate-50 rounded-2xl flex flex-col gap-2">
+                                    <span className="text-2xl">🚪</span>
+                                    <span className="text-sm font-bold text-slate-900">{chalet.RoomsCount} {isRTL ? 'غرف' : 'Rooms'}</span>
+                                </div>
+                                <div className="p-4 bg-slate-50 rounded-2xl flex flex-col gap-2">
+                                    <span className="text-2xl">🚿</span>
+                                    <span className="text-sm font-bold text-slate-900">{chalet.BathroomsCount} {isRTL ? 'حمامات' : 'Baths'}</span>
+                                </div>
+                                <div className="p-4 bg-slate-50 rounded-2xl flex flex-col gap-2">
+                                    <span className="text-2xl">👩‍👩‍👧</span>
+                                    <span className="text-sm font-bold text-slate-900">{chalet.AdultsCapacity} {isRTL ? 'كبار' : 'Adults'}</span>
+                                </div>
+                                <div className="p-4 bg-slate-50 rounded-2xl flex flex-col gap-2">
+                                    <span className="text-2xl">👶</span>
+                                    <span className="text-sm font-bold text-slate-900">{chalet.ChildrenCapacity} {isRTL ? 'أطفال' : 'Children'}</span>
+                                </div>
+                            </div>
+
+                            <hr className="border-slate-100" />
+
+                            {/* Description with Read More */}
+                            <section>
+                                <h3 className="text-2xl font-bold text-slate-900 mb-4">{t('chalet.description')}</h3>
+                                <div className={`relative ${!isDescExpanded ? 'max-h-[7.5rem] overflow-hidden' : ''}`}>
+                                    <p className="text-slate-600 leading-relaxed text-lg whitespace-pre-line">
+                                        {description}
+                                    </p>
+                                    {!isDescExpanded && (
+                                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent"></div>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => setIsDescExpanded(!isDescExpanded)}
+                                    className="mt-4 flex items-center gap-1 font-bold text-slate-900 underline underline-offset-4 decoration-2 hover:text-blue-600 transition-colors"
+                                >
+                                    {isDescExpanded ? (isRTL ? 'عرض أقل' : 'Show less') : (isRTL ? 'اقرأ المزيد' : 'Read more')}
+                                    <svg className={`w-4 h-4 transition-transform ${isDescExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                            </section>
+
+                            <hr className="border-slate-100" />
+
+                            {/* Reviews */}
+                            <section className="pt-4">
+                                <div className="flex items-center gap-2 mb-8">
+                                    <span className="text-2xl font-bold text-slate-900">★ 4.9</span>
+                                    <span className="text-2xl text-slate-200">·</span>
+                                    <span className="text-2xl font-bold text-slate-900">12 {isRTL ? 'تقييم' : 'reviews'}</span>
+                                </div>
+                                <ReviewsList chaletId={chalet.Id} />
+                            </section>
+                        </div>
+
+                        {/* Right Column: Desktop Booking Widget */}
+                        <div className="hidden lg:block">
+                            <div className="sticky top-28 bg-white p-6 rounded-3xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border border-slate-100 ring-1 ring-slate-100">
+                                <div className="mb-6">
+                                    <span className="text-2xl font-black text-slate-900">{chalet.PricePerNight} {t('common.sar')}</span>
+                                    <span className="text-slate-500 ml-1">night</span>
+                                </div>
                                 <BookingForm
                                     chaletId={chalet.Id}
                                     pricePerNight={chalet.PricePerNight}
@@ -193,48 +229,52 @@ const ChaletDetailPage = () => {
                                     initialCheckOut={checkOut}
                                 />
                             </div>
-
-                            {/* Trust Badges */}
-                            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 text-center">
-                                <h3 className="text-blue-900 font-bold mb-2">{isRTL ? 'حجز آمن 100%' : '100% Secure Booking'}</h3>
-                                <p className="text-blue-700 text-sm">
-                                    {isRTL
-                                        ? 'نضمن لك أفضل سعر وحجز مؤكد فوراً.'
-                                        : 'We guarantee the best price and instant confirmation.'}
-                                </p>
-                            </div>
                         </div>
-                    </div>
-
-                    {/* Reviews Section - Moved OUT of the left column wrapper to be a direct child of the grid */}
-                    {/* On Desktop: We force it to span the full width of the left column (col-span-2) by placing it in the grid flow properly or making it full width. 
-                        Actually, to keep the desktop layout same (Reviews inside left col), we need to be clever.
-                        But the user only requested mobile change.
-                        
-                        If we make this a direct child of the grid:
-                        Mobile: Images/Desc (div 1) -> Booking (div 2) -> Reviews (div 3). CORRECT ✅
-                        Desktop: Grid is 3 columns.
-                        Div 1 (Images/Desc): col-span-2.
-                        Div 2 (Booking): col-span-1.
-                        Div 3 (Reviews): We want it to be under Div 1 in the layout.
-                        
-                        If we just let it be, it will likely start a new row.
-                        Row 1: [Images/Desc (2)] [Booking (1)]
-                        Row 2: [Reviews (?)]
-                        
-                        We want Reviews to be col-span-2, so it stays on the left side under Images/Desc.
-                    */}
-                    <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <span>⭐</span>
-                            {isRTL ? 'تقييمات الضيوف' : 'Guest Reviews'}
-                        </h2>
-                        <ReviewsList chaletId={chalet.Id} />
                     </div>
                 </div>
             </main>
 
+            {/* Mobile Sticky Booking Section (Expandable) */}
+            <div className={`lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 z-50 transition-all duration-500 ease-in-out ${isBookingVisible ? 'h-[80vh] overflow-y-auto rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)]' : 'h-24'}`}>
+                {isBookingVisible && (
+                    <div className="sticky top-0 right-0 left-0 flex justify-center p-4 bg-white z-10">
+                        <button onClick={() => setIsBookingVisible(false)} className="w-12 h-1.5 bg-slate-200 rounded-full hover:bg-slate-300 transition-colors"></button>
+                    </div>
+                )}
+
+                <div className="container mx-auto px-6 h-full flex flex-col">
+                    {!isBookingVisible ? (
+                        <div className="h-full flex items-center justify-between">
+                            <div>
+                                <span className="text-xl font-black text-slate-900 block">{chalet.PricePerNight} {t('common.sar')}</span>
+                                <span className="text-xs text-slate-500 font-bold underline">{isRTL ? 'ليلة واحدة' : 'night'}</span>
+                            </div>
+                            <button
+                                onClick={toggleBooking}
+                                className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-blue-500/20 active:scale-95 transition-all text-sm uppercase tracking-wider"
+                            >
+                                {isRTL ? 'احجز الآن' : 'Book Now'}
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="pb-12 pt-4" ref={bookingRef}>
+                            <div className="mb-8 text-center px-4">
+                                <h3 className="text-2xl font-black text-slate-900">{isRTL ? 'أكد حجزك' : 'Book Your Stay'}</h3>
+                                <p className="text-slate-500 text-sm mt-1">{villageName} · ★ 4.9</p>
+                            </div>
+                            <BookingForm
+                                chaletId={chalet.Id}
+                                pricePerNight={chalet.PricePerNight}
+                                initialCheckIn={checkIn}
+                                initialCheckOut={checkOut}
+                            />
+                        </div>
+                    )}
+                </div>
+            </div>
+
             <Footer />
+            <div className="h-24 lg:hidden"></div> {/* Spacer for sticky bar */}
         </div>
     );
 };
