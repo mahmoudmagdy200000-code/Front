@@ -15,10 +15,8 @@ const Footer = () => {
                             <img
                                 src="/logo.png"
                                 alt="Logo"
-                                width={112}
-                                height={112}
                                 loading="lazy"
-                                className="h-24 md:h-28 w-auto grayscale invert brightness-200 transition-all hover:brightness-255"
+                                className="h-24 md:h-28 w-auto brightness-0 invert opacity-70 transition-all hover:opacity-100"
                             />
                         </Link>
                         <p className="text-gray-400 text-sm leading-relaxed max-w-xs font-medium">

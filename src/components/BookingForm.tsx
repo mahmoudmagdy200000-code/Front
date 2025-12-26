@@ -134,11 +134,10 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
             return;
         }
 
-        // Phone validation: must be exactly 11 digits
-        // Phone validation: must be exactly 11 digits
-        const phoneRegex = /^\d{11}$/;
+        // Phone validation: must be exactly 11 digits and start with 01
+        const phoneRegex = /^01\d{9}$/;
         if (!phoneRegex.test(userPhoneNumber)) {
-            setErrors(prev => ({ ...prev, phone: isRTL ? 'رقم الهاتف يجب أن يتكون من 11 رقم' : 'Phone number must be exactly 11 digits' }));
+            setErrors(prev => ({ ...prev, phone: isRTL ? 'رقم الهاتف يجب أن يبدأ بـ 01 ويتكون من 11 رقم' : 'Phone number must start with 01 and be exactly 11 digits' }));
             return;
         }
 

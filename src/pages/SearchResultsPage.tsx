@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect, Suspense, lazy, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getChalets } from '../api/chalets';
@@ -8,6 +8,7 @@ import HomeHeader from '../components/HomeHeader';
 import Footer from '../components/Footer';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
+import NoResultsState from '../components/NoResultsState';
 const ChaletFilters = lazy(() => import('../components/ChaletFilters'));
 
 const SearchResultsPage = () => {
@@ -20,6 +21,19 @@ const SearchResultsPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [totalPages, setTotalPages] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
+
+    // Refs for scrolling
+    const filterRef = useRef<HTMLDivElement>(null);
+    const resultsRef = useRef<HTMLDivElement>(null);
+
+    // Initial scroll to filters on load
+    useEffect(() => {
+        // We use a small timeout to ensure layout is ready
+        const timer = setTimeout(() => {
+            filterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 500);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Get current page from URL or default to 1
     const currentPage = parseInt(searchParams.get('page') || '1');
@@ -109,6 +123,11 @@ const SearchResultsPage = () => {
 
         newParams.set('page', '1'); // Reset to page 1
         setSearchParams(newParams);
+
+        // Scroll to results summary after applying filters
+        setTimeout(() => {
+            resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     };
 
     const handleSearchQuery = (_query: string) => {
@@ -133,7 +152,7 @@ const SearchResultsPage = () => {
                         </div>
 
                         {/* Integrated Filters */}
-                        <div className="mt-6">
+                        <div className="mt-6" ref={filterRef}>
                             <Suspense fallback={<div className="h-12 animate-pulse bg-slate-50 rounded-xl"></div>}>
                                 <ChaletFilters
                                     currentMin={currentMinPrice}
@@ -146,7 +165,7 @@ const SearchResultsPage = () => {
                     </div>
                 </div>
 
-                <div className="container mx-auto px-6 py-8">
+                <div className="container mx-auto px-6 py-8" ref={resultsRef}>
                     {/* Professional Result Header */}
                     <div className="mb-8 border-b border-slate-100 pb-6">
                         <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase mb-1">
@@ -193,17 +212,29 @@ const SearchResultsPage = () => {
                                     />
                                 </>
                             ) : (
-                                <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-                                    <p className="text-gray-500 text-lg">
-                                        {isRTL ? 'لا توجد شاليهات تطابق بحثك' : 'No chalets found matching your criteria.'}
-                                    </p>
-                                    <button
-                                        onClick={() => setSearchParams({})}
-                                        className="mt-4 text-blue-600 hover:underline"
-                                    >
-                                        {isRTL ? 'عرض كل الشاليهات' : 'View all chalets'}
-                                    </button>
-                                </div>
+                                <NoResultsState
+                                    onResetFilters={() => setSearchParams({})}
+                                    onClearPrice={() => {
+                                        const newParams = new URLSearchParams(searchParams);
+                                        newParams.delete('minPrice');
+                                        newParams.delete('maxPrice');
+                                        setSearchParams(newParams);
+                                    }}
+                                    onClearVillage={() => {
+                                        const newParams = new URLSearchParams(searchParams);
+                                        newParams.delete('village');
+                                        setSearchParams(newParams);
+                                    }}
+                                    onScrollToSearch={() => {
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        // Optional: focus on search form if needed
+                                    }}
+                                    activeFilters={{
+                                        hasDates: !!(searchParams.get('checkIn') && searchParams.get('checkOut')),
+                                        hasPrice: !!(searchParams.get('minPrice') || searchParams.get('maxPrice')),
+                                        hasVillage: !!searchParams.get('village')
+                                    }}
+                                />
                             )}
                         </>
                     )}
