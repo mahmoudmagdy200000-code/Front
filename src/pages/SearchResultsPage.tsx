@@ -124,10 +124,14 @@ const SearchResultsPage = () => {
         newParams.set('page', '1'); // Reset to page 1
         setSearchParams(newParams);
 
-        // Scroll to results summary after applying filters
+        // Scroll to results summary after applying filters with a slight delay for rendering
         setTimeout(() => {
-            resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+            if (resultsRef.current) {
+                const yOffset = -20; // Slight offset for better visibility
+                const y = resultsRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }, 300);
     };
 
     const handleSearchQuery = (_query: string) => {
