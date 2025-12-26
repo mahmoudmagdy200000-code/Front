@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 
 interface NoResultsStateProps {
     onResetFilters: () => void;
-    onClearDates?: () => void;
     onClearPrice?: () => void;
     onClearVillage?: () => void;
     activeFilters: {
@@ -15,7 +14,6 @@ interface NoResultsStateProps {
 
 const NoResultsState = ({
     onResetFilters,
-    onClearDates,
     onClearPrice,
     onClearVillage,
     activeFilters,
