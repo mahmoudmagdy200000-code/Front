@@ -48,6 +48,7 @@ export interface GetChaletsParams {
     isFeatured?: boolean;
     page?: number;
     pageSize?: number;
+    sortBy?: 'price_asc' | 'price_desc';
 }
 
 // Get all chalets with optional search parameters
@@ -63,6 +64,7 @@ export const getChalets = async (params: GetChaletsParams = {}): Promise<PagedRe
     if (params.isFeatured !== undefined) queryParams.append('isFeatured', params.isFeatured.toString());
     if (params.page !== undefined) queryParams.append('page', params.page.toString());
     if (params.pageSize !== undefined) queryParams.append('pageSize', params.pageSize.toString());
+    if (params.sortBy) queryParams.append('sortBy', params.sortBy);
 
     const response = await axiosInstance.get<PagedResult<Chalet>>('/chalets', { params: queryParams });
     return response.data;

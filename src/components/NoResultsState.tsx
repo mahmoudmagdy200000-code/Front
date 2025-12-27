@@ -6,6 +6,7 @@ interface NoResultsStateProps {
     onClearVillage?: () => void;
     onOpenPriceFilter?: () => void;  // New: Open price filter
     onOpenVillageFilter?: () => void; // New: Open village filter
+    onOpenDateFilter?: () => void; // New: Open date filter modal
     activeFilters: {
         hasDates: boolean;
         hasPrice: boolean;
@@ -20,6 +21,7 @@ const NoResultsState = ({
     onClearVillage,
     onOpenPriceFilter,
     onOpenVillageFilter,
+    onOpenDateFilter,
     activeFilters,
     onScrollToSearch
 }: NoResultsStateProps) => {
@@ -59,7 +61,7 @@ const NoResultsState = ({
                     <h4 className="font-bold text-slate-800 mb-2">{isRTL ? 'تغيير المواعيد' : 'Change Dates'}</h4>
                     <p className="text-xs text-slate-400 mb-4">{isRTL ? 'ربما تكون هذه المواعيد محجوزة بالكامل' : 'Maybe these dates are fully booked'}</p>
                     <button
-                        onClick={onScrollToSearch}
+                        onClick={onOpenDateFilter || onScrollToSearch}
                         className="text-sm font-bold text-blue-600 hover:text-blue-700 underline decoration-2 underline-offset-4"
                     >
                         {isRTL ? 'تعديل التاريخ' : 'Edit dates'}

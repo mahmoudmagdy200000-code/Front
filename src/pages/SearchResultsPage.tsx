@@ -9,6 +9,8 @@ import Footer from '../components/Footer';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
 import NoResultsState from '../components/NoResultsState';
+import DatePicker from '../components/DatePicker';
+import { formatDateToDDMMYYYY, parseDateFromDDMMYYYY } from '../utils/dateUtils';
 const ChaletFilters = lazy(() => import('../components/ChaletFilters'));
 
 const SearchResultsPage = () => {
@@ -25,6 +27,8 @@ const SearchResultsPage = () => {
     // Refs for scrolling
     const filterRef = useRef<HTMLDivElement>(null);
     const resultsRef = useRef<HTMLDivElement>(null);
+
+    const [sortBy, setSortBy] = useState<'price_asc' | 'price_desc' | null>(null);
 
     // Initial scroll to filters on load
     useEffect(() => {
@@ -86,11 +90,20 @@ const SearchResultsPage = () => {
                     children,
                     villageName,
                     page: currentPage,
-                    pageSize: pageSize
+                    pageSize: pageSize,
+                    sortBy: sortBy || undefined
                 });
                 console.log('✅ [fetchChalets] Result:', result);
 
-                setChalets(result.Items);
+                let items = result.Items;
+                // Client-side sort to ensure order if backend doesn't support it fully yet
+                if (sortBy === 'price_asc') {
+                    items = [...items].sort((a, b) => a.PricePerNight - b.PricePerNight);
+                } else if (sortBy === 'price_desc') {
+                    items = [...items].sort((a, b) => b.PricePerNight - a.PricePerNight);
+                }
+
+                setChalets(items);
                 setTotalPages(result.TotalPages);
                 setTotalCount(result.TotalCount);
 
@@ -103,7 +116,7 @@ const SearchResultsPage = () => {
         };
 
         fetchChalets();
-    }, [searchParams, pageSize, t]);
+    }, [searchParams, pageSize, t, sortBy]);
 
     const handlePageChange = (page: number) => {
         const newParams = new URLSearchParams(searchParams);
@@ -161,6 +174,48 @@ const SearchResultsPage = () => {
         }, 100);
     };
 
+    // Date Modal Logic
+    const [showDateModal, setShowDateModal] = useState(false);
+    const [modalCheckIn, setModalCheckIn] = useState('');
+    const [modalCheckOut, setModalCheckOut] = useState('');
+
+    const handleOpenDateFilter = () => {
+        const checkIn = searchParams.get('checkIn');
+        const checkOut = searchParams.get('checkOut');
+
+        setModalCheckIn(checkIn ? formatDateToDDMMYYYY(checkIn) : '');
+        setModalCheckOut(checkOut ? formatDateToDDMMYYYY(checkOut) : '');
+        setShowDateModal(true);
+    };
+
+    const handleApplyDateChanges = () => {
+        const newParams = new URLSearchParams(searchParams);
+
+        if (modalCheckIn) {
+            newParams.set('checkIn', parseDateFromDDMMYYYY(modalCheckIn));
+        } else {
+            newParams.delete('checkIn');
+        }
+
+        if (modalCheckOut) {
+            newParams.set('checkOut', parseDateFromDDMMYYYY(modalCheckOut));
+        } else {
+            newParams.delete('checkOut');
+        }
+
+        newParams.set('page', '1');
+        setSearchParams(newParams);
+        setShowDateModal(false);
+
+        setTimeout(() => {
+            if (resultsRef.current) {
+                const yOffset = -20;
+                const y = resultsRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }, 300);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
             <HomeHeader searchQuery="" setSearchQuery={handleSearchQuery} />
@@ -194,14 +249,32 @@ const SearchResultsPage = () => {
                 </div>
 
                 <div className="container mx-auto px-6 py-8" ref={resultsRef}>
-                    {/* Professional Result Header */}
-                    <div className="mb-8 border-b border-slate-100 pb-6">
-                        <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase mb-1">
-                            {isRTL ? `أكثر من ${totalCount} إقامة في رأس سدر` : `Over ${totalCount} stays in Ras Sedr`}
-                        </h1>
-                        <p className="text-2xl font-black text-slate-800">
-                            {isRTL ? 'شاليهات متميزة ومراجعة من الضيوف' : 'Highly rated chalets reviewed by guests'}
-                        </p>
+                    {/* Professional Result Header with Sort */}
+                    <div className="mb-8 border-b border-slate-100 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                        <div>
+                            <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase mb-1">
+                                {isRTL ? `أكثر من ${totalCount} إقامة في رأس سدر` : `Over ${totalCount} stays in Ras Sedr`}
+                            </h1>
+                            <p className="text-2xl font-black text-slate-800">
+                                {isRTL ? 'شاليهات متميزة ومراجعة من الضيوف' : 'Highly rated chalets reviewed by guests'}
+                            </p>
+                        </div>
+
+                        {/* Sort Dropdown */}
+                        <div className="flex items-center gap-2">
+                            <label className="text-sm font-medium text-slate-500 whitespace-nowrap">
+                                {isRTL ? 'ترتيب حسب:' : 'Sort by:'}
+                            </label>
+                            <select
+                                value={sortBy || ''}
+                                onChange={(e) => setSortBy(e.target.value as any || null)}
+                                className="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none font-bold"
+                            >
+                                <option value="">{isRTL ? 'المقترح' : 'Recommended'}</option>
+                                <option value="price_asc">{isRTL ? 'السعر: من الأقل للأكثر' : 'Price: Low to High'}</option>
+                                <option value="price_desc">{isRTL ? 'السعر: من الأكثر للأقل' : 'Price: High to Low'}</option>
+                            </select>
+                        </div>
                     </div>
 
                     {loading && (
@@ -255,6 +328,7 @@ const SearchResultsPage = () => {
                                     }}
                                     onOpenPriceFilter={handleOpenPriceFilter}
                                     onOpenVillageFilter={handleOpenVillageFilter}
+                                    onOpenDateFilter={handleOpenDateFilter}
                                     onScrollToSearch={() => {
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                         // Optional: focus on search form if needed
@@ -269,6 +343,66 @@ const SearchResultsPage = () => {
                         </>
                     )}
                 </div>
+
+                {/* Date Filter Modal */}
+                {showDateModal && (
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-300">
+                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                                <h3 className="text-xl font-bold text-gray-900">
+                                    {isRTL ? 'تعديل تواريخ الحجز' : 'Modify Booking Dates'}
+                                </h3>
+                                <button
+                                    onClick={() => setShowDateModal(false)}
+                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="p-8 space-y-6">
+                                <div className="space-y-2">
+                                    <DatePicker
+                                        label={isRTL ? 'تاريخ الوصول' : 'Check-in'}
+                                        value={modalCheckIn}
+                                        onChange={(val) => setModalCheckIn(val)}
+                                        placeholder="DD/MM/YYYY"
+                                        minDate={new Date()}
+                                        isRTL={isRTL}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <DatePicker
+                                        label={isRTL ? 'تاريخ المغادرة' : 'Check-out'}
+                                        value={modalCheckOut}
+                                        onChange={(val) => setModalCheckOut(val)}
+                                        placeholder="DD/MM/YYYY"
+                                        minDate={modalCheckIn && parseDateFromDDMMYYYY(modalCheckIn) ? new Date(new Date(parseDateFromDDMMYYYY(modalCheckIn)).getTime() + 86400000) : new Date()}
+                                        isRTL={isRTL}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-4">
+                                <button
+                                    onClick={() => setShowDateModal(false)}
+                                    className="flex-1 py-3 px-6 rounded-xl font-bold text-gray-600 hover:bg-white hover:shadow-sm hover:text-gray-800 transition-all border border-transparent hover:border-gray-200"
+                                >
+                                    {isRTL ? 'إلغاء' : 'Cancel'}
+                                </button>
+                                <button
+                                    onClick={handleApplyDateChanges}
+                                    disabled={!modalCheckIn || !modalCheckOut}
+                                    className="flex-1 py-3 px-6 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isRTL ? 'تحديث البحث' : 'Update Search'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
             <Footer />
         </div>
