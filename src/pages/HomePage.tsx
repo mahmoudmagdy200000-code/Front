@@ -3,22 +3,33 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getChalets } from '../api/chalets';
 import type { Chalet } from '../types/chalet';
+import { requestOwnerUpgrade, getMyOwnerRequest, type OwnerRequest } from '../api/admin';
+import { useAuth } from '../context/AuthContext';
 import ChaletCard from '../components/ChaletCard';
 import HomeHeader from '../components/HomeHeader';
 import Footer from '../components/Footer';
 import SearchForm from '../components/SearchForm';
 import { Button } from '../components/ui';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Phone, CheckCircle2, Clock, AlertCircle, X } from 'lucide-react';
 
 const HomePage = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    const { isAuthenticated, role, phoneNumber } = useAuth();
     const isRTL = i18n.language === 'ar';
 
     const [chalets, setChalets] = useState<Chalet[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Owner Request State
+    const [showPhoneForm, setShowPhoneForm] = useState(false);
+    const [contactPhone, setContactPhone] = useState(phoneNumber || '');
+    const [requestLoading, setRequestLoading] = useState(false);
+    const [requestError, setRequestError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [pendingRequest, setPendingRequest] = useState<OwnerRequest | null>(null);
 
     useEffect(() => {
         const fetchChalets = async () => {
@@ -35,8 +46,57 @@ const HomePage = () => {
             }
         };
 
+        const fetchPendingRequest = async () => {
+            if (isAuthenticated && role === 'Client') {
+                try {
+                    const data = await getMyOwnerRequest();
+                    setPendingRequest(data.request);
+                } catch {
+                    // No pending request
+                }
+            }
+        };
+
         fetchChalets();
-    }, [t]);
+        fetchPendingRequest();
+    }, [t, isAuthenticated, role]);
+
+    const handleOwnerButtonClick = () => {
+        if (!isAuthenticated) {
+            navigate('/owner/login');
+            return;
+        }
+
+        if (role === 'Owner' || role === 'Admin') {
+            navigate('/owner/dashboard');
+            return;
+        }
+
+        setShowPhoneForm(true);
+    };
+
+    const handleSubmitRequest = async () => {
+        if (!contactPhone.trim()) {
+            setRequestError(isRTL ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number');
+            return;
+        }
+
+        try {
+            setRequestLoading(true);
+            setRequestError(null);
+            const result = await requestOwnerUpgrade(contactPhone);
+            setPendingRequest(result);
+            setSuccessMessage(isRTL
+                ? 'تم إرسال طلبك بنجاح! سيتم التواصل معك خلال 24 ساعة.'
+                : 'Request submitted! We will contact you within 24 hours.');
+            setShowPhoneForm(false);
+            setTimeout(() => setSuccessMessage(null), 8000);
+        } catch (err: any) {
+            setRequestError(err.message || (isRTL ? 'حدث خطأ، حاول مرة أخرى' : 'Failed, please try again'));
+        } finally {
+            setRequestLoading(false);
+        }
+    };
 
     const filteredChalets = Array.isArray(chalets) ? chalets.filter(chalet => {
         const title = (isRTL ? chalet.TitleAr : chalet.TitleEn) || "";
@@ -104,7 +164,7 @@ const HomePage = () => {
                 {/* Minimal Owner CTA Section - Before Footer */}
                 <div className="bg-white border-t border-gray-200 px-6 py-16">
                     <div className="container mx-auto">
-                        <div className="max-w-2xl mx-auto text-center space-y-6">
+                        <div className="max-w-xl mx-auto text-center space-y-6">
                             <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
                                 {isRTL ? 'هل تمتلك شاليه في رأس سدر؟' : 'Own a chalet in Ras Sedr?'}
                             </h3>
@@ -113,13 +173,111 @@ const HomePage = () => {
                                     ? 'حوّل شاليهك لمصدر دخل ثابت معنا'
                                     : 'Turn your chalet into a steady income source with us'}
                             </p>
-                            <Button
-                                onClick={() => navigate('/owner/login')}
-                                className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
-                            >
-                                {isRTL ? 'سجّل كمالك' : 'Register as Owner'}
-                                <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-                            </Button>
+
+                            {/* Success Message */}
+                            {successMessage && (
+                                <div className="bg-green-50 text-green-700 p-4 rounded-xl text-sm font-medium border border-green-200 flex items-center justify-center gap-2">
+                                    <CheckCircle2 className="w-5 h-5" />
+                                    {successMessage}
+                                </div>
+                            )}
+
+                            {/* Already Owner/Admin */}
+                            {(role === 'Owner' || role === 'Admin') && (
+                                <div className="bg-blue-50 text-blue-700 p-4 rounded-xl text-sm font-medium border border-blue-200 flex items-center justify-center gap-2">
+                                    <CheckCircle2 className="w-5 h-5" />
+                                    {isRTL ? 'أنت مسجل كمالك بالفعل!' : "You're already registered as an owner!"}
+                                </div>
+                            )}
+
+                            {/* Pending Request Status */}
+                            {pendingRequest && (
+                                <div className={`p-4 rounded-xl text-sm font-medium border flex items-center justify-center gap-2 ${pendingRequest.Status === 'Pending'
+                                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                        : pendingRequest.Status === 'Approved'
+                                            ? 'bg-green-50 text-green-700 border-green-200'
+                                            : 'bg-red-50 text-red-700 border-red-200'
+                                    }`}>
+                                    {pendingRequest.Status === 'Pending' && <Clock className="w-5 h-5" />}
+                                    {pendingRequest.Status === 'Approved' && <CheckCircle2 className="w-5 h-5" />}
+                                    {pendingRequest.Status === 'Rejected' && <AlertCircle className="w-5 h-5" />}
+                                    {pendingRequest.Status === 'Pending' && (isRTL ? 'طلبك قيد المراجعة، سيتم التواصل معك قريباً' : 'Your request is under review')}
+                                    {pendingRequest.Status === 'Approved' && (isRTL ? 'تم قبول طلبك!' : 'Your request was approved!')}
+                                    {pendingRequest.Status === 'Rejected' && (isRTL ? 'تم رفض الطلب' : 'Request was rejected')}
+                                </div>
+                            )}
+
+                            {/* Phone Form */}
+                            {showPhoneForm && !pendingRequest && role !== 'Owner' && role !== 'Admin' && (
+                                <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-semibold text-gray-700">
+                                            {isRTL ? 'رقم الهاتف للتواصل' : 'Contact Phone Number'}
+                                        </label>
+                                        <button
+                                            onClick={() => { setShowPhoneForm(false); setRequestError(null); }}
+                                            className="text-gray-400 hover:text-gray-600"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
+
+                                    <div className="relative">
+                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="tel"
+                                            value={contactPhone}
+                                            onChange={(e) => setContactPhone(e.target.value)}
+                                            placeholder="01xxxxxxxxx"
+                                            className="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                            dir="ltr"
+                                        />
+                                    </div>
+
+                                    {requestError && (
+                                        <p className="text-red-600 text-sm flex items-center gap-1">
+                                            <AlertCircle className="w-4 h-4" />
+                                            {requestError}
+                                        </p>
+                                    )}
+
+                                    <Button
+                                        onClick={handleSubmitRequest}
+                                        isLoading={requestLoading}
+                                        className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                                    >
+                                        {isRTL ? 'إرسال الطلب' : 'Submit Request'}
+                                    </Button>
+
+                                    <p className="text-xs text-gray-500">
+                                        {isRTL
+                                            ? 'سيتم التواصل معك خلال 24 ساعة للموافقة على طلبك'
+                                            : 'We will contact you within 24 hours to approve your request'}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Main CTA Button */}
+                            {!showPhoneForm && !pendingRequest && role !== 'Owner' && role !== 'Admin' && (
+                                <Button
+                                    onClick={handleOwnerButtonClick}
+                                    className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
+                                >
+                                    {isRTL ? 'سجّل كمالك' : 'Register as Owner'}
+                                    <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                                </Button>
+                            )}
+
+                            {/* Go to Dashboard Button for Owners */}
+                            {(role === 'Owner' || role === 'Admin') && (
+                                <Button
+                                    onClick={() => navigate('/owner/dashboard')}
+                                    className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold inline-flex items-center gap-2"
+                                >
+                                    {isRTL ? 'اذهب للوحة التحكم' : 'Go to Dashboard'}
+                                    <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
