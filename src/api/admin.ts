@@ -31,8 +31,8 @@ export interface UserWithRole {
 /**
  * Request owner upgrade (Client only)
  */
-export const requestOwnerUpgrade = async (): Promise<OwnerRequest> => {
-    const response = await axiosInstance.post<OwnerRequest>('/auth/request-owner');
+export const requestOwnerUpgrade = async (phoneNumber?: string): Promise<OwnerRequest> => {
+    const response = await axiosInstance.post<OwnerRequest>('/auth/request-owner', { phoneNumber });
     return response.data;
 };
 

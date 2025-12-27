@@ -8,7 +8,7 @@ import { requestOwnerUpgrade, getMyOwnerRequest, type OwnerRequest } from '../ap
 const ClientDashboardPage = () => {
     const { i18n } = useTranslation();
     const navigate = useNavigate();
-    const { role, fullName, email, logout } = useAuth();
+    const { role, fullName, email, logout, phoneNumber } = useAuth();
     const isRTL = i18n.language === 'ar';
 
     const [pendingRequest, setPendingRequest] = useState<OwnerRequest | null>(null);
@@ -16,6 +16,8 @@ const ClientDashboardPage = () => {
     const [requestLoading, setRequestLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [phone, setPhone] = useState(phoneNumber || '');
+    const [showPhoneInput, setShowPhoneInput] = useState(false);
 
     // Redirect if not a Client
     useEffect(() => {
@@ -47,14 +49,26 @@ const ClientDashboardPage = () => {
     };
 
     const handleRequestOwner = async () => {
+        // If phone is missing, show input first
+        if (!phoneNumber && !showPhoneInput) {
+            setShowPhoneInput(true);
+            return;
+        }
+
+        if (showPhoneInput && !phone) {
+            setError(isRTL ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number');
+            return;
+        }
+
         try {
             setRequestLoading(true);
             setError(null);
-            const result = await requestOwnerUpgrade();
+            const result = await requestOwnerUpgrade(showPhoneInput ? phone : undefined);
             setPendingRequest(result);
             setSuccessMessage(isRTL
                 ? 'تم إرسال طلبك بنجاح! سيتم مراجعته من قبل المسؤول.'
                 : 'Your request has been submitted! An admin will review it.');
+            setShowPhoneInput(false);
             setTimeout(() => setSuccessMessage(null), 5000);
         } catch (err: any) {
             setError(err.message || 'Failed to submit request');
@@ -171,17 +185,43 @@ const ClientDashboardPage = () => {
                             </div>
                         )}
 
-                        {/* Request Button */}
+                        {/* Request Button & Phone Input */}
                         {!pendingRequest || pendingRequest.Status === 'Rejected' ? (
-                            <Button
-                                variant="primary"
-                                size="lg"
-                                onClick={handleRequestOwner}
-                                isLoading={requestLoading}
-                                leftIcon={<span className="text-xl">🚀</span>}
-                            >
-                                {isRTL ? 'طلب ترقية للمالك' : 'Request Owner Upgrade'}
-                            </Button>
+                            <div className="max-w-sm mx-auto">
+                                {showPhoneInput && (
+                                    <div className="mb-4 text-left">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            {isRTL ? 'رقم الهاتف (ضروري للتواصل)' : 'Phone Number (Required for contact)'}
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                            placeholder={isRTL ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                )}
+                                <Button
+                                    variant="primary"
+                                    size="lg"
+                                    onClick={handleRequestOwner}
+                                    isLoading={requestLoading}
+                                    className="w-full"
+                                    leftIcon={<span className="text-xl">🚀</span>}
+                                >
+                                    {isRTL ? 'طلب ترقية للمالك' : 'Request Owner Upgrade'}
+                                </Button>
+                                {showPhoneInput && (
+                                    <button
+                                        onClick={() => setShowPhoneInput(false)}
+                                        className="mt-2 text-sm text-gray-500 hover:text-gray-700 underline"
+                                    >
+                                        {isRTL ? 'إلغاء' : 'Cancel'}
+                                    </button>
+                                )}
+                            </div>
                         ) : pendingRequest.Status === 'Pending' ? (
                             <Button
                                 variant="secondary"

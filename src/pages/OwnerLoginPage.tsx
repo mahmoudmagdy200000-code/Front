@@ -10,7 +10,7 @@ import { LogIn, User, Lock, ArrowLeft, Loader2, Sparkles } from 'lucide-react';
 const OwnerLoginPage = () => {
     const { i18n } = useTranslation();
     const navigate = useNavigate();
-    const { login, googleLogin } = useAuth();
+    const { isAuthenticated, role, login, googleLogin } = useAuth();
     const isRTL = i18n.language === 'ar';
 
     const [emailOrUsername, setEmailOrUsername] = useState('');
@@ -21,7 +21,13 @@ const OwnerLoginPage = () => {
 
     useEffect(() => {
         setIsVisible(true);
-    }, []);
+        if (isAuthenticated) {
+            if (role === 'Admin') navigate('/admin/owner-requests');
+            else if (role === 'Owner') navigate('/owner/dashboard');
+            else if (role === 'Client') navigate('/client/dashboard');
+            else navigate('/');
+        }
+    }, [isAuthenticated, role, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,15 +54,12 @@ const OwnerLoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-            {/* Premium Background Image with Overlay */}
+        <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-[#0a0c10]" dir={isRTL ? 'rtl' : 'ltr'}>
+            {/* Optimized Background - Gradient instead of heavy image */}
             <div className="absolute inset-0 z-0">
-                <img
-                    src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80&w=2000" // Fallback high quality
-                    alt="Luxury Chalet"
-                    className="w-full h-full object-cover scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/60 via-black/50 to-emerald-900/40 backdrop-blur-[2px]"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-gray-900 to-emerald-900/30"></div>
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px]"></div>
             </div>
 
             {/* Language Switcher Floating */}
@@ -64,11 +67,11 @@ const OwnerLoginPage = () => {
                 <LanguageSwitcher />
             </div>
 
-            <div className={`relative z-10 w-full max-w-md transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <div className={`relative z-10 w-full max-w-md transition-all duration-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 {/* Logo Section */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl mb-6 transform hover:rotate-12 transition-transform cursor-pointer">
-                        <Sparkles className="w-10 h-10 text-blue-300" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/5 border border-white/10 shadow-xl mb-6 transform hover:rotate-6 transition-transform">
+                        <Sparkles className="w-10 h-10 text-blue-400" />
                     </div>
                     <h1 className="text-4xl font-black text-white mb-2 drop-shadow-lg tracking-tight">
                         {isRTL ? 'أهلاً بك مجدداً' : 'Welcome Back'}
@@ -79,10 +82,10 @@ const OwnerLoginPage = () => {
                 </div>
 
                 {/* Glassmorphism Login Card */}
-                <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden relative group">
-                    {/* Interior Glow */}
-                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/30 transition-colors"></div>
-                    <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/30 transition-colors"></div>
+                <div className="bg-[#1a1c23]/80 border border-white/10 rounded-[2.5rem] p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden relative group">
+                    {/* Interior Glow - Reduced blur */}
+                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
                     <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                         <div className="space-y-2">

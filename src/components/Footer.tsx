@@ -13,10 +13,10 @@ const Footer = () => {
                     <div className="space-y-6">
                         <Link to="/" className="block">
                             <img
-                                src="/logo.png"
+                                src="/logo.jpg"
                                 alt="Logo"
                                 loading="lazy"
-                                className="h-24 md:h-28 w-auto brightness-0 invert opacity-70 transition-all hover:opacity-100"
+                                className="h-20 md:h-24 w-auto rounded-xl opacity-80 transition-all hover:opacity-100 shadow-lg border border-gray-800"
                             />
                         </Link>
                         <p className="text-gray-400 text-sm leading-relaxed max-w-xs font-medium">

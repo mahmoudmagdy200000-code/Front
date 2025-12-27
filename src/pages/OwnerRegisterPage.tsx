@@ -10,9 +10,12 @@ import {
     Eye, EyeOff
 } from 'lucide-react';
 
+import { useAuth } from '../context/AuthContext';
+
 const OwnerRegisterPage = () => {
     const { i18n } = useTranslation();
     const navigate = useNavigate();
+    const { isAuthenticated, role } = useAuth();
     const isRTL = i18n.language === 'ar';
 
     const [formData, setFormData] = useState({
@@ -32,7 +35,13 @@ const OwnerRegisterPage = () => {
 
     useEffect(() => {
         setIsVisible(true);
-    }, []);
+        if (isAuthenticated) {
+            if (role === 'Admin') navigate('/admin/owner-requests');
+            else if (role === 'Owner') navigate('/owner/dashboard');
+            else if (role === 'Client') navigate('/client/dashboard');
+            else navigate('/');
+        }
+    }, [isAuthenticated, role, navigate]);
 
     const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [field]: e.target.value });
@@ -117,15 +126,12 @@ const OwnerRegisterPage = () => {
     ];
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 md:p-8 overflow-x-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-            {/* Dynamic Background */}
+        <div className="min-h-screen relative flex items-center justify-center p-4 md:p-8 overflow-x-hidden bg-[#090b10]" dir={isRTL ? 'rtl' : 'ltr'}>
+            {/* Optimized Background */}
             <div className="absolute inset-0 z-0">
-                <img
-                    src="https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&q=80&w=2000"
-                    alt="Luxury Resort"
-                    className="w-full h-full object-cover scale-110 blur-[1px]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-900/70 via-black/40 to-blue-900/50 backdrop-blur-[1px]"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-900/30 via-gray-900 to-blue-900/30"></div>
+                <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-emerald-600/5 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[120px]"></div>
             </div>
 
             {/* Language Switcher */}
@@ -133,25 +139,25 @@ const OwnerRegisterPage = () => {
                 <LanguageSwitcher />
             </div>
 
-            <div className={`relative z-10 w-full max-w-2xl transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+            <div className={`relative z-10 w-full max-w-2xl transition-all duration-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/20 backdrop-blur-xl border border-white/20 shadow-xl mb-4 group cursor-pointer">
-                        <UserPlus className="w-8 h-8 text-emerald-300 group-hover:scale-110 transition-transform" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 shadow-lg mb-4 group cursor-pointer">
+                        <UserPlus className="w-8 h-8 text-emerald-400 group-hover:scale-110 transition-transform" />
                     </div>
                     <h1 className="text-4xl font-black text-white mb-2 tracking-tight drop-shadow-md">
                         {isRTL ? 'انضم إلينا اليوم' : 'Join Our Community'}
                     </h1>
-                    <p className="text-emerald-100/70">
+                    <p className="text-emerald-100/60">
                         {isRTL ? 'ابدأ رحلتك في عالم الفخامة والخصوصية' : 'Start your journey into premium chalet experiences'}
                     </p>
                 </div>
 
                 {/* Glass Card */}
-                <div className="bg-white/10 backdrop-blur-3xl border border-white/15 rounded-[3rem] p-8 md:p-12 shadow-[0_48px_80px_-20px_rgba(0,0,0,0.6)] relative overflow-hidden group">
-                    {/* Visual Accents */}
-                    <div className="absolute -top-32 -right-32 w-64 h-64 bg-emerald-400/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-emerald-400/20 transition-colors"></div>
-                    <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-blue-400/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-blue-400/20 transition-colors"></div>
+                <div className="bg-[#14161d]/90 border border-white/10 rounded-[3rem] p-8 md:p-12 shadow-[0_48px_80px_-20px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+                    {/* Visual Accents - Reduced blur */}
+                    <div className="absolute -top-32 -right-32 w-64 h-64 bg-emerald-400/5 rounded-full blur-[60px] pointer-events-none"></div>
+                    <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-blue-400/5 rounded-full blur-[60px] pointer-events-none"></div>
 
                     <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
                         {/* Section 1: Personal Info */}

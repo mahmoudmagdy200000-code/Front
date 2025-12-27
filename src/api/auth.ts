@@ -13,6 +13,7 @@ export interface LoginResponse {
     Email: string;
     FullName: string;
     Role: string;
+    PhoneNumber?: string;
     EmailConfirmed: boolean;
     Message: string;
 }

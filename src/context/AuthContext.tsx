@@ -9,6 +9,7 @@ export interface AuthContextType {
     email: string | null;
     fullName: string | null;
     role: string | null;
+    phoneNumber: string | null;
     login: (emailOrUsername: string, password: string) => Promise<void>;
     googleLogin: (idToken: string) => Promise<void>;
     logout: () => void;
@@ -24,6 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [email, setEmail] = useState<string | null>(null);
     const [fullName, setFullName] = useState<string | null>(null);
     const [role, setRole] = useState<string | null>(null);
+    const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -42,6 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setEmail(savedEmail);
                 setFullName(savedFullName);
                 setRole(savedRole);
+                setPhoneNumber(localStorage.getItem('phoneNumber'));
             }
         } catch (error) {
             console.error('Error loading auth state:', error);
@@ -65,6 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setEmail(response.Email);
         setFullName(response.FullName);
         setRole(response.Role);
+        setPhoneNumber(response.PhoneNumber || null);
 
         localStorage.setItem('token', response.Token);
         localStorage.setItem('userId', response.UserId);
@@ -72,6 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('email', response.Email);
         localStorage.setItem('fullName', response.FullName);
         localStorage.setItem('role', response.Role);
+        if (response.PhoneNumber) localStorage.setItem('phoneNumber', response.PhoneNumber);
     };
 
     const googleLogin = async (idToken: string) => {
@@ -83,6 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setEmail(response.Email);
         setFullName(response.FullName);
         setRole(response.Role);
+        setPhoneNumber(response.PhoneNumber || null);
 
         localStorage.setItem('token', response.Token);
         localStorage.setItem('userId', response.UserId);
@@ -90,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('email', response.Email);
         localStorage.setItem('fullName', response.FullName);
         localStorage.setItem('role', response.Role);
+        if (response.PhoneNumber) localStorage.setItem('phoneNumber', response.PhoneNumber);
     };
 
     const logout = () => {
@@ -99,6 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setEmail(null);
         setFullName(null);
         setRole(null);
+        setPhoneNumber(null);
 
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
@@ -106,6 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem('email');
         localStorage.removeItem('fullName');
         localStorage.removeItem('role');
+        localStorage.removeItem('phoneNumber');
     };
 
     const isAuthenticated = !!token;
@@ -122,7 +131,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ token, userId, username, email, fullName, role, login, googleLogin, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ token, userId, username, email, fullName, role, phoneNumber, login, googleLogin, logout, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );
