@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
-import { getMyOwnerRequest, requestOwnerUpgrade, type OwnerRequest } from '../api/admin';
 import DatePicker from './DatePicker';
 
 const Header = () => {
@@ -15,8 +14,6 @@ const Header = () => {
 
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
-    const [pendingRequest, setPendingRequest] = useState<OwnerRequest | null>(null);
-    const [requestLoading, setRequestLoading] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
@@ -25,22 +22,6 @@ const Header = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
-    // Check for pending owner request if logged in as Client
-    useEffect(() => {
-        if (isAuthenticated && role === 'Client') {
-            checkPendingRequest();
-        }
-    }, [isAuthenticated, role]);
-
-    const checkPendingRequest = async () => {
-        try {
-            const data = await getMyOwnerRequest();
-            setPendingRequest(data.request);
-        } catch (err) {
-            // Ignore errors
-        }
-    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -64,19 +45,6 @@ const Header = () => {
         logout();
         setShowUserMenu(false);
         navigate('/');
-    };
-
-    const handleBecomeOwner = async () => {
-        try {
-            setRequestLoading(true);
-            const result = await requestOwnerUpgrade();
-            setPendingRequest(result);
-            alert(isRTL ? 'تم إرسال طلبك بنجاح!' : 'Your request has been submitted!');
-        } catch (err: any) {
-            alert(err.message || 'Failed to submit request');
-        } finally {
-            setRequestLoading(false);
-        }
     };
 
     const getUserDisplayName = () => {
@@ -159,20 +127,11 @@ const Header = () => {
                                         {/* Desktop User Actions */}
                                         {role === 'Client' && (
                                             <button
-                                                onClick={pendingRequest ? undefined : handleBecomeOwner}
-                                                disabled={requestLoading || !!pendingRequest}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${pendingRequest
-                                                    ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-700 cursor-default'
-                                                    : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-lg'
-                                                    }`}
+                                                onClick={() => navigate('/client/dashboard')}
+                                                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-all"
                                             >
-                                                {requestLoading ? (
-                                                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-                                                ) : pendingRequest ? (
-                                                    <><span>⏳</span><span className="hidden lg:inline">{isRTL ? 'قيد المراجعة' : 'Pending'}</span></>
-                                                ) : (
-                                                    <><span>🏠</span><span className="hidden lg:inline">{isRTL ? 'كن مالك' : 'Become Owner'}</span></>
-                                                )}
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                                <span className="hidden lg:inline">{isRTL ? 'حسابي' : 'My Profile'}</span>
                                             </button>
                                         )}
                                         {role === 'Owner' && (
@@ -261,21 +220,11 @@ const Header = () => {
                                             <div className="md:hidden border-b border-gray-700 py-1">
                                                 {role === 'Client' && (
                                                     <button
-                                                        onClick={() => {
-                                                            if (!pendingRequest) {
-                                                                handleBecomeOwner();
-                                                            }
-                                                        }}
-                                                        disabled={requestLoading || !!pendingRequest}
+                                                        onClick={() => { setShowUserMenu(false); navigate('/client/dashboard'); }}
                                                         className="w-full px-4 py-2 text-left text-gray-200 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
                                                     >
-                                                        {requestLoading ? (
-                                                            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-                                                        ) : pendingRequest ? (
-                                                            <><span>⏳</span><span>{isRTL ? 'طلبك قيد المراجعة' : 'Request Pending'}</span></>
-                                                        ) : (
-                                                            <><span>🏠</span><span>{isRTL ? 'كن مالك شاليه' : 'Become Owner'}</span></>
-                                                        )}
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                                        <span>{isRTL ? 'حسابي' : 'My Profile'}</span>
                                                     </button>
                                                 )}
                                                 {role === 'Owner' && (

@@ -76,8 +76,19 @@ const HomePage = () => {
     };
 
     const handleSubmitRequest = async () => {
-        if (!contactPhone.trim()) {
+        const phone = contactPhone.trim();
+
+        // Validate phone number
+        if (!phone) {
             setRequestError(isRTL ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number');
+            return;
+        }
+
+        // Check if phone starts with 01 and is 11 digits
+        if (!/^01\d{9}$/.test(phone)) {
+            setRequestError(isRTL
+                ? 'رقم الهاتف يجب أن يكون 11 رقم ويبدأ بـ 01'
+                : 'Phone number must be 11 digits and start with 01');
             return;
         }
 
@@ -193,10 +204,10 @@ const HomePage = () => {
                             {/* Pending Request Status */}
                             {pendingRequest && (
                                 <div className={`p-4 rounded-xl text-sm font-medium border flex items-center justify-center gap-2 ${pendingRequest.Status === 'Pending'
-                                        ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                        : pendingRequest.Status === 'Approved'
-                                            ? 'bg-green-50 text-green-700 border-green-200'
-                                            : 'bg-red-50 text-red-700 border-red-200'
+                                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                    : pendingRequest.Status === 'Approved'
+                                        ? 'bg-green-50 text-green-700 border-green-200'
+                                        : 'bg-red-50 text-red-700 border-red-200'
                                     }`}>
                                     {pendingRequest.Status === 'Pending' && <Clock className="w-5 h-5" />}
                                     {pendingRequest.Status === 'Approved' && <CheckCircle2 className="w-5 h-5" />}

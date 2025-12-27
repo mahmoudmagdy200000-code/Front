@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
-import { getMyOwnerRequest, requestOwnerUpgrade, type OwnerRequest } from '../api/admin';
 
 interface HomeHeaderProps {
     searchQuery: string;
@@ -18,11 +17,6 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const location = useLocation();
-
-    // Owner request state
-    const [pendingRequest, setPendingRequest] = useState<OwnerRequest | null>(null);
-
-    const [requestLoading, setRequestLoading] = useState(false);
 
     // Desktop detection
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
@@ -47,45 +41,10 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
         }
     }, [notification]);
 
-    // Check for pending owner request if logged in as Client
-    useEffect(() => {
-        if (isAuthenticated && role === 'Client') {
-            checkPendingRequest();
-        }
-    }, [isAuthenticated, role]);
-
-    const checkPendingRequest = async () => {
-        try {
-            const data = await getMyOwnerRequest();
-            setPendingRequest(data.request);
-        } catch (err) {
-            // Ignore errors
-        }
-    };
-
     const handleLogout = () => {
         logout();
         setShowUserMenu(false);
         navigate('/');
-    };
-
-    const handleBecomeOwner = async () => {
-        try {
-            setRequestLoading(true);
-            const result = await requestOwnerUpgrade();
-            setPendingRequest(result);
-            setNotification({
-                type: 'success',
-                message: isRTL ? 'تم إرسال طلبك بنجاح!' : 'Your request has been submitted successfully!'
-            });
-        } catch (err: any) {
-            setNotification({
-                type: 'error',
-                message: err.message || (isRTL ? 'فشل إرسال الطلب' : 'Failed to submit request')
-            });
-        } finally {
-            setRequestLoading(false);
-        }
     };
 
     const getUserDisplayName = () => {
@@ -161,33 +120,17 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
                         {isAuthenticated ? (
                             /* ===== LOGGED IN USER ===== */
                             <div className="flex items-center gap-3">
-                                {/* Become Owner Button - Only for Clients */}
+                                {/* My Profile Button - Only for Clients */}
                                 {role === 'Client' && (
-                                    <button
-                                        onClick={pendingRequest ? undefined : handleBecomeOwner}
-                                        disabled={requestLoading || !!pendingRequest}
-                                        className={`flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all ${pendingRequest
-                                            ? 'bg-yellow-100 text-yellow-700 border border-yellow-300 cursor-default'
-                                            : 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-md hover:shadow-lg'
-                                            }`}
+                                    <Link
+                                        to="/client/dashboard"
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-medium transition-all"
                                     >
-                                        {requestLoading ? (
-                                            <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                            </svg>
-                                        ) : pendingRequest ? (
-                                            <>
-                                                <span>⏳</span>
-                                                <span className="hidden sm:inline">{isRTL ? 'قيد المراجعة' : 'Pending'}</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <span>🏠</span>
-                                                <span className="hidden sm:inline">{isRTL ? 'كن مالك' : 'Become Owner'}</span>
-                                            </>
-                                        )}
-                                    </button>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <span className="hidden sm:inline">{isRTL ? 'حسابي' : 'My Profile'}</span>
+                                    </Link>
                                 )}
 
                                 {/* Owner Dashboard Button */}
@@ -325,16 +268,14 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
                                     </div>
 
                                     {role === 'Client' && (
-                                        <button
-                                            onClick={() => {
-                                                if (!pendingRequest) handleBecomeOwner();
-                                                setIsMenuOpen(false);
-                                            }}
-                                            disabled={requestLoading || !!pendingRequest}
-                                            className="w-full px-4 py-3 text-left text-green-600 hover:bg-green-50 flex items-center gap-3"
+                                        <Link
+                                            to="/client/dashboard"
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className="block px-4 py-3 text-gray-700 hover:bg-gray-50 flex items-center gap-3"
                                         >
-                                            {pendingRequest ? <span>⏳ {isRTL ? 'طلبك قيد المراجعة' : 'Request Pending'}</span> : <span>🏠 {isRTL ? 'كن مالك' : 'Become Owner'}</span>}
-                                        </button>
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                            {isRTL ? 'حسابي' : 'My Profile'}
+                                        </Link>
                                     )}
 
                                     {role === 'Owner' && (
