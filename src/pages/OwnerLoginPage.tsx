@@ -178,7 +178,7 @@ const OwnerLoginPage = () => {
                                     }}
                                     theme="filled_blue"
                                     size="large"
-                                    width="100%"
+                                    width="350"
                                     shape="pill"
                                 />
                             </div>

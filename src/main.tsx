@@ -5,7 +5,7 @@ import App from './App.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"; // Placeholder
+const GOOGLE_CLIENT_ID = "835766687854-cfvt7hknje0887mp3dscdoie71lfrl3s.apps.googleusercontent.com"; // Placeholder
 
 console.log('Starting app render...');
 createRoot(document.getElementById('root')!).render(
