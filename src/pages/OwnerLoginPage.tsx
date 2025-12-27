@@ -1,20 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { Button, Input, Card } from '../components/ui';
+import { GoogleLogin } from '@react-oauth/google';
+import { Button, Input } from '../components/ui';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { LogIn, User, Lock, ArrowLeft, Loader2, Sparkles } from 'lucide-react';
 
 const OwnerLoginPage = () => {
     const { i18n } = useTranslation();
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, googleLogin } = useAuth();
     const isRTL = i18n.language === 'ar';
 
     const [emailOrUsername, setEmailOrUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        setIsVisible(true);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,18 +36,10 @@ const OwnerLoginPage = () => {
             setLoading(true);
             await login(emailOrUsername, password);
 
-            // Get role from localStorage after successful login
             const userRole = localStorage.getItem('role');
-
-            // Redirect based on role
-            if (userRole === 'Admin') {
-                navigate('/admin/owner-requests');
-            } else if (userRole === 'Owner') {
-                navigate('/owner/dashboard');
-            } else {
-                // Client goes to homepage
-                navigate('/');
-            }
+            if (userRole === 'Admin') navigate('/admin/owner-requests');
+            else if (userRole === 'Owner') navigate('/owner/dashboard');
+            else navigate('/');
         } catch (err: any) {
             setError(err.response?.data?.message || (isRTL ? 'فشل تسجيل الدخول' : 'Login failed. Please check your credentials.'));
         } finally {
@@ -49,95 +48,177 @@ const OwnerLoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-            {/* Language Switcher */}
-            <div className="absolute top-4 right-4">
+        <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+            {/* Premium Background Image with Overlay */}
+            <div className="absolute inset-0 z-0">
+                <img
+                    src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80&w=2000" // Fallback high quality
+                    alt="Luxury Chalet"
+                    className="w-full h-full object-cover scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/60 via-black/50 to-emerald-900/40 backdrop-blur-[2px]"></div>
+            </div>
+
+            {/* Language Switcher Floating */}
+            <div className="absolute top-6 right-6 z-20">
                 <LanguageSwitcher />
             </div>
 
-            <Card className="w-full max-w-md">
-                {/* Logo/Title */}
+            <div className={`relative z-10 w-full max-w-md transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                {/* Logo Section */}
                 <div className="text-center mb-8">
-                    <div className="text-6xl mb-4">🏖️</div>
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                        {isRTL ? 'تسجيل الدخول' : 'Welcome Back'}
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl mb-6 transform hover:rotate-12 transition-transform cursor-pointer">
+                        <Sparkles className="w-10 h-10 text-blue-300" />
+                    </div>
+                    <h1 className="text-4xl font-black text-white mb-2 drop-shadow-lg tracking-tight">
+                        {isRTL ? 'أهلاً بك مجدداً' : 'Welcome Back'}
                     </h1>
-                    <p className="text-gray-600">
-                        {isRTL ? 'قم بتسجيل الدخول إلى حسابك' : 'Sign in to your account'}
+                    <p className="text-blue-100/80 font-medium">
+                        {isRTL ? 'سجل دخولك لاستكشاف أفضل الشاليهات' : 'Sign in to access your dream escape'}
                     </p>
                 </div>
 
-                {/* Login Form */}
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <Input
-                        type="text"
-                        label={isRTL ? 'البريد الإلكتروني أو اسم المستخدم' : 'Email or Username'}
-                        value={emailOrUsername}
-                        onChange={(e) => setEmailOrUsername(e.target.value)}
-                        placeholder={isRTL ? 'أدخل البريد الإلكتروني أو اسم المستخدم' : 'Enter email or username'}
-                        disabled={loading}
-                        required
-                    />
+                {/* Glassmorphism Login Card */}
+                <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden relative group">
+                    {/* Interior Glow */}
+                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/30 transition-colors"></div>
+                    <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/30 transition-colors"></div>
 
-                    <Input
-                        type="password"
-                        label={isRTL ? 'كلمة المرور' : 'Password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder={isRTL ? 'أدخل كلمة المرور' : 'Enter password'}
-                        disabled={loading}
-                        required
-                    />
-
-                    {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                </svg>
-                                <span>{error}</span>
+                    <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-blue-50/90 flex items-center gap-2 mb-1 px-1">
+                                <User className="w-4 h-4" />
+                                {isRTL ? 'البريد أو اسم المستخدم' : 'Email or Username'}
+                            </label>
+                            <div className="relative group/input">
+                                <Input
+                                    type="text"
+                                    value={emailOrUsername}
+                                    onChange={(e) => setEmailOrUsername(e.target.value)}
+                                    placeholder={isRTL ? 'أدخل بياناتك' : 'Enter your credentials'}
+                                    disabled={loading}
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-14 rounded-2xl focus:bg-white/10 focus:ring-blue-400/50 transition-all pl-12"
+                                />
+                                <LogIn className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${emailOrUsername ? 'text-blue-300' : 'text-white/20'}`} />
                             </div>
                         </div>
-                    )}
 
-                    <Button
-                        type="submit"
-                        variant="primary"
-                        size="lg"
-                        isLoading={loading}
-                        className="w-full"
-                    >
-                        {isRTL ? 'تسجيل الدخول' : 'Login'}
-                    </Button>
-                </form>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-blue-50/90 flex items-center gap-2 mb-1 px-1">
+                                <Lock className="w-4 h-4" />
+                                {isRTL ? 'كلمة المرور' : 'Password'}
+                            </label>
+                            <div className="relative group/input">
+                                <Input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder={isRTL ? 'أدخل كلمة المرور' : 'Enter your password'}
+                                    disabled={loading}
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-14 rounded-2xl focus:bg-white/10 focus:ring-blue-400/50 transition-all pl-12"
+                                />
+                                <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${password ? 'text-blue-300' : 'text-white/20'}`} />
+                            </div>
+                        </div>
 
-                {/* Register Link */}
-                <div className="mt-6 text-center border-t border-gray-100 pt-6">
-                    <p className="text-gray-600 mb-3">
-                        {isRTL ? 'ليس لديك حساب؟' : "Don't have an account?"}
-                    </p>
-                    <Button
-                        variant="outline"
-                        onClick={() => navigate('/owner/register')}
-                        className="w-full"
-                    >
-                        {isRTL ? 'سجل الآن' : 'Create Account'}
-                    </Button>
+                        {error && (
+                            <div className="bg-red-500/20 border border-red-500/30 text-red-100 px-4 py-3 rounded-2xl animate-shake">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-5 h-5 rounded-full bg-red-500/40 flex items-center justify-center flex-shrink-0">
+                                        <span className="text-xs font-bold font-sans">!</span>
+                                    </div>
+                                    <span className="text-sm font-medium leading-tight">{error}</span>
+                                </div>
+                            </div>
+                        )}
+
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            size="lg"
+                            isLoading={loading}
+                            className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-500 shadow-[0_20px_40px_-12px_rgba(37,99,235,0.4)] transition-all font-bold text-lg active:scale-95 disabled:opacity-50"
+                        >
+                            {loading ? (
+                                <Loader2 className="w-6 h-6 animate-spin mx-auto text-white/50" />
+                            ) : (
+                                isRTL ? 'تسجيل الدخول' : 'Sign In'
+                            )}
+                        </Button>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-4 my-8">
+                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white/30">{isRTL ? 'أو عبر' : 'Or via'}</span>
+                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                        </div>
+
+                        {/* Google Auth Wrapper */}
+                        <div className="google-auth-container flex justify-center">
+                            <div className="w-full [&>div]:!w-full [&>div]:!justify-center [&>div]:!rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform active:scale-[0.98]">
+                                <GoogleLogin
+                                    onSuccess={async (credentialResponse) => {
+                                        if (credentialResponse.credential) {
+                                            try {
+                                                setLoading(true);
+                                                await googleLogin(credentialResponse.credential);
+                                                const userRole = localStorage.getItem('role');
+                                                if (userRole === 'Admin') navigate('/admin/owner-requests');
+                                                else if (userRole === 'Owner') navigate('/owner/dashboard');
+                                                else navigate('/');
+                                            } catch (err: any) {
+                                                setError(isRTL ? 'فشل تسجيل الدخول عبر جوجل' : 'Google login failed');
+                                            } finally {
+                                                setLoading(false);
+                                            }
+                                        }
+                                    }}
+                                    onError={() => {
+                                        setError(isRTL ? 'فشل تسجيل الدخول عبر جوجل' : 'Google login failed');
+                                    }}
+                                    theme="filled_blue"
+                                    size="large"
+                                    width="100%"
+                                    shape="pill"
+                                />
+                            </div>
+                        </div>
+                    </form>
+
+                    {/* Bottom Links */}
+                    <div className="mt-10 space-y-4 relative z-10">
+                        <div className="p-1 px-4 text-center">
+                            <p className="text-sm text-white/50 inline-block">
+                                {isRTL ? 'ليس لديك حساب؟' : "Don't have an account?"}
+                            </p>
+                            <button
+                                onClick={() => navigate('/owner/register')}
+                                className="text-blue-400 font-black ml-2 hover:text-blue-300 transition-colors underline decoration-2 underline-offset-4"
+                            >
+                                {isRTL ? 'سجل الآن' : 'Create Account'}
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={() => navigate('/')}
+                            className="w-full py-3 rounded-2xl text-white/40 hover:text-white/70 hover:bg-white/5 transition-all flex items-center justify-center gap-2 group/back"
+                        >
+                            <ArrowLeft className={`w-4 h-4 transition-transform group-hover/back:-translate-x-1 ${isRTL ? 'rotate-180' : ''}`} />
+                            <span className="text-xs font-bold uppercase tracking-widest">
+                                {isRTL ? 'العودة للرئيسية' : 'Back to Explorer'}
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
-                {/* Back to Home */}
-                <div className="mt-4 text-center">
-                    <Button
-                        variant="ghost"
-                        onClick={() => navigate('/')}
-                        className="text-sm"
-                    >
-                        ← {isRTL ? 'العودة للرئيسية' : 'Back to Home'}
-                    </Button>
-                </div>
-            </Card>
+                {/* Footer Disclaimer */}
+                <p className="mt-8 text-center text-white/20 text-[10px] uppercase tracking-tighter font-medium px-4">
+                    {isRTL ? 'بالدخول أنت توافق على شروط الخدمة وسياسة الخصوصية' : 'By signing in, you agree to our Terms of Service & Privacy Policy'}
+                </p>
+            </div>
         </div>
     );
 };
 
 export default OwnerLoginPage;
+

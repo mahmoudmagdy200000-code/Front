@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, type ReactNode, useEffect } from 'react';
-import { loginApi } from '../api/auth';
+import { loginApi, googleLoginApi } from '../api/auth';
 
 // Enhanced auth context with additional user fields
 export interface AuthContextType {
@@ -10,6 +10,7 @@ export interface AuthContextType {
     fullName: string | null;
     role: string | null;
     login: (emailOrUsername: string, password: string) => Promise<void>;
+    googleLogin: (idToken: string) => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -73,6 +74,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('role', response.Role);
     };
 
+    const googleLogin = async (idToken: string) => {
+        const response = await googleLoginApi(idToken);
+
+        setToken(response.Token);
+        setUserId(response.UserId);
+        setUsername(response.Username);
+        setEmail(response.Email);
+        setFullName(response.FullName);
+        setRole(response.Role);
+
+        localStorage.setItem('token', response.Token);
+        localStorage.setItem('userId', response.UserId);
+        localStorage.setItem('username', response.Username);
+        localStorage.setItem('email', response.Email);
+        localStorage.setItem('fullName', response.FullName);
+        localStorage.setItem('role', response.Role);
+    };
+
     const logout = () => {
         setToken(null);
         setUserId(null);
@@ -103,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ token, userId, username, email, fullName, role, login, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ token, userId, username, email, fullName, role, login, googleLogin, logout, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );

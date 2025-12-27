@@ -53,7 +53,13 @@ export const registerApi = async (data: RegisterRequest): Promise<RegisterRespon
     return response.data;
 };
 
-// Legacy function for backward compatibility (deprecated)
 export const login = async (username: string, password: string): Promise<LoginResponse> => {
     return loginApi(username, password);
+};
+
+export const googleLoginApi = async (idToken: string): Promise<LoginResponse> => {
+    const response = await axiosInstance.post<LoginResponse>('/auth/google', {
+        idToken
+    });
+    return response.data;
 };

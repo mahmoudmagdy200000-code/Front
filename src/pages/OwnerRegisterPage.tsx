@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Card } from '../components/ui';
+import { Button, Input } from '../components/ui';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import axiosInstance from '../api/axios';
+import {
+    User, Mail, Lock, Phone, UserPlus, ArrowLeft,
+    ShieldCheck, CheckCircle2, AlertCircle, Loader2, Sparkles,
+    Eye, EyeOff
+} from 'lucide-react';
 
 const OwnerRegisterPage = () => {
     const { i18n } = useTranslation();
@@ -17,16 +22,21 @@ const OwnerRegisterPage = () => {
         password: '',
         confirmPassword: '',
         phoneNumber: '',
-        // Note: Role removed - backend forces 'Client' for all registrations
     });
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        setIsVisible(true);
+    }, []);
 
     const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [field]: e.target.value });
-        setError(null); // Clear error on input change
+        setError(null);
     };
 
     const validateForm = (): string | null => {
@@ -42,7 +52,6 @@ const OwnerRegisterPage = () => {
             return isRTL ? 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' : 'Password must be at least 8 characters';
         }
 
-        // Password complexity check
         const hasUpperCase = /[A-Z]/.test(formData.password);
         const hasLowerCase = /[a-z]/.test(formData.password);
         const hasDigit = /\d/.test(formData.password);
@@ -70,8 +79,6 @@ const OwnerRegisterPage = () => {
 
         try {
             setLoading(true);
-
-            // Map to PascalCase for API
             const apiPayload = {
                 FullName: formData.fullName,
                 Username: formData.username,
@@ -85,221 +92,248 @@ const OwnerRegisterPage = () => {
             setSuccess(true);
             setTimeout(() => {
                 navigate('/owner/login');
-            }, 2000);
+            }, 2500);
         } catch (err: any) {
-            console.error('Registration failed', err);
             let errorMessage = '';
-
-            if (err.response) {
-                // Server responded with a status code
-                const data = err.response.data;
-
-                if (data?.message) {
-                    errorMessage = data.message;
-                } else if (data?.errors) {
-                    // ASP.NET Core Validation Problem Details
-                    if (typeof data.errors === 'object') {
-                        errorMessage = Object.values(data.errors).flat().join('\n');
-                    } else if (Array.isArray(data.errors)) {
-                        errorMessage = data.errors.join('\n');
-                    }
-                } else if (typeof data === 'string') {
-                    errorMessage = data;
-                } else {
-                    // Fallback to showing the status text or raw data
-                    errorMessage = `Server Error (${err.response.status}): ${JSON.stringify(data)}`;
-                }
-            } else if (err.request) {
-                // Request was made but no response received
-                errorMessage = isRTL ? 'لم يتم استلام رد من الخادم. تحقق من اتصالك بالإنترنت.' : 'No response from server. Check your internet connection.';
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.response?.data?.errors) {
+                errorMessage = Object.values(err.response.data.errors).flat().join('\n');
             } else {
-                // Request setup error
-                errorMessage = isRTL ? 'حدث خطأ غير متوقع.' : `Unexpected error: ${err.message}`;
-            }
-
-            // Final fallback
-            if (!errorMessage) {
                 errorMessage = isRTL ? 'فشل التسجيل. يرجى المحاولة مرة أخرى.' : 'Registration failed. Please try again.';
             }
-
             setError(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
+    const passwordRequirements = [
+        { label: isRTL ? '8 أحرف على الأقل' : 'Min 8 characters', met: formData.password.length >= 8 },
+        { label: isRTL ? 'حرف كبير (A-Z)' : 'Uppercase letter', met: /[A-Z]/.test(formData.password) },
+        { label: isRTL ? 'حرف صغير (a-z)' : 'Lowercase letter', met: /[a-z]/.test(formData.password) },
+        { label: isRTL ? 'رقم واحد (0-9)' : 'One digit', met: /\d/.test(formData.password) },
+        { label: isRTL ? 'رمز خاص (!@#$)' : 'Special char', met: /[^\da-zA-Z]/.test(formData.password) },
+    ];
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen relative flex items-center justify-center p-4 md:p-8 overflow-x-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+            {/* Dynamic Background */}
+            <div className="absolute inset-0 z-0">
+                <img
+                    src="https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&q=80&w=2000"
+                    alt="Luxury Resort"
+                    className="w-full h-full object-cover scale-110 blur-[1px]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-900/70 via-black/40 to-blue-900/50 backdrop-blur-[1px]"></div>
+            </div>
+
             {/* Language Switcher */}
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-6 right-6 z-20">
                 <LanguageSwitcher />
             </div>
 
-            <Card className="w-full max-w-md">
-                {/* Logo/Title */}
-                <div className="text-center mb-6">
-                    <div className="text-6xl mb-4">🏖️</div>
-                    <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                        {isRTL ? 'تسجيل حساب جديد' : 'Create Account'}
+            <div className={`relative z-10 w-full max-w-2xl transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+                {/* Header */}
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/20 backdrop-blur-xl border border-white/20 shadow-xl mb-4 group cursor-pointer">
+                        <UserPlus className="w-8 h-8 text-emerald-300 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <h1 className="text-4xl font-black text-white mb-2 tracking-tight drop-shadow-md">
+                        {isRTL ? 'انضم إلينا اليوم' : 'Join Our Community'}
                     </h1>
+                    <p className="text-emerald-100/70">
+                        {isRTL ? 'ابدأ رحلتك في عالم الفخامة والخصوصية' : 'Start your journey into premium chalet experiences'}
+                    </p>
                 </div>
 
-                {/* Register Form */}
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <Input
-                        type="text"
-                        label={isRTL ? 'الاسم الكامل' : 'Full Name'}
-                        value={formData.fullName}
-                        onChange={handleChange('fullName')}
-                        placeholder={isRTL ? 'أدخل الاسم الكامل' : 'Enter your full name'}
-                        disabled={loading}
-                        required
-                    />
+                {/* Glass Card */}
+                <div className="bg-white/10 backdrop-blur-3xl border border-white/15 rounded-[3rem] p-8 md:p-12 shadow-[0_48px_80px_-20px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+                    {/* Visual Accents */}
+                    <div className="absolute -top-32 -right-32 w-64 h-64 bg-emerald-400/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-emerald-400/20 transition-colors"></div>
+                    <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-blue-400/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-blue-400/20 transition-colors"></div>
 
-                    <Input
-                        type="tel"
-                        label={isRTL ? 'رقم الهاتف' : 'Phone Number'}
-                        value={formData.phoneNumber}
-                        onChange={handleChange('phoneNumber')}
-                        placeholder={isRTL ? 'أدخل رقم الهاتف' : 'Enter phone number'}
-                        disabled={loading}
-                        required
-                    />
-
-                    <Input
-                        type="text"
-                        label={isRTL ? 'اسم المستخدم' : 'Username'}
-                        value={formData.username}
-                        onChange={handleChange('username')}
-                        placeholder={isRTL ? 'أدخل اسم المستخدم' : 'Enter username'}
-                        disabled={loading}
-                        required
-                    />
-
-                    <Input
-                        type="email"
-                        label={isRTL ? 'البريد الإلكتروني' : 'Email'}
-                        value={formData.email}
-                        onChange={handleChange('email')}
-                        placeholder={isRTL ? 'أدخل البريد الإلكتروني' : 'Enter email'}
-                        disabled={loading}
-                        required
-                    />
-
-                    <Input
-                        type="password"
-                        label={isRTL ? 'كلمة المرور' : 'Password'}
-                        value={formData.password}
-                        onChange={handleChange('password')}
-                        placeholder={isRTL ? 'أدخل كلمة المرور' : 'Enter password'}
-                        disabled={loading}
-                        required
-                        helperText={isRTL ? '8 أحرف على الأقل، حرف كبير، حرف صغير، رقم، ورمز خاص' : 'Min 8 chars, uppercase, lowercase, digit, special char'}
-                    />
-
-                    <Input
-                        type="password"
-                        label={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
-                        value={formData.confirmPassword}
-                        onChange={handleChange('confirmPassword')}
-                        placeholder={isRTL ? 'أعد إدخال كلمة المرور' : 'Re-enter password'}
-                        disabled={loading}
-                        required
-                    />
-
-                    {/* Success Message */}
-                    {success && (
-                        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span>{isRTL ? 'تم التسجيل بنجاح! جاري التحويل...' : 'Registration successful! Redirecting...'}</span>
+                    <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+                        {/* Section 1: Personal Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wider text-white/50 px-1 ml-1 flex items-center gap-2">
+                                    <User className="w-3 h-3" /> {isRTL ? 'الاسم الكامل' : 'Full Name'}
+                                </label>
+                                <div className="relative">
+                                    <Input
+                                        type="text"
+                                        value={formData.fullName}
+                                        onChange={handleChange('fullName')}
+                                        placeholder={formData.fullName ? "" : (isRTL ? "أدخل اسمك" : "John Doe")}
+                                        className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-14 rounded-2xl focus:bg-white/10"
+                                    />
+                                    <User className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wider text-white/50 px-1 ml-1 flex items-center gap-2">
+                                    <Phone className="w-3 h-3" /> {isRTL ? 'رقم الهاتف' : 'Phone Number'}
+                                </label>
+                                <div className="relative">
+                                    <Input
+                                        type="tel"
+                                        value={formData.phoneNumber}
+                                        onChange={handleChange('phoneNumber')}
+                                        placeholder={isRTL ? "05xxxxxxxx" : "+123456789"}
+                                        className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-14 rounded-2xl"
+                                    />
+                                    <Phone className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                </div>
                             </div>
                         </div>
-                    )}
 
-                    {/* Error Message */}
-                    {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm">{error}</span>
+                        {/* Section 2: Account details */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wider text-white/50 px-1 ml-1 flex items-center gap-2">
+                                    <Sparkles className="w-3 h-3" /> {isRTL ? 'اسم المستخدم' : 'Username'}
+                                </label>
+                                <div className="relative">
+                                    <Input
+                                        type="text"
+                                        value={formData.username}
+                                        onChange={handleChange('username')}
+                                        placeholder={isRTL ? "اختر معرفاً" : "johny_99"}
+                                        className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-14 rounded-2xl"
+                                    />
+                                    <ShieldCheck className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wider text-white/50 px-1 ml-1 flex items-center gap-2">
+                                    <Mail className="w-3 h-3" /> {isRTL ? 'البريد الإلكتروني' : 'Email Address'}
+                                </label>
+                                <div className="relative">
+                                    <Input
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={handleChange('email')}
+                                        placeholder="example@mail.com"
+                                        className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-14 rounded-2xl"
+                                    />
+                                    <Mail className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                </div>
                             </div>
                         </div>
-                    )}
 
-                    {/* Submit Button */}
-                    <Button
-                        type="submit"
-                        variant="success"
-                        size="lg"
-                        isLoading={loading}
-                        disabled={success}
-                        className="w-full"
-                    >
-                        {isRTL ? 'تسجيل' : 'Register'}
-                    </Button>
-                </form>
+                        {/* Section 3: Security */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wider text-white/50 px-1 ml-1 flex items-center gap-2">
+                                    <Lock className="w-3 h-3" /> {isRTL ? 'كلمة المرور' : 'Secure Password'}
+                                </label>
+                                <div className="relative">
+                                    <Input
+                                        type={showPassword ? "text" : "password"}
+                                        value={formData.password}
+                                        onChange={handleChange('password')}
+                                        className="bg-white/5 border-white/10 text-white h-14 rounded-2xl pr-12"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wider text-white/50 px-1 ml-1 flex items-center gap-2">
+                                    <Lock className="w-3 h-3" /> {isRTL ? 'تأكيد كلمة المرور' : 'Verify Password'}
+                                </label>
+                                <Input
+                                    type="password"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange('confirmPassword')}
+                                    className="bg-white/5 border-white/10 text-white h-14 rounded-2xl focus:bg-white/10"
+                                />
+                            </div>
+                        </div>
 
-                {/* Already have account */}
-                <div className="mt-6 text-center border-t border-gray-100 pt-6">
-                    <p className="text-gray-600 mb-3">
-                        {isRTL ? 'لديك حساب بالفعل؟' : 'Already have an account?'}
-                    </p>
-                    <Button
-                        variant="outline"
-                        onClick={() => navigate('/owner/login')}
-                        className="w-full"
-                    >
-                        {isRTL ? 'تسجيل الدخول' : 'Login'}
-                    </Button>
+                        {/* Password Requirements Visualization */}
+                        <div className="p-5 bg-white/5 rounded-3xl border border-white/5">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {passwordRequirements.map((req, i) => (
+                                    <div key={i} className="flex items-center gap-2 transition-all">
+                                        <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${req.met ? 'bg-emerald-500/40' : 'bg-white/5'}`}>
+                                            <CheckCircle2 className={`w-3 h-3 ${req.met ? 'text-emerald-300' : 'text-white/10'}`} />
+                                        </div>
+                                        <span className={`text-[10px] font-bold uppercase tracking-tighter ${req.met ? 'text-emerald-300' : 'text-white/20'}`}>
+                                            {req.label}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Status Messages */}
+                        {success && (
+                            <div className="bg-emerald-500/20 border border-emerald-500/30 text-emerald-100 p-4 rounded-2xl animate-pulse text-center">
+                                <span className="font-bold">{isRTL ? 'تم إنشاء الحساب بنجاح! جاري التوجه للمصادقة...' : 'Account created! Redirecting to login...'}</span>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className="bg-red-500/20 border border-red-500/30 text-red-100 p-4 rounded-2xl flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                                <span className="text-sm font-medium">{error}</span>
+                            </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex flex-col gap-4">
+                            <Button
+                                type="submit"
+                                variant="success"
+                                size="lg"
+                                isLoading={loading}
+                                disabled={success}
+                                className="w-full h-16 rounded-[1.5rem] bg-emerald-600 hover:bg-emerald-500 shadow-[0_20px_40px_-12px_rgba(16,185,129,0.3)] transition-all font-black text-lg"
+                            >
+                                {loading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (isRTL ? 'إنشاء حساب جديد' : 'Create My Account')}
+                            </Button>
+
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+                                <p className="text-sm text-white/40">
+                                    {isRTL ? 'لديك حساب بالفعل؟' : 'Already have an account?'}
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate('/owner/login')}
+                                        className="ml-2 font-bold text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-widest text-xs border-b border-emerald-400/30"
+                                    >
+                                        {isRTL ? 'تسجيل الدخول' : 'Sign In instead'}
+                                    </button>
+                                </p>
+
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/')}
+                                    className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors text-xs font-black uppercase tracking-[0.2em]"
+                                >
+                                    <ArrowLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                                    {isRTL ? 'العودة' : 'Explorer'}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
-                {/* Back to Home */}
-                <div className="mt-4 text-center">
-                    <Button
-                        variant="ghost"
-                        onClick={() => navigate('/')}
-                        className="text-sm"
-                    >
-                        ← {isRTL ? 'العودة للرئيسية' : 'Back to Home'}
-                    </Button>
+                {/* Secure Badge */}
+                <div className="mt-8 flex items-center justify-center gap-3 text-white/20">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">{isRTL ? 'بياناتك مشفرة وآمنة تماماً' : 'Encrypted & Secure Registration'}</span>
                 </div>
-
-                {/* Password Requirements */}
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm font-semibold text-gray-700 mb-2">
-                        {isRTL ? 'متطلبات كلمة المرور:' : 'Password Requirements:'}
-                    </p>
-                    <ul className="text-xs text-gray-600 space-y-1">
-                        <li className="flex items-center gap-2">
-                            <span className="text-green-600">✓</span>
-                            {isRTL ? 'على الأقل 8 أحرف' : 'At least 8 characters'}
-                        </li>
-                        <li className="flex items-center gap-2">
-                            <span className="text-green-600">✓</span>
-                            {isRTL ? 'حرف كبير واحد (A-Z)' : 'One uppercase letter (A-Z)'}
-                        </li>
-                        <li className="flex items-center gap-2">
-                            <span className="text-green-600">✓</span>
-                            {isRTL ? 'حرف صغير واحد (a-z)' : 'One lowercase letter (a-z)'}
-                        </li>
-                        <li className="flex items-center gap-2">
-                            <span className="text-green-600">✓</span>
-                            {isRTL ? 'رقم واحد (0-9)' : 'One digit (0-9)'}
-                        </li>
-                        <li className="flex items-center gap-2">
-                            <span className="text-green-600">✓</span>
-                            {isRTL ? 'رمز خاص (!@#$%...)' : 'One special character (!@#$%...)'}
-                        </li>
-                    </ul>
-                </div>
-            </Card>
+            </div>
         </div>
     );
 };
 
 export default OwnerRegisterPage;
+
