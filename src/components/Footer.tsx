@@ -13,7 +13,7 @@ const Footer = () => {
                     <div className="space-y-6">
                         <Link to="/" className="block">
                             <img
-                                src="/logo.jpg"
+                                src="/logo.png"
                                 alt="Logo"
                                 loading="lazy"
                                 className="h-20 md:h-24 w-auto rounded-xl opacity-90 transition-all hover:opacity-100 shadow-md border border-white"

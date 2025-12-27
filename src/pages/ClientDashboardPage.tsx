@@ -213,41 +213,66 @@ const ClientDashboardPage = () => {
                                     <span className="font-bold">{phoneNumber || (isRTL ? 'رقم الهاتف غير مرتبط' : 'Phone not linked')}</span>
                                 </div>
 
-                                {!phoneNumber && !showLinkPhone && (
+                                {!showLinkPhone && (
                                     <button
-                                        onClick={() => setShowLinkPhone(true)}
-                                        className="text-blue-600 hover:text-blue-700 font-bold text-sm flex items-center gap-1 transition-colors"
+                                        onClick={() => {
+                                            setLinkPhoneInput(phoneNumber || '');
+                                            setShowLinkPhone(true);
+                                        }}
+                                        className="text-blue-600 hover:text-blue-700 font-bold text-sm flex items-center gap-1 transition-colors px-2 py-1 hover:bg-blue-50 rounded-lg"
                                     >
                                         <RefreshCw className="w-4 h-4" />
-                                        {isRTL ? 'ربط رقم الهاتف' : 'Link phone now'}
+                                        {phoneNumber
+                                            ? (isRTL ? 'تغيير رقم الهاتف' : 'Change phone number')
+                                            : (isRTL ? 'ربط رقم الهاتف' : 'Link phone now')}
                                     </button>
                                 )}
                             </div>
 
-                            {/* Link Phone Inline Form */}
+                            {/* Link/Change Phone Inline Form */}
                             {showLinkPhone && (
-                                <div className="mt-4 p-4 bg-gray-50 rounded-2xl border border-gray-200 max-w-md">
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                                        {isRTL ? 'أدخل رقم هاتفك (11 رقم)' : 'Enter your phone (11 digits)'}
-                                    </label>
+                                <div className="mt-4 p-5 bg-blue-50/50 rounded-2xl border border-blue-100 max-w-md animate-in fade-in slide-in-from-top-2">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <label className="text-sm font-bold text-blue-900">
+                                            {isRTL ? 'رقم الهاتف الجديد (11 رقم)' : 'New phone number (11 digits)'}
+                                        </label>
+                                        <button
+                                            onClick={() => {
+                                                setShowLinkPhone(false);
+                                                setLinkError(null);
+                                            }}
+                                            className="text-gray-400 hover:text-gray-600 text-xs font-bold"
+                                        >
+                                            {isRTL ? 'إلغاء' : 'Cancel'}
+                                        </button>
+                                    </div>
                                     <div className="flex gap-2">
-                                        <input
-                                            type="tel"
-                                            value={linkPhoneInput}
-                                            onChange={(e) => setLinkPhoneInput(e.target.value)}
-                                            placeholder="01xxxxxxxxx"
-                                            className="flex-1 bg-white border border-gray-300 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-mono"
-                                            dir="ltr"
-                                        />
+                                        <div className="relative flex-1">
+                                            <PhoneIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                            <input
+                                                type="tel"
+                                                value={linkPhoneInput}
+                                                onChange={(e) => setLinkPhoneInput(e.target.value)}
+                                                placeholder="01xxxxxxxxx"
+                                                className="w-full bg-white border border-gray-200 rounded-xl pl-11 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-mono text-gray-900"
+                                                dir="ltr"
+                                                autoFocus
+                                            />
+                                        </div>
                                         <Button
                                             onClick={handleManualLink}
                                             isLoading={linkLoading}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-11"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-[46px] px-6"
                                         >
-                                            {isRTL ? 'ربط' : 'Link'}
+                                            {isRTL ? 'حفظ' : 'Save'}
                                         </Button>
                                     </div>
-                                    {linkError && <p className="text-red-600 text-xs mt-2 font-bold">{linkError}</p>}
+                                    {linkError && <p className="text-red-600 text-xs mt-2 font-bold px-1">{linkError}</p>}
+                                    <p className="text-[10px] text-blue-600/60 mt-3 font-medium italic">
+                                        {isRTL
+                                            ? '* سيتم تحديث حجوزاتك تلقائياً بعد تغيير الرقم'
+                                            : '* Your bookings will refresh automatically after update'}
+                                    </p>
                                 </div>
                             )}
                         </div>
