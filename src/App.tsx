@@ -1,9 +1,11 @@
+
 import './i18n/i18n';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
-import ProtectedRoute from './components/ProtectedRoute';
+import RoleGuard from './components/guards/RoleGuard';
+// RoleGuard will handle route protection based on roles
 import { LoadingSpinner } from './components/ui';
 
 import ScrollToTop from './components/ScrollToTop';
@@ -44,35 +46,35 @@ function App() {
               <Route
                 path="/owner/dashboard"
                 element={
-                  <ProtectedRoute>
+                  <RoleGuard allowedRoles={['Owner']}>
                     <DashboardPage />
-                  </ProtectedRoute>
+                  </RoleGuard>
                 }
               />
               <Route
                 path="/owner/dashboard/chalet/:id"
                 element={
-                  <ProtectedRoute>
+                  <RoleGuard allowedRoles={['Owner']}>
                     <ChaletBookingsPage />
-                  </ProtectedRoute>
+                  </RoleGuard>
                 }
               />
               <Route
                 path="/owner/earnings"
                 element={
-                  <ProtectedRoute>
+                  <RoleGuard allowedRoles={['Owner']}>
                     <EarningsPage />
-                  </ProtectedRoute>
+                  </RoleGuard>
                 }
               />
 
-              {/* Admin Dashboard (Admin only) */}
+              {/* Admin Dashboard (Admin & SuperAdmin) */}
               <Route
                 path="/admin/owner-requests"
                 element={
-                  <ProtectedRoute requireOwner={false}>
+                  <RoleGuard allowedRoles={['Admin', 'SuperAdmin']}>
                     <AdminDashboardPage />
-                  </ProtectedRoute>
+                  </RoleGuard>
                 }
               />
 
@@ -80,9 +82,9 @@ function App() {
               <Route
                 path="/client/dashboard"
                 element={
-                  <ProtectedRoute requireOwner={false}>
+                  <RoleGuard allowedRoles={['Client']}>
                     <ClientDashboardPage />
-                  </ProtectedRoute>
+                  </RoleGuard>
                 }
               />
             </Routes>

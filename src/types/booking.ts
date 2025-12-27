@@ -9,6 +9,7 @@ export interface Booking {
     Status: string;
     BookingReference?: string;
     TotalPrice?: number;
+    DepositAmount?: number;
     Chalet?: Chalet;
     CreatedAt?: string;
     PlatformCommissionAmount?: number;

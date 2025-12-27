@@ -11,6 +11,7 @@ interface DatePickerProps {
     placeholder?: string;
     label?: string;
     minDate?: Date;
+    maxDate?: Date; // Maximum selectable date
     rangeFrom?: Date;
     rangeTo?: Date;
     isRTL?: boolean;
@@ -23,6 +24,7 @@ const DatePicker = ({
     placeholder = 'DD/MM/YYYY',
     label,
     minDate,
+    maxDate,
     rangeFrom,
     rangeTo,
     isRTL = false,
@@ -99,7 +101,15 @@ const DatePicker = ({
                         mode="single"
                         selected={selectedDate}
                         onSelect={handleDaySelect}
-                        disabled={minDate ? { before: minDate } : undefined}
+                        disabled={
+                            minDate && maxDate
+                                ? [{ before: minDate }, { after: maxDate }]
+                                : minDate
+                                    ? { before: minDate }
+                                    : maxDate
+                                        ? { after: maxDate }
+                                        : undefined
+                        }
                         locale={isRTL ? arSA : enUS}
                         dir={isRTL ? 'rtl' : 'ltr'}
                         showOutsideDays

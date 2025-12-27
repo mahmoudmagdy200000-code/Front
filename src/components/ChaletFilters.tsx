@@ -7,9 +7,10 @@ interface ChaletFiltersProps {
     currentMin?: number;
     currentMax?: number;
     currentVillage?: string;
+    autoOpenFilter?: 'price' | 'village' | null; // Auto-open specific filter
 }
 
-const ChaletFilters: React.FC<ChaletFiltersProps> = ({ onFilterChange, currentMin, currentMax, currentVillage }) => {
+const ChaletFilters: React.FC<ChaletFiltersProps> = ({ onFilterChange, currentMin, currentMax, currentVillage, autoOpenFilter }) => {
     const { i18n } = useTranslation();
     const isRTL = i18n.language === 'ar';
 
@@ -17,6 +18,33 @@ const ChaletFilters: React.FC<ChaletFiltersProps> = ({ onFilterChange, currentMi
     const [max, setMax] = useState<string>(currentMax?.toString() || '');
     const [village, setVillage] = useState<string>(currentVillage || '');
     const [isOpen, setIsOpen] = useState(false);
+
+    // Auto-open filter if specified
+    useEffect(() => {
+        if (autoOpenFilter) {
+            setIsOpen(true);
+            // Scroll to filters section smoothly
+            setTimeout(() => {
+                const filterElement = document.querySelector('[data-filter-section]');
+                if (filterElement) {
+                    filterElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        }
+    }, [autoOpenFilter]);
+
+    // Clean up openFilter param after use (only on mount)
+    useEffect(() => {
+        if (autoOpenFilter) {
+            // Remove the openFilter param after a short delay to allow the filter to open
+            const timer = setTimeout(() => {
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.delete('openFilter');
+                window.history.replaceState({}, '', currentUrl.toString());
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, []); // Empty deps - only run once on mount
 
     // Sync with props if they change externally
     useEffect(() => {
@@ -43,7 +71,7 @@ const ChaletFilters: React.FC<ChaletFiltersProps> = ({ onFilterChange, currentMi
     const hasActiveFilters = !!(min || max || village);
 
     return (
-        <div className="w-full max-w-5xl mx-auto mb-6">
+        <div className="w-full max-w-5xl mx-auto mb-6" data-filter-section>
             <div className={`bg-white rounded-[1.5rem] shadow-xl shadow-blue-900/5 border border-blue-50/50 transition-all duration-500 overflow-hidden ${isOpen ? 'ring-2 ring-blue-500/20' : ''}`}>
 
                 {/* Header / Toggle Button (Mobile & Desktop) */}

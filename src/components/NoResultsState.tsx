@@ -4,6 +4,8 @@ interface NoResultsStateProps {
     onResetFilters: () => void;
     onClearPrice?: () => void;
     onClearVillage?: () => void;
+    onOpenPriceFilter?: () => void;  // New: Open price filter
+    onOpenVillageFilter?: () => void; // New: Open village filter
     activeFilters: {
         hasDates: boolean;
         hasPrice: boolean;
@@ -16,6 +18,8 @@ const NoResultsState = ({
     onResetFilters,
     onClearPrice,
     onClearVillage,
+    onOpenPriceFilter,
+    onOpenVillageFilter,
     activeFilters,
     onScrollToSearch
 }: NoResultsStateProps) => {
@@ -72,12 +76,22 @@ const NoResultsState = ({
                         </div>
                         <h4 className="font-bold text-slate-800 mb-2">{isRTL ? 'توسيع الميزانية' : 'Widen Budget'}</h4>
                         <p className="text-xs text-slate-400 mb-4">{isRTL ? 'عرض الشاليهات بكافة الأسعار' : 'Show chalets at all prices'}</p>
-                        <button
-                            onClick={onClearPrice}
-                            className="text-sm font-bold text-green-600 hover:text-green-700 underline decoration-2 underline-offset-4"
-                        >
-                            {isRTL ? 'إزالة فلتر السعر' : 'Clear price filter'}
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={onClearPrice}
+                                className="flex-1 text-xs font-bold text-green-600 hover:text-green-700 underline decoration-2 underline-offset-4"
+                            >
+                                {isRTL ? 'إزالة الفلتر' : 'Clear filter'}
+                            </button>
+                            {onOpenPriceFilter && (
+                                <button
+                                    onClick={onOpenPriceFilter}
+                                    className="flex-1 text-xs font-bold text-blue-600 hover:text-blue-700 underline decoration-2 underline-offset-4"
+                                >
+                                    {isRTL ? 'تعديل السعر' : 'Adjust price'}
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
 
@@ -91,12 +105,22 @@ const NoResultsState = ({
                         </div>
                         <h4 className="font-bold text-slate-800 mb-2">{isRTL ? 'البحث بكل القرى' : 'Try all Locations'}</h4>
                         <p className="text-xs text-slate-400 mb-4">{isRTL ? 'ابحث في كل قرى رأس سدر' : 'Search in all Ras Sedr villages'}</p>
-                        <button
-                            onClick={onClearVillage}
-                            className="text-sm font-bold text-purple-600 hover:text-purple-700 underline decoration-2 underline-offset-4"
-                        >
-                            {isRTL ? 'عرض كل المواقع' : 'Show all locations'}
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={onClearVillage}
+                                className="flex-1 text-xs font-bold text-purple-600 hover:text-purple-700 underline decoration-2 underline-offset-4"
+                            >
+                                {isRTL ? 'عرض الكل' : 'Show all'}
+                            </button>
+                            {onOpenVillageFilter && (
+                                <button
+                                    onClick={onOpenVillageFilter}
+                                    className="flex-1 text-xs font-bold text-blue-600 hover:text-blue-700 underline decoration-2 underline-offset-4"
+                                >
+                                    {isRTL ? 'تغيير القرية' : 'Change village'}
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>

@@ -152,6 +152,7 @@ const SearchForm = ({
                         label={isRTL ? 'تاريخ الوصول' : 'Check-in'}
                         placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
                         minDate={new Date()}
+                        maxDate={checkOutDate ? new Date(checkOutDate.getTime() - 24 * 60 * 60 * 1000) : undefined}
                         rangeFrom={checkInDate}
                         rangeTo={checkOutDate}
                         isRTL={isRTL}

@@ -173,125 +173,127 @@ const HomePage = () => {
                 </div>
 
                 {/* Minimal Owner CTA Section - Before Footer */}
-                <div className="bg-white border-t border-gray-200 px-6 py-16">
-                    <div className="container mx-auto">
-                        <div className="max-w-xl mx-auto text-center space-y-6">
-                            <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
-                                {isRTL ? 'هل تمتلك شاليه في رأس سدر؟' : 'Own a chalet in Ras Sedr?'}
-                            </h3>
-                            <p className="text-gray-600 text-lg">
-                                {isRTL
-                                    ? 'حوّل شاليهك لمصدر دخل ثابت معنا'
-                                    : 'Turn your chalet into a steady income source with us'}
-                            </p>
+                {role !== 'Admin' && role !== 'SuperAdmin' && (
+                    <div className="bg-white border-t border-gray-200 px-6 py-16">
+                        <div className="container mx-auto">
+                            <div className="max-w-xl mx-auto text-center space-y-6">
+                                <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
+                                    {isRTL ? 'هل تمتلك شاليه في رأس سدر؟' : 'Own a chalet in Ras Sedr?'}
+                                </h3>
+                                <p className="text-gray-600 text-lg">
+                                    {isRTL
+                                        ? 'حوّل شاليهك لمصدر دخل ثابت معنا'
+                                        : 'Turn your chalet into a steady income source with us'}
+                                </p>
 
-                            {/* Success Message */}
-                            {successMessage && (
-                                <div className="bg-green-50 text-green-700 p-4 rounded-xl text-sm font-medium border border-green-200 flex items-center justify-center gap-2">
-                                    <CheckCircle2 className="w-5 h-5" />
-                                    {successMessage}
-                                </div>
-                            )}
+                                {/* Success Message */}
+                                {successMessage && (
+                                    <div className="bg-green-50 text-green-700 p-4 rounded-xl text-sm font-medium border border-green-200 flex items-center justify-center gap-2">
+                                        <CheckCircle2 className="w-5 h-5" />
+                                        {successMessage}
+                                    </div>
+                                )}
 
-                            {/* Already Owner/Admin */}
-                            {(role === 'Owner' || role === 'Admin') && (
-                                <div className="bg-blue-50 text-blue-700 p-4 rounded-xl text-sm font-medium border border-blue-200 flex items-center justify-center gap-2">
-                                    <CheckCircle2 className="w-5 h-5" />
-                                    {isRTL ? 'أنت مسجل كمالك بالفعل!' : "You're already registered as an owner!"}
-                                </div>
-                            )}
+                                {/* Already Owner */}
+                                {role === 'Owner' && (
+                                    <div className="bg-blue-50 text-blue-700 p-4 rounded-xl text-sm font-medium border border-blue-200 flex items-center justify-center gap-2">
+                                        <CheckCircle2 className="w-5 h-5" />
+                                        {isRTL ? 'أنت مسجل كمالك بالفعل!' : "You're already registered as an owner!"}
+                                    </div>
+                                )}
 
-                            {/* Pending Request Status */}
-                            {pendingRequest && (
-                                <div className={`p-4 rounded-xl text-sm font-medium border flex items-center justify-center gap-2 ${pendingRequest.Status === 'Pending'
-                                    ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                    : pendingRequest.Status === 'Approved'
-                                        ? 'bg-green-50 text-green-700 border-green-200'
-                                        : 'bg-red-50 text-red-700 border-red-200'
-                                    }`}>
-                                    {pendingRequest.Status === 'Pending' && <Clock className="w-5 h-5" />}
-                                    {pendingRequest.Status === 'Approved' && <CheckCircle2 className="w-5 h-5" />}
-                                    {pendingRequest.Status === 'Rejected' && <AlertCircle className="w-5 h-5" />}
-                                    {pendingRequest.Status === 'Pending' && (isRTL ? 'طلبك قيد المراجعة، سيتم التواصل معك قريباً' : 'Your request is under review')}
-                                    {pendingRequest.Status === 'Approved' && (isRTL ? 'تم قبول طلبك!' : 'Your request was approved!')}
-                                    {pendingRequest.Status === 'Rejected' && (isRTL ? 'تم رفض الطلب' : 'Request was rejected')}
-                                </div>
-                            )}
+                                {/* Pending Request Status */}
+                                {pendingRequest && (
+                                    <div className={`p-4 rounded-xl text-sm font-medium border flex items-center justify-center gap-2 ${pendingRequest.Status === 'Pending'
+                                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                        : pendingRequest.Status === 'Approved'
+                                            ? 'bg-green-50 text-green-700 border-green-200'
+                                            : 'bg-red-50 text-red-700 border-red-200'
+                                        }`}>
+                                        {pendingRequest.Status === 'Pending' && <Clock className="w-5 h-5" />}
+                                        {pendingRequest.Status === 'Approved' && <CheckCircle2 className="w-5 h-5" />}
+                                        {pendingRequest.Status === 'Rejected' && <AlertCircle className="w-5 h-5" />}
+                                        {pendingRequest.Status === 'Pending' && (isRTL ? 'طلبك قيد المراجعة، سيتم التواصل معك قريباً' : 'Your request is under review')}
+                                        {pendingRequest.Status === 'Approved' && (isRTL ? 'تم قبول طلبك!' : 'Your request was approved!')}
+                                        {pendingRequest.Status === 'Rejected' && (isRTL ? 'تم رفض الطلب' : 'Request was rejected')}
+                                    </div>
+                                )}
 
-                            {/* Phone Form */}
-                            {showPhoneForm && !pendingRequest && role !== 'Owner' && role !== 'Admin' && (
-                                <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-sm font-semibold text-gray-700">
-                                            {isRTL ? 'رقم الهاتف للتواصل' : 'Contact Phone Number'}
-                                        </label>
-                                        <button
-                                            onClick={() => { setShowPhoneForm(false); setRequestError(null); }}
-                                            className="text-gray-400 hover:text-gray-600"
+                                {/* Phone Form */}
+                                {showPhoneForm && !pendingRequest && role !== 'Owner' && (
+                                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-sm font-semibold text-gray-700">
+                                                {isRTL ? 'رقم الهاتف للتواصل' : 'Contact Phone Number'}
+                                            </label>
+                                            <button
+                                                onClick={() => { setShowPhoneForm(false); setRequestError(null); }}
+                                                className="text-gray-400 hover:text-gray-600"
+                                            >
+                                                <X className="w-5 h-5" />
+                                            </button>
+                                        </div>
+
+                                        <div className="relative">
+                                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                type="tel"
+                                                value={contactPhone}
+                                                onChange={(e) => setContactPhone(e.target.value)}
+                                                placeholder="01xxxxxxxxx"
+                                                className="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                                dir="ltr"
+                                            />
+                                        </div>
+
+                                        {requestError && (
+                                            <p className="text-red-600 text-sm flex items-center gap-1">
+                                                <AlertCircle className="w-4 h-4" />
+                                                {requestError}
+                                            </p>
+                                        )}
+
+                                        <Button
+                                            onClick={handleSubmitRequest}
+                                            isLoading={requestLoading}
+                                            className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold"
                                         >
-                                            <X className="w-5 h-5" />
-                                        </button>
-                                    </div>
+                                            {isRTL ? 'إرسال الطلب' : 'Submit Request'}
+                                        </Button>
 
-                                    <div className="relative">
-                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                        <input
-                                            type="tel"
-                                            value={contactPhone}
-                                            onChange={(e) => setContactPhone(e.target.value)}
-                                            placeholder="01xxxxxxxxx"
-                                            className="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                                            dir="ltr"
-                                        />
-                                    </div>
-
-                                    {requestError && (
-                                        <p className="text-red-600 text-sm flex items-center gap-1">
-                                            <AlertCircle className="w-4 h-4" />
-                                            {requestError}
+                                        <p className="text-xs text-gray-500">
+                                            {isRTL
+                                                ? 'سيتم التواصل معك خلال 24 ساعة للموافقة على طلبك'
+                                                : 'We will contact you within 24 hours to approve your request'}
                                         </p>
-                                    )}
+                                    </div>
+                                )}
 
+                                {/* Main CTA Button */}
+                                {!showPhoneForm && !pendingRequest && role !== 'Owner' && (
                                     <Button
-                                        onClick={handleSubmitRequest}
-                                        isLoading={requestLoading}
-                                        className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                                        onClick={handleOwnerButtonClick}
+                                        className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
                                     >
-                                        {isRTL ? 'إرسال الطلب' : 'Submit Request'}
+                                        {isRTL ? 'سجّل كمالك' : 'Register as Owner'}
+                                        <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
                                     </Button>
+                                )}
 
-                                    <p className="text-xs text-gray-500">
-                                        {isRTL
-                                            ? 'سيتم التواصل معك خلال 24 ساعة للموافقة على طلبك'
-                                            : 'We will contact you within 24 hours to approve your request'}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Main CTA Button */}
-                            {!showPhoneForm && !pendingRequest && role !== 'Owner' && role !== 'Admin' && (
-                                <Button
-                                    onClick={handleOwnerButtonClick}
-                                    className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
-                                >
-                                    {isRTL ? 'سجّل كمالك' : 'Register as Owner'}
-                                    <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-                                </Button>
-                            )}
-
-                            {/* Go to Dashboard Button for Owners */}
-                            {(role === 'Owner' || role === 'Admin') && (
-                                <Button
-                                    onClick={() => navigate('/owner/dashboard')}
-                                    className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold inline-flex items-center gap-2"
-                                >
-                                    {isRTL ? 'اذهب للوحة التحكم' : 'Go to Dashboard'}
-                                    <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-                                </Button>
-                            )}
+                                {/* Go to Dashboard Button for Owners */}
+                                {role === 'Owner' && (
+                                    <Button
+                                        onClick={() => navigate('/owner/dashboard')}
+                                        className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold inline-flex items-center gap-2"
+                                    >
+                                        {isRTL ? 'اذهب للوحة التحكم' : 'Go to Dashboard'}
+                                        <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </main>
             <Footer />
         </div>

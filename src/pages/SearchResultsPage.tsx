@@ -43,6 +43,9 @@ const SearchResultsPage = () => {
     const currentMinPrice = searchParams.get('minPrice') ? parseInt(searchParams.get('minPrice')!) : undefined;
     const currentVillage = searchParams.get('village') || undefined;
 
+    // Auto-open filter detection
+    const autoOpenFilter = searchParams.get('openFilter') as 'price' | 'village' | null;
+
     // Determine page size based on screen width
     const getPageSize = () => {
         const width = window.innerWidth;
@@ -138,6 +141,26 @@ const SearchResultsPage = () => {
         // Implement header search logic if needed
     };
 
+    const handleOpenPriceFilter = () => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('openFilter', 'price');
+        setSearchParams(newParams);
+        // Scroll to filters
+        setTimeout(() => {
+            filterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    };
+
+    const handleOpenVillageFilter = () => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('openFilter', 'village');
+        setSearchParams(newParams);
+        // Scroll to filters
+        setTimeout(() => {
+            filterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
             <HomeHeader searchQuery="" setSearchQuery={handleSearchQuery} />
@@ -162,6 +185,7 @@ const SearchResultsPage = () => {
                                     currentMin={currentMinPrice}
                                     currentMax={currentMaxPrice}
                                     currentVillage={currentVillage}
+                                    autoOpenFilter={autoOpenFilter}
                                     onFilterChange={handleFilterChange}
                                 />
                             </Suspense>
@@ -229,6 +253,8 @@ const SearchResultsPage = () => {
                                         newParams.delete('village');
                                         setSearchParams(newParams);
                                     }}
+                                    onOpenPriceFilter={handleOpenPriceFilter}
+                                    onOpenVillageFilter={handleOpenVillageFilter}
                                     onScrollToSearch={() => {
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                         // Optional: focus on search form if needed
