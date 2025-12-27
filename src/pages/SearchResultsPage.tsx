@@ -346,8 +346,8 @@ const SearchResultsPage = () => {
 
                 {/* Date Filter Modal */}
                 {showDateModal && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-300">
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                        <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl border border-gray-100 overflow-visible animate-in fade-in zoom-in duration-300 my-8">
                             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                                 <h3 className="text-xl font-bold text-gray-900">
                                     {isRTL ? 'تعديل تواريخ الحجز' : 'Modify Booking Dates'}
@@ -362,8 +362,8 @@ const SearchResultsPage = () => {
                                 </button>
                             </div>
 
-                            <div className="p-8 space-y-6">
-                                <div className="space-y-2">
+                            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 min-h-[300px]">
+                                <div className="space-y-2 relative">
                                     <DatePicker
                                         label={isRTL ? 'تاريخ الوصول' : 'Check-in'}
                                         value={modalCheckIn}
@@ -373,7 +373,7 @@ const SearchResultsPage = () => {
                                         isRTL={isRTL}
                                     />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 relative">
                                     <DatePicker
                                         label={isRTL ? 'تاريخ المغادرة' : 'Check-out'}
                                         value={modalCheckOut}
