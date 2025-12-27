@@ -12,6 +12,7 @@ export interface AuthContextType {
     phoneNumber: string | null;
     login: (emailOrUsername: string, password: string) => Promise<void>;
     googleLogin: (idToken: string) => Promise<void>;
+    updatePhoneNumber: (phone: string) => void;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -99,6 +100,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (response.PhoneNumber) localStorage.setItem('phoneNumber', response.PhoneNumber);
     };
 
+    const updatePhoneNumber = (phone: string) => {
+        setPhoneNumber(phone);
+        localStorage.setItem('phoneNumber', phone);
+    };
+
     const logout = () => {
         setToken(null);
         setUserId(null);
@@ -131,7 +137,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ token, userId, username, email, fullName, role, phoneNumber, login, googleLogin, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ token, userId, username, email, fullName, role, phoneNumber, login, googleLogin, updatePhoneNumber, logout, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );

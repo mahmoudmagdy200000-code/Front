@@ -64,3 +64,10 @@ export const googleLoginApi = async (idToken: string): Promise<LoginResponse> =>
     });
     return response.data;
 };
+
+export const linkPhoneNumberApi = async (phoneNumber: string): Promise<{ message: string, phoneNumber: string }> => {
+    const response = await axiosInstance.put('/auth/link-phone', {
+        phoneNumber
+    });
+    return response.data;
+};
