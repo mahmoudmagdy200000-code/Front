@@ -370,6 +370,7 @@ const SearchResultsPage = () => {
                                         onChange={(val) => setModalCheckIn(val)}
                                         placeholder="DD/MM/YYYY"
                                         minDate={new Date()}
+                                        defaultMonth={modalCheckOut ? new Date(parseDateFromDDMMYYYY(modalCheckOut)) : undefined}
                                         isRTL={isRTL}
                                     />
                                 </div>
@@ -380,6 +381,7 @@ const SearchResultsPage = () => {
                                         onChange={(val) => setModalCheckOut(val)}
                                         placeholder="DD/MM/YYYY"
                                         minDate={modalCheckIn && parseDateFromDDMMYYYY(modalCheckIn) ? new Date(new Date(parseDateFromDDMMYYYY(modalCheckIn)).getTime() + 86400000) : new Date()}
+                                        defaultMonth={modalCheckIn ? new Date(parseDateFromDDMMYYYY(modalCheckIn)) : undefined}
                                         isRTL={isRTL}
                                     />
                                 </div>

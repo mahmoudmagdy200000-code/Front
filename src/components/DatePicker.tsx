@@ -16,6 +16,7 @@ interface DatePickerProps {
     rangeTo?: Date;
     isRTL?: boolean;
     position?: 'top' | 'bottom';
+    defaultMonth?: Date; // Opens calendar at this month if no date selected
 }
 
 const DatePicker = ({
@@ -29,6 +30,7 @@ const DatePicker = ({
     rangeTo,
     isRTL = false,
     position = 'bottom',
+    defaultMonth,
 }: DatePickerProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -94,10 +96,10 @@ const DatePicker = ({
             {/* Calendar Popover */}
             {isOpen && (
                 <div className={`absolute ${isRTL ? 'right-0' : 'left-0'} ${position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
-                    } bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-50 p-3 animate-in fade-in zoom-in-95 duration-200`}
-                    style={{ minWidth: '320px' }}
+                    } bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-50 p-3 animate-in fade-in zoom-in-95 duration-200 w-max max-w-[90vw]`}
                 >
                     <DayPicker
+                        defaultMonth={defaultMonth || selectedDate || undefined}
                         mode="single"
                         selected={selectedDate}
                         onSelect={handleDaySelect}

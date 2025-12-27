@@ -350,6 +350,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                                 placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
                                 minDate={new Date()}
                                 isRTL={isRTL}
+                                defaultMonth={checkOutDate ? new Date(parseDateFromDDMMYYYY(checkOutDate)) : undefined}
                             />
                             {errors.checkIn && (
                                 <p className="text-sm text-red-600 mt-1 font-medium">{errors.checkIn}</p>
@@ -376,6 +377,7 @@ const BookingForm = ({ chaletId, pricePerNight, initialCheckIn = '', initialChec
                                 })()}
                                 isRTL={isRTL}
                                 position="top"
+                                defaultMonth={checkInDate ? new Date(parseDateFromDDMMYYYY(checkInDate)) : undefined}
                             />
                             {errors.checkOut && (
                                 <p className="text-sm text-red-600 mt-1 font-medium">{errors.checkOut}</p>

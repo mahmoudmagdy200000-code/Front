@@ -84,6 +84,7 @@ const Header = () => {
                                     placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
                                     minDate={new Date()}
                                     isRTL={isRTL}
+                                    defaultMonth={checkOut ? new Date(parseDateFromDDMMYYYY(checkOut)) : undefined}
                                 />
                             </div>
                             <div className="flex-1 relative group date-picker-dark-mode">
@@ -96,6 +97,7 @@ const Header = () => {
                                     placeholder={isRTL ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
                                     minDate={new Date()}
                                     isRTL={isRTL}
+                                    defaultMonth={checkIn ? new Date(parseDateFromDDMMYYYY(checkIn)) : undefined}
                                 />
                             </div>
                             <button

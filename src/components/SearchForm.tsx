@@ -156,6 +156,7 @@ const SearchForm = ({
                         rangeFrom={checkInDate}
                         rangeTo={checkOutDate}
                         isRTL={isRTL}
+                        defaultMonth={checkOutDate}
                     />
                     {errors.checkIn && (
                         <p className="text-sm text-red-600 mt-1 font-medium">{errors.checkIn}</p>
@@ -176,6 +177,7 @@ const SearchForm = ({
                         rangeFrom={checkInDate}
                         rangeTo={checkOutDate}
                         isRTL={isRTL}
+                        defaultMonth={checkInDate}
                     />
                     {errors.checkOut && (
                         <p className="text-sm text-red-600 mt-1 font-medium">{errors.checkOut}</p>
