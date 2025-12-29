@@ -186,6 +186,22 @@ const OwnerLoginPage = () => {
                                 />
                             </div>
                         </div>
+
+                        {/* Google Password Reset Link */}
+                        <div className="mt-3 text-center">
+                            <a
+                                href="https://accounts.google.com/signin/recovery"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold text-gray-400 hover:text-[#4A90E2] transition-colors duration-200 group/g-reset"
+                                aria-label={isRTL ? 'إعادة تعيين كلمة مرور جوجل' : 'Reset Google Password'}
+                            >
+                                <Lock className="w-3 h-3 opacity-70 group-hover/g-reset:opacity-100" />
+                                <span>
+                                    {isRTL ? 'نسيت كلمة مرور جوجل؟ استعدها بآمان' : 'Forgot Google password? Reset it securely'}
+                                </span>
+                            </a>
+                        </div>
                     </form>
 
                     {/* Bottom Links */}
