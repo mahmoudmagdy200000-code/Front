@@ -71,3 +71,8 @@ export const linkPhoneNumberApi = async (phoneNumber: string): Promise<{ message
     });
     return response.data;
 };
+
+export const getMeApi = async (): Promise<LoginResponse> => {
+    const response = await axiosInstance.get<LoginResponse>('/auth/me');
+    return response.data;
+};

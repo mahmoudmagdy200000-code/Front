@@ -13,6 +13,7 @@ export interface AuthContextType {
     login: (emailOrUsername: string, password: string) => Promise<void>;
     googleLogin: (idToken: string) => Promise<void>;
     updatePhoneNumber: (phone: string) => void;
+    refreshProfile: () => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -20,6 +21,7 @@ export interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    // ... state declarations ...
     const [token, setToken] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
@@ -28,6 +30,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [role, setRole] = useState<string | null>(null);
     const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+
+    // Helper to update state and localStorage
+    const updateAuthState = (data: any) => {
+        setToken(data.Token);
+        setUserId(data.UserId);
+        setUsername(data.Username);
+        setEmail(data.Email);
+        setFullName(data.FullName);
+        setRole(data.Role);
+        setPhoneNumber(data.PhoneNumber || null);
+
+        localStorage.setItem('token', data.Token);
+        localStorage.setItem('userId', data.UserId);
+        localStorage.setItem('username', data.Username);
+        localStorage.setItem('email', data.Email);
+        localStorage.setItem('fullName', data.FullName);
+        localStorage.setItem('role', data.Role);
+        if (data.PhoneNumber) localStorage.setItem('phoneNumber', data.PhoneNumber);
+    };
+
+    // ... useEffect for initial load ...
 
     useEffect(() => {
         try {
@@ -62,42 +85,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (emailOrUsername: string, password: string) => {
         const response = await loginApi(emailOrUsername, password);
-
-        setToken(response.Token);
-        setUserId(response.UserId);
-        setUsername(response.Username);
-        setEmail(response.Email);
-        setFullName(response.FullName);
-        setRole(response.Role);
-        setPhoneNumber(response.PhoneNumber || null);
-
-        localStorage.setItem('token', response.Token);
-        localStorage.setItem('userId', response.UserId);
-        localStorage.setItem('username', response.Username);
-        localStorage.setItem('email', response.Email);
-        localStorage.setItem('fullName', response.FullName);
-        localStorage.setItem('role', response.Role);
-        if (response.PhoneNumber) localStorage.setItem('phoneNumber', response.PhoneNumber);
+        updateAuthState(response);
     };
 
     const googleLogin = async (idToken: string) => {
         const response = await googleLoginApi(idToken);
+        updateAuthState(response);
+    };
 
-        setToken(response.Token);
-        setUserId(response.UserId);
-        setUsername(response.Username);
-        setEmail(response.Email);
-        setFullName(response.FullName);
-        setRole(response.Role);
-        setPhoneNumber(response.PhoneNumber || null);
-
-        localStorage.setItem('token', response.Token);
-        localStorage.setItem('userId', response.UserId);
-        localStorage.setItem('username', response.Username);
-        localStorage.setItem('email', response.Email);
-        localStorage.setItem('fullName', response.FullName);
-        localStorage.setItem('role', response.Role);
-        if (response.PhoneNumber) localStorage.setItem('phoneNumber', response.PhoneNumber);
+    // New function to refresh profile from server
+    const refreshProfile = async () => {
+        if (!token) return; // Can't refresh if not logged in
+        try {
+            // We need to import getMeApi inside here or at top
+            const { getMeApi } = await import('../api/auth');
+            const response = await getMeApi();
+            updateAuthState(response);
+            console.log('User profile refreshed:', response);
+        } catch (error) {
+            console.error('Failed to refresh profile:', error);
+            // Don't logout on error, just log it. Maybe token expired, but axios interceptor usually handles 401.
+        }
     };
 
     const updatePhoneNumber = (phone: string) => {
@@ -137,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ token, userId, username, email, fullName, role, phoneNumber, login, googleLogin, updatePhoneNumber, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ token, userId, username, email, fullName, role, phoneNumber, login, googleLogin, updatePhoneNumber, refreshProfile, logout, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );

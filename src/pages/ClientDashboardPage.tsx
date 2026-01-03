@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button, LoadingSpinner } from '../components/ui';
 import { searchBookings } from '../api/bookings';
 import { linkPhoneNumberApi } from '../api/auth';
+import { requestOwnerUpgrade, getMyOwnerRequest, type OwnerRequest } from '../api/admin';
 import type { Booking } from '../types/booking';
 import HomeHeader from '../components/HomeHeader';
 import Footer from '../components/Footer';
@@ -25,12 +26,18 @@ import {
 const ClientDashboardPage = () => {
     const { i18n } = useTranslation();
     const navigate = useNavigate();
-    const { isAuthenticated, role, fullName, email, phoneNumber, updatePhoneNumber } = useAuth();
+    const { isAuthenticated, role, fullName, email, phoneNumber, updatePhoneNumber, refreshProfile } = useAuth();
     const isRTL = i18n.language === 'ar';
 
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Owner Request State
+    const [requestLoading, setRequestLoading] = useState(false);
+    const [requestError, setRequestError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [pendingRequest, setPendingRequest] = useState<OwnerRequest | null>(null);
 
     // Linking phone number state
     const [showLinkPhone, setShowLinkPhone] = useState(false);
@@ -54,12 +61,56 @@ const ClientDashboardPage = () => {
             return;
         }
 
+        // Refresh profile on mount to check for role updates
+        refreshProfile();
+
         if (phoneNumber) {
             fetchBookings(phoneNumber);
         } else {
             setLoading(false);
         }
+
+        fetchPendingRequest();
     }, [isAuthenticated, phoneNumber, role, navigate]);
+
+    const fetchPendingRequest = async () => {
+        try {
+            const data = await getMyOwnerRequest();
+            setPendingRequest(data.request);
+        } catch {
+            // No pending request
+        }
+    };
+
+    const handleUpgradeRequest = async () => {
+        const phoneToUse = phoneNumber;
+
+        if (!phoneToUse) {
+            setRequestError(isRTL ? 'يرجى ربط رقم الهاتف أولاً' : 'Please link your phone number first');
+            return;
+        }
+
+        try {
+            setRequestLoading(true);
+            setRequestError(null);
+            const result = await requestOwnerUpgrade(phoneToUse);
+            setPendingRequest(result);
+            setSuccessMessage(isRTL
+                ? 'تم إرسال طلبك بنجاح! سيتم التواصل معك قريباً.'
+                : 'Request submitted! We will contact you soon.');
+
+            // Wait a bit then refresh profile just in case it was auto-approved (unlikely but good practice)
+            setTimeout(() => refreshProfile(), 2000);
+
+            setTimeout(() => setSuccessMessage(null), 8000);
+        } catch (err: any) {
+            setRequestError(err.message || (isRTL ? 'حدث خطأ، حاول مرة أخرى' : 'Failed, please try again'));
+        } finally {
+            setRequestLoading(false);
+        }
+    };
+
+    // ... existing helper functions (fetchBookings, handleLinkSuccess, etc) ...
 
     const fetchBookings = async (phone: string) => {
         try {
@@ -274,6 +325,72 @@ const ClientDashboardPage = () => {
                                             : '* Your bookings will refresh automatically after update'}
                                     </p>
                                 </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
+
+                {/* BECOME OWNER SECTION */}
+                <section className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-lg overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                        <svg className="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z" />
+                        </svg>
+                    </div>
+
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div className="flex-1 space-y-2 text-center md:text-left">
+                            <h2 className="text-2xl font-black">
+                                {isRTL ? 'هل لديك شاليه في رأس سدر؟' : 'Do you own a chalet?'}
+                            </h2>
+                            <p className="text-blue-100 text-lg">
+                                {isRTL
+                                    ? 'انضم إلينا كمالك وابدأ في تحقيق أرباح من شاليهك اليوم.'
+                                    : 'Join us as an owner and start earning from your chalet today.'}
+                            </p>
+
+                            {successMessage && (
+                                <div className="mt-4 bg-white/20 backdrop-blur-sm p-3 rounded-xl flex items-center justify-center md:justify-start gap-2 text-sm font-bold">
+                                    <CheckCircle2 className="w-5 h-5 text-green-300" />
+                                    {successMessage}
+                                </div>
+                            )}
+
+                            {requestError && (
+                                <div className="mt-4 bg-red-500/20 backdrop-blur-sm p-3 rounded-xl flex items-center justify-center md:justify-start gap-2 text-sm font-bold border border-red-500/30">
+                                    <AlertCircle className="w-5 h-5 text-red-200" />
+                                    {requestError}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex-shrink-0">
+                            {/* Pending Request Status */}
+                            {pendingRequest ? (
+                                <div className={`px-6 py-4 rounded-xl text-sm font-bold border flex items-center gap-3 shadow-sm bg-white text-gray-800`}>
+                                    {pendingRequest.Status === 'Pending' && <Clock className="w-5 h-5 text-amber-500" />}
+                                    {pendingRequest.Status === 'Approved' && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+                                    {pendingRequest.Status === 'Rejected' && <AlertCircle className="w-5 h-5 text-red-500" />}
+
+                                    <div className="flex flex-col">
+                                        <span>
+                                            {pendingRequest.Status === 'Pending' && (isRTL ? 'طلبك قيد المراجعة' : 'Request under review')}
+                                            {pendingRequest.Status === 'Approved' && (isRTL ? 'تم قبول طلبك!' : 'Request approved!')}
+                                            {pendingRequest.Status === 'Rejected' && (isRTL ? 'تم رفض الطلب' : 'Request rejected')}
+                                        </span>
+                                        <span className="text-xs font-normal text-gray-500">
+                                            {isRTL ? 'سيتم الرد خلال 24 ساعة' : 'Response within 24 hours'}
+                                        </span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <Button
+                                    onClick={handleUpgradeRequest}
+                                    isLoading={requestLoading}
+                                    className="h-14 px-8 bg-white text-blue-600 hover:bg-blue-50 rounded-2xl font-black text-lg shadow-xl shadow-blue-900/20"
+                                >
+                                    {isRTL ? 'ترقية حسابي لمالك' : 'Upgrade to Owner'}
+                                </Button>
                             )}
                         </div>
                     </div>
