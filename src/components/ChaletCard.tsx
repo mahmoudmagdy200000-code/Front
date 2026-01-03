@@ -57,7 +57,12 @@ const ChaletCard = ({ chalet, checkIn, checkOut, priority }: ChaletCardProps) =>
                     </div>
                 )}
 
-
+                {/* ID Badge */}
+                <div className={`absolute top-3 left-3 flex gap-2`}>
+                    <span className="backdrop-blur-md bg-black/40 text-white text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-widest border border-white/10 shadow-sm">
+                        ID {chalet.Id}
+                    </span>
+                </div>
             </div>
 
             {/* Content Section */}

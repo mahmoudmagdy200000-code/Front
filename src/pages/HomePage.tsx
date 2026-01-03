@@ -182,6 +182,57 @@ const HomePage = () => {
                     </div>
                 </div>
 
+                {/* Explore All Chalets Catchy Section */}
+                <div className="px-6 py-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white relative overflow-hidden">
+                    {/* Decorative background elements */}
+                    <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-blue-500 rounded-full blur-[100px] opacity-20 animate-pulse"></div>
+                    <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-indigo-500 rounded-full blur-[100px] opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
+
+                    <div className="container mx-auto relative z-10">
+                        <div className="max-w-4xl mx-auto text-center space-y-8">
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+                                {isRTL
+                                    ? 'لم تجد ما تبحث عنه بعد؟'
+                                    : "Haven't found your perfect stay yet?"}
+                                <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-200">
+                                    {isRTL ? 'اكتشف مجموعتنا الكاملة' : 'Explore our complete collection'}
+                                </span>
+                            </h2>
+
+                            <p className="text-blue-100/80 text-lg md:text-xl max-w-2xl mx-auto font-medium">
+                                {isRTL
+                                    ? 'مئات الشاليهات الفاخرة بانتظارك في رأس سدر. من الإطلالات الساحرة على البحر إلى الحدائق الهادئة، اعثر على المكان المثالي لإجازتك القادمة.'
+                                    : 'Hundreds of premium chalets await you in Ras Sedr. From stunning sea views to quiet garden retreats, find the perfect spot for your next summer escape.'}
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                                <Button
+                                    onClick={() => navigate('/chalets')}
+                                    className="group h-16 px-10 rounded-2xl bg-white text-blue-900 hover:bg-blue-50 font-black text-lg transition-all shadow-xl shadow-blue-900/40 flex items-center gap-3 w-full sm:w-auto"
+                                >
+                                    {isRTL ? 'تصفح كل الشاليهات' : 'Browse All Chalets'}
+                                    <ArrowRight className={`w-6 h-6 group-hover:translate-x-1.5 transition-transform ${isRTL ? 'rotate-180 group-hover:-translate-x-1.5' : ''}`} />
+                                </Button>
+
+                                <div className="flex items-center gap-4 text-blue-100/60 font-black uppercase tracking-widest text-xs py-4 px-6 border border-white/10 rounded-2xl bg-white/5 backdrop-blur-sm">
+                                    <div className="flex -space-x-3 rtl:space-x-reverse">
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="w-8 h-8 rounded-full border-2 border-indigo-900 bg-blue-500 overflow-hidden">
+                                                <img
+                                                    src={`https://i.pravatar.cc/100?u=${i}`}
+                                                    alt="user"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <span>500+ {isRTL ? 'عملاء سعداء' : 'Happy Guests'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Minimal Owner CTA Section - Before Footer */}
                 {role !== 'Admin' && role !== 'SuperAdmin' && (
                     <div className="bg-white border-t border-gray-200 px-6 py-16">
