@@ -57,12 +57,7 @@ const ChaletCard = ({ chalet, checkIn, checkOut, priority }: ChaletCardProps) =>
                     </div>
                 )}
 
-                {/* Visual Label (Placeholders for Sea/Garden View if needed) */}
-                <div className="absolute bottom-3 left-3 flex gap-2">
-                    <span className="px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black text-slate-900 uppercase tracking-widest shadow-sm">
-                        {chalet.Id % 2 === 0 ? (isArabic ? 'إطلالة بحر' : 'Sea View') : (isArabic ? 'إطلالة حديقة' : 'Garden View')}
-                    </span>
-                </div>
+
             </div>
 
             {/* Content Section */}
