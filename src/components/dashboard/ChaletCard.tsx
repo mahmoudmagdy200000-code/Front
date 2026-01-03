@@ -55,7 +55,7 @@ const ChaletCard = ({ chalet, onEdit, onDelete }: ChaletCardProps) => {
 
                 {/* ID Badge - Absolute positioned relative to image container */}
                 <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-md text-xs font-bold text-gray-700 shadow-sm z-10 border border-gray-100/50">
-                    #{chalet.Id}
+                    ID {chalet.Id}
                 </div>
             </div>
 

@@ -7,9 +7,11 @@ import LanguageSwitcher from './LanguageSwitcher';
 interface HomeHeaderProps {
     searchQuery: string;
     setSearchQuery: (query: string) => void;
+    onSearch?: (query: string) => void;
 }
 
-const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
+const HomeHeader = ({ searchQuery, setSearchQuery, onSearch }: HomeHeaderProps) => {
+    // ... existing hooks ...
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { isAuthenticated, logout, role, fullName, email } = useAuth();
@@ -99,17 +101,23 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
                         placeholder={isRTL ? "ابحث عن شاليه..." : "Search for a chalet..."}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && onSearch) {
+                                onSearch(searchQuery);
+                            }
+                        }}
                         className={`w-full py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-gray-700 transition-all ${isRTL ? 'pr-12 pl-6' : 'pl-12 pr-6'
                             }`}
                     />
-                    <svg
-                        className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-4' : 'left-4'}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <button
+                        onClick={() => onSearch && onSearch(searchQuery)}
+                        className={`absolute top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-50 text-blue-500 hover:text-blue-600 transition-all cursor-pointer ${isRTL ? 'right-3' : 'left-3'}`}
+                        aria-label="Search"
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
                 </div>
 
                 {/* Desktop Actions */}
@@ -342,17 +350,27 @@ const HomeHeader = ({ searchQuery, setSearchQuery }: HomeHeaderProps) => {
                         placeholder={isRTL ? "ابحث عن شاليه..." : "Search for a chalet..."}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && onSearch) {
+                                onSearch(searchQuery);
+                            }
+                        }}
                         className={`w-full py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-gray-700 transition-all ${isRTL ? 'pr-12 pl-6' : 'pl-12 pr-6'
                             }`}
                     />
-                    <svg
-                        className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-4' : 'left-4'}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <button
+                        onClick={() => onSearch && onSearch(searchQuery)}
+                        className={`absolute top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-50 text-blue-500 hover:text-blue-600 transition-all cursor-pointer ${isRTL ? 'right-3' : 'left-3'}`}
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                        <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 

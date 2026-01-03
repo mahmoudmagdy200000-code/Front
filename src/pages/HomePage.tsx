@@ -114,9 +114,19 @@ const HomePage = () => {
         return title.toLowerCase().includes(searchQuery.toLowerCase());
     }) : [];
 
+    const handleSearch = (query: string) => {
+        if (query.trim()) {
+            navigate(`/chalets?searchTerm=${encodeURIComponent(query.trim())}`);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
-            <HomeHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <HomeHeader
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSearch={handleSearch}
+            />
 
             <main className="flex-grow">
                 {/* Search Form Section */}

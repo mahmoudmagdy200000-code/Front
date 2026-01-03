@@ -68,6 +68,12 @@ const SearchResultsPage = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const [headerSearchQuery, setHeaderSearchQuery] = useState(searchParams.get('searchTerm') || '');
+
+    useEffect(() => {
+        setHeaderSearchQuery(searchParams.get('searchTerm') || '');
+    }, [searchParams]);
+
     useEffect(() => {
         const fetchChalets = async () => {
             try {
@@ -79,8 +85,9 @@ const SearchResultsPage = () => {
                 const adults = searchParams.get('adults') ? parseInt(searchParams.get('adults')!) : undefined;
                 const children = searchParams.get('children') ? parseInt(searchParams.get('children')!) : undefined;
                 const villageName = searchParams.get('village') || undefined;
+                const searchTerm = searchParams.get('searchTerm') || undefined;
 
-                console.log('🔍 [fetchChalets] villageName from URL:', villageName);
+                console.log('🔍 [fetchChalets] villageName:', villageName, 'searchTerm:', searchTerm);
                 const result = await getChalets({
                     checkInDate,
                     checkOutDate,
@@ -89,6 +96,7 @@ const SearchResultsPage = () => {
                     adults,
                     children,
                     villageName,
+                    searchTerm,
                     page: currentPage,
                     pageSize: pageSize,
                     sortBy: sortBy || undefined
@@ -150,8 +158,15 @@ const SearchResultsPage = () => {
         }, 300);
     };
 
-    const handleSearchQuery = (_query: string) => {
-        // Implement header search logic if needed
+    const handleSearch = (query: string) => {
+        const newParams = new URLSearchParams(searchParams);
+        if (query && query.trim()) {
+            newParams.set('searchTerm', query.trim());
+        } else {
+            newParams.delete('searchTerm');
+        }
+        newParams.set('page', '1');
+        setSearchParams(newParams);
     };
 
     const handleOpenPriceFilter = () => {
@@ -218,7 +233,11 @@ const SearchResultsPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
-            <HomeHeader searchQuery="" setSearchQuery={handleSearchQuery} />
+            <HomeHeader
+                searchQuery={headerSearchQuery}
+                setSearchQuery={setHeaderSearchQuery}
+                onSearch={handleSearch}
+            />
 
             <main className="flex-grow">
                 <div className="bg-white border-b border-gray-200 px-6 py-8">
