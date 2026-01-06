@@ -183,17 +183,14 @@ const HomePage = () => {
                 </div>
 
                 {/* Explore All Chalets Catchy Section - High Impact Guest CTA */}
-                <div className="px-6 py-20 bg-slate-950 text-white relative overflow-hidden border-y border-white/5">
+                <div className="px-6 py-16 bg-slate-950 text-white relative overflow-hidden border-y border-white/5">
                     {/* Subtle decorative glow */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-600/10 rounded-full blur-[120px]"></div>
 
                     <div className="container mx-auto relative z-10">
-                        <div className="max-w-4xl mx-auto text-center space-y-8">
+                        <div className="max-w-4xl mx-auto text-center space-y-6">
                             <h2 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tight leading-[1.1]">
-                                {isRTL
-                                    ? 'لم تجد ما تبحث عنه بعد؟'
-                                    : "Haven't found your perfect stay yet?"}
-                                <span className="block mt-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
                                     {isRTL ? 'اكتشف مجموعتنا الكاملة' : 'Explore our complete collection'}
                                 </span>
                             </h2>

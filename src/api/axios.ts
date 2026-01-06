@@ -66,7 +66,8 @@ axiosInstance.interceptors.response.use(
             // Unauthorized - لا تقم بإعادة التوجيه إذا كان الخطأ من صفحة تسجيل الدخول نفسها
             if (!error.config.url.includes('/login')) {
                 localStorage.removeItem('token');
-                window.location.href = '/owner/login'; // Redirect to correct login page
+                // Use hash-based routing for login redirect
+                window.location.href = '/#/owner/login';
             }
         }
 
