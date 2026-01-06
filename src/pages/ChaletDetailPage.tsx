@@ -2,7 +2,9 @@ import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getChaletById } from '../api/chalets';
+import { getChaletReviews } from '../api/reviews';
 import type { Chalet } from '../types/chalet';
+import type { Review } from '../types/review';
 import BookingForm from '../components/BookingForm';
 import AirbnbGallery from '../components/AirbnbGallery';
 const ReviewsList = lazy(() => import('../components/reviews/ReviewsList'));
@@ -15,6 +17,7 @@ const ChaletDetailPage = () => {
     const [searchParams] = useSearchParams();
     const { t, i18n } = useTranslation();
     const [chalet, setChalet] = useState<Chalet | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -27,22 +30,32 @@ const ChaletDetailPage = () => {
     const checkIn = searchParams.get('checkIn') || '';
     const checkOut = searchParams.get('checkOut') || '';
 
+    const fetchChaletData = async () => {
+        if (!id) return;
+        try {
+            setLoading(true);
+            const chaletId = parseInt(id);
+            const [chaletData, reviewsData] = await Promise.all([
+                getChaletById(chaletId),
+                getChaletReviews(chaletId)
+            ]);
+            setChalet(chaletData);
+            setReviews(reviewsData);
+            setError(null);
+        } catch (err) {
+            setError(t('common.error'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchChalet = async () => {
-            if (!id) return;
-            try {
-                setLoading(true);
-                const data = await getChaletById(parseInt(id));
-                setChalet(data);
-                setError(null);
-            } catch (err) {
-                setError(t('common.error'));
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchChalet();
+        fetchChaletData();
     }, [id, t]);
+
+    const averageRating = reviews.length > 0
+        ? (reviews.reduce((acc: number, r: Review) => acc + r.Rating, 0) / reviews.length).toFixed(1)
+        : 0;
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
@@ -119,10 +132,10 @@ const ChaletDetailPage = () => {
 
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-600 font-medium">
                                     <div className="flex items-center gap-1">
-                                        <span className="text-slate-900 font-bold">★ 4.9</span>
+                                        <span className="text-slate-900 font-bold">★ {averageRating || 'New'}</span>
                                         <span className="text-slate-400">·</span>
                                         <button className="underline font-bold decoration-2 underline-offset-4 hover:text-blue-600 transition-colors">
-                                            {isRTL ? '12 تقييم' : '12 reviews'}
+                                            {reviews.length} {isRTL ? 'تقييم' : 'reviews'}
                                         </button>
                                     </div>
                                     <span className="text-slate-400 hidden sm:inline">·</span>
@@ -207,9 +220,9 @@ const ChaletDetailPage = () => {
                             {/* Reviews */}
                             <section className="pt-4">
                                 <div className="flex items-center gap-2 mb-8">
-                                    <span className="text-2xl font-bold text-slate-900">★ 4.9</span>
+                                    <span className="text-2xl font-bold text-slate-900">★ {averageRating || 'New'}</span>
                                     <span className="text-2xl text-slate-200">·</span>
-                                    <span className="text-2xl font-bold text-slate-900">12 {isRTL ? 'تقييم' : 'reviews'}</span>
+                                    <span className="text-2xl font-bold text-slate-900">{reviews.length} {isRTL ? 'تقييم' : 'reviews'}</span>
                                 </div>
                                 <Suspense fallback={<div className="h-20 animate-pulse bg-slate-50 rounded-xl"></div>}>
                                     <ReviewsList chaletId={chalet.Id} />
@@ -262,7 +275,7 @@ const ChaletDetailPage = () => {
                         <div className="pb-12 pt-4" ref={bookingRef}>
                             <div className="mb-8 text-center px-4">
                                 <h3 className="text-2xl font-black text-slate-900">{isRTL ? 'أكد حجزك' : 'Book Your Stay'}</h3>
-                                <p className="text-slate-500 text-sm mt-1">{villageName} · ★ 4.9</p>
+                                <p className="text-slate-500 text-sm mt-1">{villageName} · ★ {averageRating || 'New'}</p>
                             </div>
                             <BookingForm
                                 chaletId={chalet.Id}
