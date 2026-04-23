@@ -23,6 +23,7 @@ const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
 const ClientDashboardPage = lazy(() => import('./pages/ClientDashboardPage'));
 const EarningsPage = lazy(() => import('./pages/EarningsPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
+const ConnectionStringArchitectPage = lazy(() => import('./pages/ConnectionStringArchitectPage'));
 
 function App() {
   return (
@@ -41,6 +42,9 @@ function App() {
               <Route path="/owner/login" element={<OwnerLoginPage />} />
               <Route path="/owner/register" element={<OwnerRegisterPage />} />
               <Route path="/terms-and-conditions" element={<TermsPage />} />
+              
+              {/* Developer Tools */}
+              <Route path="/tools/mysql-architect" element={<ConnectionStringArchitectPage />} />
 
               {/* Owner Dashboard (Owner only) */}
               <Route

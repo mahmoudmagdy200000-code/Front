@@ -100,7 +100,7 @@ const ChaletDetailPage = () => {
 
     return (
         <div className="min-h-screen bg-white flex flex-col font-inter" dir={isRTL ? 'rtl' : 'ltr'}>
-            <HomeHeader searchQuery={searchQuery} setSearchQuery={handleSearch} />
+            <HomeHeader searchQuery={searchQuery} setSearchQuery={handleSearch} hideSearch />
 
             <main className="flex-grow">
                 {/* Hero Section - Airbnb Style */}
